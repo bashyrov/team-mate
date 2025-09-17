@@ -9,8 +9,8 @@
 {% endfor %}
 </p>
 
-<a href="{% url 'project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project</a>
-<a href="{% url 'task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
+<a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project</a>
+<a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
 
 <h4>Tasks</h4>
 <table class="table table-striped">
@@ -34,7 +34,7 @@
                 {{ tag.name }}{% if not forloop.last %}, {% endif %}
             {% endfor %}
             </td>
-            <td><a href="{% url 'task_edit' task.pk %}" class="btn btn-sm btn-secondary">Edit</a></td>
+            <td><a href="{% url 'projects:task_edit' task.pk %}" class="btn btn-sm btn-secondary">Edit</a></td>
         </tr>
         {% empty %}
         <tr><td colspan="5">No tasks yet.</td></tr>

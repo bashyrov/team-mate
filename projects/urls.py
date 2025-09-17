@@ -1,17 +1,19 @@
 from django.urls import path
-from . import views
+from projects import views
+
+
+app_name = 'projects'
 
 urlpatterns = [
-    path('', views.home, name='home'),
-    path('my-projects/', views.my_projects, name='my_projects'),
-    path('project/<int:pk>/', views.project_detail, name='project_detail'),
-    path('profile/<int:pk>/', views.profile, name='profile'),
+    path('', views.ProjectListView.as_view(), name='dashboard'),
+    path('projects/', views.ProjectListView.as_view(), name='project-list'),
+    path('my-projects/', views.MyProjectListView.as_view(), name='my_projects'),
+    path('project/<int:pk>/', views.ProjectDetailView.as_view(), name='project_detail'),
+    path('project/create/', views.ProjectCreateView.as_view(), name='project_create'),
+    path('project/<int:pk>/edit/', views.ProjectUpdateView.as_view(), name='project_edit'),
 
-    # CRUD для проектов
-    path('project/create/', views.project_create, name='project_create'),
-    path('project/<int:pk>/edit/', views.project_edit, name='project_edit'),
+    path('profile/<int:pk>/', views.DeveloperDetailView.as_view(), name='profile'),
 
-    # CRUD для задач
-    path('project/<int:project_pk>/task/create/', views.task_create, name='task_create'),
-    path('task/<int:pk>/edit/', views.task_edit, name='task_edit'),
+    path('project/<int:project_pk>/task/create/', views.TaskCreateView.as_view(), name='task_create'),
+    path('task/<int:pk>/edit/', views.TaskUpdateView.as_view(), name='task_edit'),
 ]

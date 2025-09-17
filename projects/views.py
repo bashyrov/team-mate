@@ -7,8 +7,9 @@ from .forms import ProjectForm, TaskForm
 # Список всех проектов
 class ProjectListView(ListView):
     model = Project
-    template_name = 'projects/index.html'
+    template_name = 'projects/project-list.html'
     context_object_name = 'projects'
+
 
 # Мои проекты (пользовательские)
 class MyProjectListView(ListView):
@@ -19,11 +20,13 @@ class MyProjectListView(ListView):
     def get_queryset(self):
         return self.request.user.projects.all()
 
+
 # Детальный вид проекта с задачами
 class ProjectDetailView(DetailView):
     model = Project
     template_name = 'projects/project_detail.html'
     context_object_name = 'project'
+
 
 # Создание проекта
 class ProjectCreateView(CreateView):
@@ -35,17 +38,21 @@ class ProjectCreateView(CreateView):
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
-# Редактирование проекта
+
+# Редактирован
+# ие проекта
 class ProjectUpdateView(UpdateView):
     model = Project
     form_class = ProjectForm
     template_name = 'projects/project_form.html'
+
 
 # Детальный вид разработчика (профиль)
 class DeveloperDetailView(DetailView):
     model = Developer
     template_name = 'projects/profile.html'
     context_object_name = 'developer'
+
 
 # Создание задачи
 class TaskCreateView(CreateView):
@@ -58,8 +65,13 @@ class TaskCreateView(CreateView):
         form.instance.project_id = project_id
         return super().form_valid(form)
 
+
 # Редактирование задачи
 class TaskUpdateView(UpdateView):
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
+
+
+def index(request):
+    return None
