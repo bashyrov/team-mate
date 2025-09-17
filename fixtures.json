@@ -1,0 +1,202 @@
+[
+    {
+        "model": "projects.Developer",
+        "pk": 1,
+        "fields": {
+            "username": "john_doe",
+            "email": "john@example.com",
+            "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+            "position": "backend",
+            "tech_stack": "Python, Django, PostgreSQL"
+        }
+    },
+    {
+        "model": "projects.Developer",
+        "pk": 2,
+        "fields": {
+            "username": "jane_smith",
+            "email": "jane@example.com",
+            "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+            "position": "frontend",
+            "tech_stack": "React, JavaScript, CSS"
+        }
+    },
+    {
+        "model": "projects.Developer",
+        "pk": 3,
+        "fields": {
+            "username": "alice_brown",
+            "email": "alice@example.com",
+            "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+            "position": "qa",
+            "tech_stack": "Selenium, JUnit"
+        }
+    },
+    {
+        "model": "projects.Developer",
+        "pk": 4,
+        "fields": {
+            "username": "bob_jones",
+            "email": "bob@example.com",
+            "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+            "position": "designer",
+            "tech_stack": "Figma, Adobe XD"
+        }
+    },
+    {
+        "model": "projects.Developer",
+        "pk": 5,
+        "fields": {
+            "username": "emma_wilson",
+            "email": "emma@example.com",
+            "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+            "position": "pm",
+            "tech_stack": "Jira, Scrum"
+        }
+    },
+    {
+        "model": "projects.Project",
+        "pk": 1,
+        "fields": {
+            "name": "E-Commerce Platform",
+            "description": "Online shopping platform with payment integration",
+            "owner": 1,
+            "members": [2, 3, 4]
+        }
+    },
+    {
+        "model": "projects.Project",
+        "pk": 2,
+        "fields": {
+            "name": "Task Management App",
+            "description": "App for managing team tasks and workflows",
+            "owner": 5,
+            "members": [1, 2, 3]
+        }
+    },
+    {
+        "model": "projects.Project",
+        "pk": 3,
+        "fields": {
+            "name": "Portfolio Website",
+            "description": "Personal portfolio for showcasing projects",
+            "owner": 2,
+            "members": [4]
+        }
+    },
+    {
+        "model": "projects.Project",
+        "pk": 4,
+        "fields": {
+            "name": "Inventory System",
+            "description": "System for tracking inventory and stock",
+            "owner": 1,
+            "members": [3, 5]
+        }
+    },
+    {
+        "model": "projects.Project",
+        "pk": 5,
+        "fields": {
+            "name": "Blog Platform",
+            "description": "Platform for publishing blog articles",
+            "owner": 2,
+            "members": [1, 4]
+        }
+    },
+    {
+        "model": "projects.Tag",
+        "pk": 1,
+        "fields": {
+            "name": "urgent"
+        }
+    },
+    {
+        "model": "projects.Tag",
+        "pk": 2,
+        "fields": {
+            "name": "bug"
+        }
+    },
+    {
+        "model": "projects.Tag",
+        "pk": 3,
+        "fields": {
+            "name": "feature"
+        }
+    },
+    {
+        "model": "projects.Tag",
+        "pk": 4,
+        "fields": {
+            "name": "frontend"
+        }
+    },
+    {
+        "model": "projects.Tag",
+        "pk": 5,
+        "fields": {
+            "name": "backend"
+        }
+    },
+    {
+        "model": "projects.Task",
+        "pk": 1,
+        "fields": {
+            "title": "Implement user authentication",
+            "description": "Add login and registration functionality",
+            "status": "in_progress",
+            "assignee": 1,
+            "project": 1,
+            "tags": [1, 5]
+        }
+    },
+    {
+        "model": "projects.Task",
+        "pk": 2,
+        "fields": {
+            "title": "Design homepage UI",
+            "description": "Create responsive homepage layout",
+            "status": "todo",
+            "assignee": 4,
+            "project": 1,
+            "tags": [4]
+        }
+    },
+    {
+        "model": "projects.Task",
+        "pk": 3,
+        "fields": {
+            "title": "Fix payment gateway bug",
+            "description": "Resolve issue with payment processing",
+            "status": "done",
+            "assignee": 3,
+            "project": 1,
+            "tags": [2, 1]
+        }
+    },
+    {
+        "model": "projects.Task",
+        "pk": 4,
+        "fields": {
+            "title": "Add task filtering",
+            "description": "Implement task filtering by status",
+            "status": "in_progress",
+            "assignee": 2,
+            "project": 2,
+            "tags": [3, 4]
+        }
+    },
+    {
+        "model": "projects.Task",
+        "pk": 5,
+        "fields": {
+            "title": "Set up database schema",
+            "description": "Create database tables for inventory",
+            "status": "done",
+            "assignee": 1,
+            "project": 4,
+            "tags": [5]
+        }
+    }
+]
