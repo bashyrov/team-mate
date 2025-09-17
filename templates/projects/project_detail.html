@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
+{% if task %}
 <h2>{{ project.name }}</h2>
 <p>{{ project.description }}</p>
 <p>Owner: {{ project.owner.username }}</p>
-<p>Links:</p>
+<p>Links: {{ project.project_url }}</p>
+<p>Created at: {{ project.created_at }}</p>
 <p>Members:
 {% for member in project.members.all %}
   {{ member.username }}{% if not forloop.last %}, {% endif %}
@@ -35,11 +37,17 @@
                 {{ tag.name }}{% if not forloop.last %}, {% endif %}
             {% endfor %}
             </td>
-            <td><a href="{% url 'projects:task_edit' task.pk %}" class="btn btn-sm btn-secondary">Edit</a></td>
+            <td>
+              <a href="{% url 'projects:task_edit' task.pk %}" class="btn btn-sm btn-secondary">Edit</a>
+              <a href="{% url 'projects:task_detail' task.pk %}" class="btn btn-sm btn-secondary">See</a>
+            </td>
         </tr>
         {% empty %}
         <tr><td colspan="5">No tasks yet.</td></tr>
         {% endfor %}
     </tbody>
 </table>
+{% else %}
+  <p>We dont find this project</p>
+{% endif %}
 {% endblock %}

@@ -6,8 +6,8 @@
     {% for project in projects %}
     <li class="list-group-item">
         <a href="{% url 'projects:project_detail' project.pk %}">{{ project.name }}</a>
+          <p>Score: {{ project.score }}</p>
     </li>
-      <p>Score: {{ project.score }}</p>
     {% empty %}
     <li class="list-group-item">No projects yet.</li>
     {% endfor %}

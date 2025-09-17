@@ -8,11 +8,11 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
   <div class="container">
-    <a class="navbar-brand" href="{% url 'projects:project-list' %}">Team Mate</a>
+    <a class="navbar-brand" href="{% url 'projects:project_list' %}">Team Mate</a>
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'projects:project-list' %}">Projects</a>
+          <a class="nav-link" href="{% url 'projects:project_list' %}">Projects</a>
         </li>
         {% if user.is_authenticated %}
         <li class="nav-item">
