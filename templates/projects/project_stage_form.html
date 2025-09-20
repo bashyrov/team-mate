@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Update Development Stage</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+
+    <div class="mb-3">
+        {{ form.development_stage.label_tag }}
+        {{ form.development_stage }}
+        {% if form.development_stage.errors %}
+            <div class="text-danger">{{ form.development_stage.errors }}</div>
+        {% endif %}
+    </div>
+
+    <div class="mb-3">
+        {{ form.deploy_url.label_tag }}
+        {{ form.deploy_url }}
+        {% if form.deploy_url.errors %}
+            <div class="text-danger">{{ form.deploy_url.errors }}</div>
+        {% endif %}
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+{% endblock %}

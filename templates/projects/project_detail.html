@@ -24,13 +24,15 @@
 
 <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project Info</a>
 <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-warning mb-3">Edit Roles</a>
-<a href="{% url 'projects:project_edit_stage' project.pk %}" class="btn btn-info mb-3">Edit Development Stage</a>
 <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
+<a href="{% url 'projects:project_edit_stage' project.pk%}" class="btn btn-secondary mb-3">Update Stage</a>
 
 
 
 {% if current_membership and current_membership.role in "LEAD,PM,Mentor" %}
-
+  <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project Info</a>
+  <a href="{% url 'projects:project_edit_stage' project.pk%}">Update Stage</a>
+  <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
 {% endif %}
 
 <hr>
