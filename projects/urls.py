@@ -12,9 +12,8 @@ urlpatterns = [
     path('project/create/', views.ProjectCreateView.as_view(), name='project_create'),
     path('project/<int:pk>/edit/', views.ProjectUpdateView.as_view(), name='project_edit'),
     path('project/<int:pk>/roles/edit/', views.ProjectRolesUpdateView.as_view(), name='project_edit_roles'),
-
+    path('project/<int:pk>/stage/edit/', views.ProjectStageUpdateView.as_view(), name='project_edit_stage'),
     path('profile/<int:pk>/', views.DeveloperDetailView.as_view(), name='profile'),
-
     path('project/<int:project_pk>/task/create/', views.TaskCreateView.as_view(), name='task_create'),
     path('task/<int:pk>/edit/', views.TaskUpdateView.as_view(), name='task_edit'),
     path('task/<int:pk>/', views.TaskDetailView.as_view(), name='task_detail'),

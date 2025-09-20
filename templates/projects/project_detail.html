@@ -3,8 +3,12 @@
 {% if project %}
 <h2>{{ project.name }}</h2>
 <p>{{ project.description }}</p>
+<p><strong>Stage:</strong> {{ project.development_stage }}</p>
 <p><strong>Owner:</strong> {{ project.owner.username }}</p>
 <p><strong>Links:</strong> {{ project.project_url }}</p>
+{% if project.deploy_url %}
+  <p><strong>Deploy:</strong> {{ project.deploy_url }}</p>
+{% endif %}
 <p><strong>Created at:</strong> {{ project.created_at }}</p>
 
 <hr>
@@ -20,10 +24,13 @@
 
 <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project Info</a>
 <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-warning mb-3">Edit Roles</a>
+<a href="{% url 'projects:project_edit_stage' project.pk %}" class="btn btn-info mb-3">Edit Development Stage</a>
+<a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
+
 
 
 {% if current_membership and current_membership.role in "LEAD,PM,Mentor" %}
-  <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
+
 {% endif %}
 
 <hr>

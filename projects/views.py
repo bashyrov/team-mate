@@ -1,7 +1,8 @@
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
 from .models import Project, Task, Developer, ProjectMembership
-from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm
+from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
+    ProjectStageForm
 from django.shortcuts import redirect, get_object_or_404, render
 
 
@@ -87,6 +88,14 @@ class ProjectMembershipUpdateView(UpdateView):
     template_name = 'projects/project_roles_form.html'
     form_class = ProjectMembershipFormUpdate
 
+    def get_success_url(self):
+        return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})
+
+
+class ProjectStageUpdateView(UpdateView):
+    model = Project
+    form_class = ProjectStageForm
+    template_name = 'projects/project_stage_form.html'
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})

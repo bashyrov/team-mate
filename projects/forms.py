@@ -10,7 +10,31 @@ user_model = get_user_model()
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'development_stage', 'deploy_url', 'project_url']
+
+
+class ProjectStageForm(forms.ModelForm):
+    development_stage = forms.ChoiceField(
+        choices=Project.DEVELOPMENT_STAGE_CHOICES,
+        label="Development Stage"
+    )
+
+    class Meta:
+        model = Project
+        fields = ['development_stage', 'deploy_url']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        stage = cleaned_data.get('development_stage')
+        deploy_url = cleaned_data.get('deploy_url')
+
+        if stage == 'deployed' and not deploy_url:
+            self.add_error(
+                'development_stage',
+                'Cannot set stage to "Deployed" without a deploy URL.'
+            )
+
+        return cleaned_data
 
 
 class ProjectMembershipFormUpdate(forms.ModelForm):

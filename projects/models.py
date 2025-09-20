@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -23,6 +24,15 @@ class Developer(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class ProjectManager(models.Manager):
+    def validate_stage(self, project):
+        if project.development_stage == 'deployed' and not project.deploy_url:
+            raise ValidationError({
+                'stage': 'Cannot set stage to "Deployed" without a deploy URL.'
+            })
+        return True
 
 
 class Project(models.Model):
@@ -51,6 +61,12 @@ class Project(models.Model):
         through="ProjectMembership",
         related_name="projects"
     )
+
+    objects = ProjectManager()
+
+    def save(self, *args, **kwargs):
+        Project.objects.validate_stage(self)
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
