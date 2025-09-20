@@ -1,4 +1,4 @@
-
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils import timezone
@@ -32,10 +32,35 @@ class Project(models.Model):
     project_url = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    members = models.ManyToManyField(Developer, related_name='projects', blank=True)
+    members = models.ManyToManyField(
+        get_user_model(),
+        through="ProjectMembership",
+        related_name="projects"
+    )
 
     def __str__(self):
         return self.name
+
+
+class ProjectMembership(models.Model):
+    ROLE_CHOICES = [
+        ("DEV", "Developer"),
+        ("LEAD", "Team Lead"),
+        ("PM", "Project Manager"),
+        ("Mentor", "Mentor"),
+    ]
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="DEV")
+
+    joined_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("project", "user")
+
+    def __str__(self):
+        return f"{self.user.username} in {self.project.name} as {self.get_role_display()}"
 
 
 class Tag(models.Model):
