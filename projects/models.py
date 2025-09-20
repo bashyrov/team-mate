@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.utils import timezone
 
 
 class Developer(AbstractUser):
+
     POSITION_CHOICES = [
         ('backend', 'Backend'),
         ('frontend', 'Frontend'),
@@ -14,6 +14,7 @@ class Developer(AbstractUser):
         ('mentor', 'Mentor'),
     ]
     position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='backend')
+    score = models.FloatField(default=0)
     tech_stack = models.CharField(max_length=255, blank=True)
     linkedin_url = models.CharField(max_length=255, blank=True)
     portfolio_url = models.CharField(max_length=255, blank=True)
@@ -25,8 +26,21 @@ class Developer(AbstractUser):
 
 
 class Project(models.Model):
+
+    DEVELOPMENT_STAGE_CHOICES = [
+        ('initiation', 'Project Initiation'),
+        ('planning', 'Planning'),
+        ('design', 'Design & Architecture'),
+        ('implementation', 'Implementation / Development'),
+        ('testing', 'Testing & QA'),
+        ('completed', 'Completed'),
+        ('deployed', 'Deployed'),
+    ]
+
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='backend')
+    deploy_url = models.CharField(max_length=255, blank=True)
     owner = models.ForeignKey(Developer, related_name='owned_projects', on_delete=models.CASCADE)
     score = models.FloatField(default=0)
     project_url = models.CharField(max_length=255, blank=True)
