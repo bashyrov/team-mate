@@ -2,10 +2,10 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Avg
 
 
 class Developer(AbstractUser):
-
     POSITION_CHOICES = [
         ('backend', 'Backend'),
         ('frontend', 'Frontend'),
@@ -25,6 +25,11 @@ class Developer(AbstractUser):
     def __str__(self):
         return self.username
 
+    def avg_project_score(self):
+        project_ids = ProjectMembership.objects.filter(user=self).values_list('project_id', flat=True)
+        avg_score = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg']
+        return avg_score or 0
+
 
 class ProjectManager(models.Manager):
     def validate_stage(self, project):
@@ -33,6 +38,7 @@ class ProjectManager(models.Manager):
                 'stage': 'Cannot set stage to "Deployed" without a deploy URL.'
             })
         return True
+
 
 
 class Project(models.Model):

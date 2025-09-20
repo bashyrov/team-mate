@@ -6,7 +6,7 @@ from .models import Project, Task, Developer, ProjectMembership
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm
 from django.shortcuts import redirect, get_object_or_404, render
-
+from django.db.models import Avg
 
 class ProjectListView(ListView):
     model = Project
@@ -166,6 +166,13 @@ class DeveloperDetailView(DetailView):
     model = Developer
     template_name = 'projects/profile.html'
     context_object_name = 'developer'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        developer = self.object
+        context['avg_project_score'] = developer.avg_project_score()
+        return context
+
 
 
 class TaskCreateView(CreateView):
