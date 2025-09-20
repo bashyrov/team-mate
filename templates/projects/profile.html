@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ developer.username }}</h2>
+<p>Position: {{ developer.get_position_display }}</p>
+<p>Tech Stack: {{ developer.tech_stack }}</p>
+<p>Email: {{ developer.email }}</p>
+{% endblock %}
