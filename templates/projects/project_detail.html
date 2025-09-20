@@ -10,13 +10,17 @@
   <p><strong>Deploy:</strong> {{ project.deploy_url }}</p>
 {% endif %}
 <p><strong>Created at:</strong> {{ project.created_at }}</p>
-
+<p><strong>Score:</strong> {{ project.score }}</p>
 <hr>
 
 <h4>Team Members</h4>
 <ul>
   {% for membership in memberships %}
-    <li>{{ membership.user.username }} – {{ membership.get_role_display }}</li>
+    <li>
+      <a href="{% url 'projects:profile' membership.user.pk %}">
+        {{ membership.user.username }}
+      </a> – {{ membership.get_role_display }}
+    </li>
   {% empty %}
     <li>No members yet.</li>
   {% endfor %}
