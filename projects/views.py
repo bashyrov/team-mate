@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
-from .models import Project, Task, Developer, ProjectMembership, ProjectRating
+from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm
 from django.shortcuts import redirect, get_object_or_404, render
@@ -34,7 +34,8 @@ class ProjectDetailView(DetailView):
         return Project.objects.prefetch_related(
             'tasks__assignee',
             'tasks__tags',
-            'projectmembership_set__user'
+            'projectmembership_set__user',
+            'ratings__user'
         )
 
     def get_context_data(self, **kwargs):
@@ -59,17 +60,17 @@ class ProjectDetailView(DetailView):
         if user.is_authenticated:
             is_member = project.projectmembership_set.filter(user=user).exists()
             is_owner = project.owner == user
-            can_rate = not is_member and not is_owner
+            is_rated = ProjectRating.objects.filter(project=project, user=user).exists()
+            can_rate = not is_member and not is_owner and not is_rated
 
         context.update({
             'memberships': memberships,
             'tasks_by_assignee': tasks_by_assignee,
             'current_membership': current_membership,
             'can_rate': can_rate,
+            'ratings': project.ratings.all().order_by('-created_at')
         })
         return context
-
-
 
 
 class TaskDetailView(DetailView):
@@ -137,7 +138,6 @@ class ProjectRatingCreateView(CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
 
-        # запрещаем оценивать свои проекты
         if self.project.members.filter(user=request.user).exists() or self.project.owner == request.user:
             raise PermissionDenied("You cannot rate your own project.")
 
@@ -316,7 +316,7 @@ class LeaderboardView(ListView):
 
     def get_queryset(self):
         return Developer.objects.annotate(
-            avg_score=Avg("projects__ratings__score")
+            avg_score=Avg("received_user_ratings__rating")
         ).order_by("-avg_score")[:10]
 
 def index(request):

@@ -46,12 +46,19 @@ class ProjectManager(models.Manager):
 class ProjectRating(models.Model):
     project = models.ForeignKey('Project', related_name='ratings', on_delete=models.CASCADE)
     user = models.ForeignKey(user_model, on_delete=models.CASCADE)
+    user_added = models.ForeignKey(
+        user_model,
+        on_delete=models.CASCADE,
+        related_name='given_project_ratings'
+    )
     score = models.IntegerField()  # например, 1–5
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    class Meta:
-        unique_together = ('project', 'user')
+    @staticmethod
+    def get_avg_rating(project):
+        return ProjectRating.objects.filter(project=project).aggregate(
+            avg=Avg("score"))["avg"] or 0
 
 
 class Project(models.Model):
@@ -66,11 +73,29 @@ class Project(models.Model):
         ('deployed', 'Deployed'),
     ]
 
+    DOMEN_CHOICES = [
+        ('marketing', 'Marketing'),
+        ('blockchain', 'Blockchain'),
+        ('food_tech', 'Food Tech'),
+        ('technology', 'Technology'),
+        ('e_commerce', 'E-Commerce'),
+        ('ed_tech', 'EdTech'),
+        ('utilities', 'Utilities'),
+        ('design', 'Design'),
+        ('saas', 'SaaS'),
+        ('fintech', 'FinTech'),
+        ('ml', 'Machine Learning'),
+        ('big_data', 'Big Data'),
+    ]
+
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    domen = models.CharField(max_length=50, choices=DOMEN_CHOICES, default='backend')
     development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='backend')
     deploy_url = models.CharField(max_length=255, blank=True)
     owner = models.ForeignKey(Developer, related_name='owned_projects', on_delete=models.CASCADE)
+    open_to_candidates = models.BooleanField(default=True)
+    unical_id = models.CharField(max_length=255, default='unical_id')
     score = models.FloatField(default=0)
     project_url = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -82,6 +107,10 @@ class Project(models.Model):
     )
 
     objects = ProjectManager()
+
+    @property
+    def avg_score(self):
+        return round(ProjectRating.get_avg_rating(self), 2)
 
     def save(self, *args, **kwargs):
         Project.objects.validate_stage(self)
@@ -140,43 +169,26 @@ class Task(models.Model):
         return self.title
 
 
-class ProjectRatings(models.Model):
+class DeveloperRatings(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(
         user_model,
         on_delete=models.CASCADE,
-        related_name='received_project_ratings'
+        related_name='received_user_ratings'
     )
     user_added = models.ForeignKey(
         user_model,
         on_delete=models.CASCADE,
-        related_name='given_project_ratings'
+        related_name='given_user_ratings'
     )
     rating = models.FloatField(default=0)
-    comment = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     @staticmethod
-    def get_avg_rating(project):
-        return ProjectRatings.objects.filter(project=project).aggregate(avg=Avg("rating"))["avg"] or 0
-
-
-class UserRatings(models.Model):
-    class UserRatings(models.Model):
-        project = models.ForeignKey(Project, on_delete=models.CASCADE)
-        user = models.ForeignKey(
-            user_model,
-            on_delete=models.CASCADE,
-            related_name='received_user_ratings'
-        )
-        user_added = models.ForeignKey(
-            user_model,
-            on_delete=models.CASCADE,
-            related_name='given_user_ratings'
-        )
-        rating = models.FloatField(default=0)
-        created_at = models.DateTimeField(auto_now_add=True)
-
-    @staticmethod
     def get_avg_rating(user):
-        return UserRatings.objects.filter(user=user).aggregate(avg=Avg("rating"))["avg"] or 0
+        return DeveloperRatings.objects.filter(user=user).aggregate(avg=Avg("rating"))["avg"] or 0
+
+
+class NewCandidates(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+

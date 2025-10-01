@@ -10,7 +10,7 @@ user_model = get_user_model()
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name', 'description', 'deploy_url', 'project_url']
+        fields = ['name', 'description', 'domen', 'deploy_url', 'project_url']
 
 
 class ProjectStageForm(forms.ModelForm):

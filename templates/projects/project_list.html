@@ -6,10 +6,37 @@
     {% for project in projects %}
     <li class="list-group-item">
         <a href="{% url 'projects:project_detail' project.pk %}">{{ project.name }}</a>
-          <p>Score: {{ project.score }}</p>
+        <p>Score: {{ project.avg_score|floatformat:2|default:"–" }}</p>
     </li>
     {% empty %}
     <li class="list-group-item">No projects yet.</li>
     {% endfor %}
 </ul>
+<hr>
+<h4>Ratings & Comments</h4>
+
+{% if ratings %}
+  <ul class="list-group">
+    {% for rating in ratings %}
+      <li class="list-group-item">
+        <strong>{{ rating.user.username }}</strong> – ⭐ {{ rating.score }}
+        <br>
+        {% if rating.comment %}
+          <em>{{ rating.comment }}</em>
+        {% else %}
+          <em>No comment</em>
+        {% endif %}
+        <br>
+        <small>{{ rating.created_at|date:"Y-m-d H:i" }}</small>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No ratings yet.</p>
+{% endif %}
+
+{% if can_rate %}
+  <a href="{% url 'projects:project_add_rating' project.pk %}" class="btn btn-primary mt-3">Add Rating</a>
+{% endif %}
+
 {% endblock %}
