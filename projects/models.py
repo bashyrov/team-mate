@@ -7,6 +7,7 @@ from django.db.models import Avg
 
 user_model = settings.AUTH_USER_MODEL
 
+
 class Developer(AbstractUser):
     POSITION_CHOICES = [
         ('backend', 'Backend'),
@@ -137,3 +138,45 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class ProjectRatings(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        user_model,
+        on_delete=models.CASCADE,
+        related_name='received_project_ratings'
+    )
+    user_added = models.ForeignKey(
+        user_model,
+        on_delete=models.CASCADE,
+        related_name='given_project_ratings'
+    )
+    rating = models.FloatField(default=0)
+    comment = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def get_avg_rating(project):
+        return ProjectRatings.objects.filter(project=project).aggregate(avg=Avg("rating"))["avg"] or 0
+
+
+class UserRatings(models.Model):
+    class UserRatings(models.Model):
+        project = models.ForeignKey(Project, on_delete=models.CASCADE)
+        user = models.ForeignKey(
+            user_model,
+            on_delete=models.CASCADE,
+            related_name='received_user_ratings'
+        )
+        user_added = models.ForeignKey(
+            user_model,
+            on_delete=models.CASCADE,
+            related_name='given_user_ratings'
+        )
+        rating = models.FloatField(default=0)
+        created_at = models.DateTimeField(auto_now_add=True)
+
+    @staticmethod
+    def get_avg_rating(user):
+        return UserRatings.objects.filter(user=user).aggregate(avg=Avg("rating"))["avg"] or 0
