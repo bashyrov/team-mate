@@ -9,6 +9,7 @@ user_model = settings.AUTH_USER_MODEL
 
 
 class Developer(AbstractUser):
+
     POSITION_CHOICES = [
         ('backend', 'Backend'),
         ('frontend', 'Frontend'),
@@ -17,6 +18,7 @@ class Developer(AbstractUser):
         ('pm', 'PM'),
         ('mentor', 'Mentor'),
     ]
+
     position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='backend')
     score = models.FloatField(default=0)
     tech_stack = models.CharField(max_length=255, blank=True)
@@ -121,6 +123,7 @@ class Project(models.Model):
 
 
 class ProjectMembership(models.Model):
+
     ROLE_CHOICES = [
         ("DEV", "Developer"),
         ("LEAD", "Team Lead"),
@@ -191,4 +194,7 @@ class DeveloperRatings(models.Model):
 
 class NewCandidates(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-
+    user = models.ForeignKey(user_model, on_delete=models.CASCADE)
+    message = models.TextField(blank=True)
+    role = models.CharField(max_length=10, choices=ProjectMembership.ROLE_CHOICES, default="DEV")
+    created_at = models.DateTimeField(auto_now_add=True)
