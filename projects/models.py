@@ -192,7 +192,15 @@ class DeveloperRatings(models.Model):
         return DeveloperRatings.objects.filter(user=user).aggregate(avg=Avg("rating"))["avg"] or 0
 
 
-class NewCandidates(models.Model):
+class ProjectOpenRole(models.Model):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="open_roles")
+    role_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.project.name} - {self.role_name}"
+
+
+class ProjectApplication(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(user_model, on_delete=models.CASCADE)
     message = models.TextField(blank=True)
