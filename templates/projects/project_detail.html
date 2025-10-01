@@ -67,6 +67,21 @@
     <li>No tasks yet.</li>
   {% endfor %}
 </ul>
+<h3>Ratings:</h3>
+<ul>
+  {% for rating in project.ratings.all %}
+    <li>{{ rating.user.username }} – Score: {{ rating.score }}
+        {% if rating.comment %}- Comment: {{ rating.comment }}{% endif %}
+    </li>
+  {% empty %}
+    <li>No ratings yet.</li>
+  {% endfor %}
+</ul>
+
+{% if can_rate %}
+  <a href="{% url 'projects:project_rate' project.pk %}" class="btn btn-primary">Rate this project</a>
+{% endif %}
+
 
 {% else %}
   <p>We don’t find this project</p>

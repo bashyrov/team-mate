@@ -6,4 +6,18 @@
 <p>Email: {{ developer.email }}</p>
 <p>Avg. rating: {{ developer.score }}</p>
 <p>Avg. projects rating: {{ avg_project_score }}</p>
+
+<hr>
+<h3>Projects participated in:</h3>
+<ul>
+  {% for project in projects %}
+    <li>
+      <a href="{% url 'projects:project_detail' project.pk %}">{{ project.name }}</a>
+      – Stage: {{ project.development_stage }}
+      – Score: {{ project.score }}
+    </li>
+  {% empty %}
+    <li>No projects yet.</li>
+  {% endfor %}
+</ul>
 {% endblock %}

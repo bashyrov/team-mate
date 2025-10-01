@@ -2,9 +2,9 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
-from .models import Project, Task, Developer, ProjectMembership
+from .models import Project, Task, Developer, ProjectMembership, ProjectRating
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
-    ProjectStageForm
+    ProjectStageForm, ProjectRatingForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db.models import Avg
 
@@ -51,12 +51,23 @@ class ProjectDetailView(DetailView):
             None
         )
 
+        user = self.request.user
+        can_rate = False
+
+        if user.is_authenticated:
+            is_member = project.projectmembership_set.filter(user=user).exists()
+            is_owner = project.owner == user
+            can_rate = not is_member and not is_owner
+
         context.update({
             'memberships': memberships,
             'tasks_by_assignee': tasks_by_assignee,
-            'current_membership': current_membership
+            'current_membership': current_membership,
+            'can_rate': can_rate,
         })
         return context
+
+
 
 
 class TaskDetailView(DetailView):
@@ -116,6 +127,29 @@ class ProjectStageUpdateView(UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})
 
 
+class ProjectRatingCreateView(CreateView):
+    model = ProjectRating
+    form_class = ProjectRatingForm
+    template_name = 'projects/project_rating_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+
+        # запрещаем оценивать свои проекты
+        if self.project.members.filter(user=request.user).exists() or self.project.owner == request.user:
+            raise PermissionDenied("You cannot rate your own project.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.project = self.project
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('projects:project_detail', kwargs={'pk': self.project.pk})
+
+
 class ProjectRolesUpdateView(UpdateView):
     model = Project
     template_name = 'projects/project_roles_form.html'
@@ -170,9 +204,14 @@ class DeveloperDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         developer = self.object
-        context['avg_project_score'] = developer.avg_project_score()
-        return context
 
+        # Средняя оценка проектов
+        project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
+        context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
+
+        # Список проектов пользователя
+        context['projects'] = Project.objects.filter(id__in=project_ids)
+        return context
 
 
 class TaskCreateView(CreateView):
@@ -263,15 +302,6 @@ class TaskUpdateView(UpdateView):
                 raise PermissionDenied("Assignee must be a member of this project.")
 
         return super().form_valid(form)
-
-
-    def get_form(self, *args, **kwargs):
-        form = super().get_form(*args, **kwargs)
-        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
-        form.fields['assignee'].queryset = get_user_model().objects.filter(
-            projectmembership__project=project
-        )
-        return form
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.kwargs['project_pk']})

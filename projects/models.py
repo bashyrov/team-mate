@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
+from team_mate import settings
 from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Avg
 
+user_model = settings.AUTH_USER_MODEL
 
 class Developer(AbstractUser):
     POSITION_CHOICES = [
@@ -39,6 +41,16 @@ class ProjectManager(models.Manager):
             })
         return True
 
+
+class ProjectRating(models.Model):
+    project = models.ForeignKey('Project', related_name='ratings', on_delete=models.CASCADE)
+    user = models.ForeignKey(user_model, on_delete=models.CASCADE)
+    score = models.IntegerField()  # например, 1–5
+    comment = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('project', 'user')
 
 
 class Project(models.Model):
@@ -87,7 +99,7 @@ class ProjectMembership(models.Model):
     ]
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE)
+    user = models.ForeignKey(user_model, on_delete=models.CASCADE)
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="DEV")
 
     joined_at = models.DateTimeField(auto_now_add=True)
@@ -115,8 +127,8 @@ class Task(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='todo')
-    assignee = models.ForeignKey(Developer, related_name='assigned_tasks', on_delete=models.SET_NULL, null=True, blank=True)
-    created_by = models.ForeignKey(Developer, related_name='created_tasks', on_delete=models.SET_NULL, null=True, blank=True)
+    assignee = models.ForeignKey(user_model, related_name='assigned_tasks', on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(user_model, related_name='created_tasks', on_delete=models.SET_NULL, null=True, blank=True)
     deadline = models.DateTimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

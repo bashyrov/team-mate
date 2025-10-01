@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.forms import inlineformset_factory
-from .models import Project, ProjectMembership, Task
+from .models import Project, ProjectMembership, Task, ProjectRating
 
 
 user_model = get_user_model()
@@ -41,6 +41,16 @@ class ProjectMembershipFormUpdate(forms.ModelForm):
     class Meta:
         model = Project
         fields = '__all__'
+
+
+class ProjectRatingForm(forms.ModelForm):
+    class Meta:
+        model = ProjectRating
+        fields = ['score', 'comment']
+        widgets = {
+            'score': forms.NumberInput(attrs={'min': 1, 'max': 5}),
+            'comment': forms.Textarea(attrs={'rows': 3}),
+        }
 
 
 class TaskForm(forms.ModelForm):
