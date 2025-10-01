@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>🏆 Leaderboard</h2>
+<table>
+    <tr>
+        <th>Rank</th>
+        <th>Developer</th>
+        <th>Position</th>
+        <th>Avg. Project Score</th>
+    </tr>
+    {% for dev in developers %}
+    <tr>
+        <td>{{ forloop.counter }}</td>
+        <td><a href="{% url 'projects:profile' dev.pk %}">{{ dev.username }}</a></td>
+        <td>{{ dev.get_position_display }}</td>
+        <td>{{ dev.avg_score|default:"–" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

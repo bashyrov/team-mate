@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
@@ -7,6 +8,7 @@ from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembe
     ProjectStageForm, ProjectRatingForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db.models import Avg
+
 
 class ProjectListView(ListView):
     model = Project
@@ -306,6 +308,16 @@ class TaskUpdateView(UpdateView):
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.kwargs['project_pk']})
 
+
+class LeaderboardView(ListView):
+    model = Developer
+    template_name = "projects/leaderboard.html"
+    context_object_name = "developers"
+
+    def get_queryset(self):
+        return Developer.objects.annotate(
+            avg_score=Avg("projects__ratings__score")
+        ).order_by("-avg_score")[:10]
 
 def index(request):
     return None
