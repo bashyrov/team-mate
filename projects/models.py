@@ -53,7 +53,7 @@ class ProjectRating(models.Model):
         on_delete=models.CASCADE,
         related_name='given_project_ratings'
     )
-    score = models.IntegerField()  # например, 1–5
+    score = models.IntegerField()
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

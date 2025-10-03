@@ -1,11 +1,12 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
-from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings
+from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
-    ProjectStageForm, ProjectRatingForm
+    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db.models import Avg
 
@@ -55,19 +56,22 @@ class ProjectDetailView(DetailView):
         )
 
         user = self.request.user
-        can_rate = False
+        can_rate = True
+        can_applicate = True
 
         if user.is_authenticated:
             is_member = project.projectmembership_set.filter(user=user).exists()
             is_owner = project.owner == user
             is_rated = ProjectRating.objects.filter(project=project, user=user).exists()
             can_rate = not is_member and not is_owner and not is_rated
+            can_applicate = not is_member and not is_owner
 
         context.update({
             'memberships': memberships,
             'tasks_by_assignee': tasks_by_assignee,
             'current_membership': current_membership,
             'can_rate': can_rate,
+            'can_applicate': can_applicate,
             'ratings': project.ratings.all().order_by('-created_at')
         })
         return context
@@ -138,7 +142,15 @@ class ProjectRatingCreateView(CreateView):
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
 
-        if self.project.members.filter(user=request.user).exists() or self.project.owner == request.user:
+        if not request.user.is_authenticated:
+            return HttpResponse("""
+                <div class='alert alert-warning'>
+                    You need to be logged in to perform this action.
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Войти</a>
+                </div>
+            """)
+
+        if self.project.members.filter(id=request.user.id).exists() or self.project.owner == request.user:
             raise PermissionDenied("You cannot rate your own project.")
 
         return super().dispatch(request, *args, **kwargs)
@@ -146,7 +158,8 @@ class ProjectRatingCreateView(CreateView):
     def form_valid(self, form):
         form.instance.project = self.project
         form.instance.user = self.request.user
-        return super().form_valid(form)
+        form.save()
+        return HttpResponse(status=204)
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.project.pk})
@@ -207,11 +220,9 @@ class DeveloperDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         developer = self.object
 
-        # Средняя оценка проектов
         project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
         context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
 
-        # Список проектов пользователя
         context['projects'] = Project.objects.filter(id__in=project_ids)
         return context
 
@@ -318,6 +329,38 @@ class LeaderboardView(ListView):
         return Developer.objects.annotate(
             avg_score=Avg("received_user_ratings__rating")
         ).order_by("-avg_score")[:10]
+
+
+class ProjectApplicationCreateView(CreateView):
+    model = ProjectApplication
+    form_class = ProjectApplicationForm
+    template_name = "projects/project_application_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
+
+        if not request.user.is_authenticated:
+            return HttpResponse("""
+                <div class='alert alert-warning'>
+                    You need to be logged in to perform this action.
+                    <a href="{% url 'login' %}?next={request.path}" class="btn btn-primary">Войти</a>
+                </div>
+            """)
+
+        if self.project.members.filter(id=request.user.id).exists() or self.project.owner == request.user:
+            raise PermissionDenied("You cannot apply to your own project.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.project_id = self.kwargs["pk"]
+        form.instance.user = self.request.user
+        form.save()
+        return HttpResponse(status=204)
+
+    def get_success_url(self):
+        return reverse_lazy("projects:project_detail", kwargs={"pk": self.project.pk})
+
 
 def index(request):
     return None

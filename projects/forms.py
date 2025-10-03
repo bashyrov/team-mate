@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.forms import inlineformset_factory
-from .models import Project, ProjectMembership, Task, ProjectRating
+from .models import Project, ProjectMembership, Task, ProjectRating, ProjectApplication
 
 
 user_model = get_user_model()
@@ -57,6 +57,12 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'status', 'assignee', 'tags']
+
+
+class ProjectApplicationForm(forms.ModelForm):
+    class Meta:
+        model = ProjectApplication
+        fields = ["role", "message"]
 
 
 class ProjectMembershipForm(forms.ModelForm):
