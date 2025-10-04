@@ -1,8 +1,9 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
 from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication, \
     ProjectOpenRole
@@ -155,6 +156,13 @@ class ProjectOpenRoleListView(ListView):
     paginate_by = 10
     template_name = "projects/project_open_roles_list.html"
     context_object_name = 'open_roles'
+    success_url = reverse_lazy('projects:open_roles_list')
+
+    def post(self, request, pk):
+        task = get_object_or_404(Task, pk=pk)
+
+        task.delete()
+        return JsonResponse({"status": "deleted"})
 
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
@@ -162,6 +170,24 @@ class ProjectOpenRoleListView(ListView):
 
     def get_queryset(self):
         return self.project.open_roles.all()
+
+    def get_context_data(self, **kwargs):
+        open_roles = self.project.open_roles.all()
+        project = Project.objects.get(pk=self.kwargs['pk'])
+
+        return {
+            'open_roles': open_roles,
+            'project': project,
+        }
+
+
+class ProjectOpenRoleDeleteView(View):
+    def post(self, request, project_pk, role_pk):
+        project = get_object_or_404(Project, pk=project_pk)
+        role = get_object_or_404(ProjectOpenRole, pk=role_pk, project=project)
+
+        role.delete()
+        return JsonResponse({"status": "deleted"})
 
 
 class TaskListView(ListView):
