@@ -61,6 +61,8 @@ class ProjectDetailView(DetailView):
         user = self.request.user
         can_rate = True
         can_applicate = True
+        is_deployed = True if project.development_stage == "deployed" else False
+        open_roles = project.open_roles.all()
 
         if user.is_authenticated:
             is_member = project.projectmembership_set.filter(user=user).exists()
@@ -72,13 +74,27 @@ class ProjectDetailView(DetailView):
         context.update({
             'memberships': memberships,
             'tasks': tasks,
+            'open_roles': open_roles,
             'tasks_by_assignee': tasks_by_assignee,
             'current_membership': current_membership,
             'can_rate': can_rate,
+            'is_deployed': is_deployed,
             'can_applicate': can_applicate,
             'ratings': project.ratings.all().order_by('-created_at')
         })
         return context
+
+
+class TaskListView(ListView):
+    model = Task
+    template_name = "projects/task_list.html"
+    context_object_name = "tasks"
+
+    def get_queryset(self):
+        project_id = self.kwargs.get("project_id")
+        return (
+            Task.objects.filter(project_id=project_id)
+        )
 
 
 class TaskDetailView(DetailView):
