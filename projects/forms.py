@@ -8,27 +8,42 @@ user_model = get_user_model()
 
 
 class ProjectSearchForm(forms.Form):
-    name = forms.CharField(max_length=255,
-                           required=False,
-                           label='',
-                           widget=forms.TextInput(attrs=
-                                                  {
-                                                      'class': 'form-control',
-                                                      'placeholder': 'Project Name',
-                                                  }))
+    project_name = forms.CharField(max_length=255,
+                                   required=False,
+                                   label='',
+                                   widget=forms.TextInput(attrs=
+                                                          {
+                                      'class': 'form-control',
+                                      'placeholder': 'Project Name',
+                                  }))
     development_stage = forms.ChoiceField(
         choices=[('', 'Select stage')] + list(Project.DEVELOPMENT_STAGE_CHOICES),
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control'})
+        label='',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px;'
+        })
     )
 
     domain = forms.ChoiceField(
         choices=[('', 'Select domain')] + list(Project.DOMEN_CHOICES),
         required=False,
-        widget=forms.Select(attrs={'class': 'form-control'})
+        label='',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px;'
+        })
     )
 
-    open_to_candidates = forms.BooleanField(required=False)
+    open_to_candidates = forms.BooleanField(
+        required=False,
+        label='Open to candidates',
+        widget=forms.CheckboxInput(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px; height:30px; width:30px;',
+        })
+    )
 
 
 class ProjectForm(forms.ModelForm):

@@ -20,26 +20,40 @@ class ProjectListView(ListView):
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(ProjectListView, self).get_context_data(**kwargs)
 
-        context["search_form"] = ProjectSearchForm()
+        project_name = self.request.GET.get('project_name', '')
+        development_stage = self.request.GET.get('development_stage', '')
+        domain = self.request.GET.get('domain', '')
+        open_to_candidates = self.request.GET.get('open_to_candidates', '')
+
+        context["search_form"] = ProjectSearchForm(
+            initial={'project_name': project_name,
+                     'development_stage': development_stage,
+                     'domain': domain,
+                     'open_to_candidates': open_to_candidates
+                     }
+        )
         return context
 
     def get_queryset(self):
 
         qs = Project.objects.all()
 
-        project_name = self.request.GET.get('name')
-        development_stage = self.request.GET.get('development_stage')
-        domain = self.request.GET.get('domain')
-        open_to_candidates = self.request.GET.get('open_to_candidates')
+        form = ProjectSearchForm(self.request.GET)
 
-        if project_name:
-            qs = qs.filter(name__icontains=project_name)
-        if development_stage:
-            qs = qs.filter(development_stage=development_stage)
-        if domain:
-            qs = qs.filter(domain=domain)
-        if open_to_candidates == 'on':
-            qs = qs.filter(open_to_candidates=True)
+        if form.is_valid():
+            project_name = form.cleaned_data.get('project_name')
+            development_stage = form.cleaned_data.get('development_stage')
+            domain = form.cleaned_data.get('domain')
+            open_to_candidates = form.cleaned_data.get('open_to_candidates')
+
+            if project_name:
+                qs = qs.filter(name__icontains=project_name)
+            if development_stage:
+                qs = qs.filter(development_stage=development_stage)
+            if domain:
+                qs = qs.filter(domain=domain)
+            if open_to_candidates == 'on':
+                qs = qs.filter(open_to_candidates=True)
 
         return qs
 
