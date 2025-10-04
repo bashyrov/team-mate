@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
 from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication
@@ -154,8 +154,14 @@ class ProjectRatingCreateView(CreateView):
                 </div>
             """)
 
+        if self.project.development_stage != 'deployed':
+            return HttpResponse(
+                "<div class='alert alert-warning'>You can only rate deployed projects.</div>"
+            )
         if self.project.members.filter(id=request.user.id).exists() or self.project.owner == request.user:
-            raise PermissionDenied("You cannot rate your own project.")
+            return HttpResponse(
+                "<div class='alert alert-warning'>You can only rate deployed projects.</div>"
+            )
 
         return super().dispatch(request, *args, **kwargs)
 

@@ -35,6 +35,9 @@
   <div class="bg-body-tertiary border rounded-3" style="padding: 15px">
     {% if  tasks %}
       <h4>Tasks grouped by Assignee</h4>
+      {% if tasks.count > 5 %}
+        <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Check All Tasks</a>
+      {% endif %}
       <ul style="padding-top: 10px;">
         {% for task in tasks %}
           {% include "includes/task-card.html" %}
