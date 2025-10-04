@@ -1,7 +1,7 @@
 <li class="list-group-item" style="margin: 3px;">
 <div class="card">
   <div class="card-header" style="position: relative;">
-    {{ project.domen }}
+    {{ project.domain }}
     {% if project.development_stage == 'deployed' %}
       <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: red; border-radius: 50%;"></span>
     {% elif project.development_stage == 'testing' %}

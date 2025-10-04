@@ -6,7 +6,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
 from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
-    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm
+    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db.models import Avg
 
@@ -16,6 +16,32 @@ class ProjectListView(ListView):
     template_name = 'projects/project_list.html'
     context_object_name = 'projects'
     paginate_by = 10
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ProjectListView, self).get_context_data(**kwargs)
+
+        context["search_form"] = ProjectSearchForm()
+        return context
+
+    def get_queryset(self):
+
+        qs = Project.objects.all()
+
+        project_name = self.request.GET.get('name')
+        development_stage = self.request.GET.get('development_stage')
+        domain = self.request.GET.get('domain')
+        open_to_candidates = self.request.GET.get('open_to_candidates')
+
+        if project_name:
+            qs = qs.filter(name__icontains=project_name)
+        if development_stage:
+            qs = qs.filter(development_stage=development_stage)
+        if domain:
+            qs = qs.filter(domain=domain)
+        if open_to_candidates == 'on':
+            qs = qs.filter(open_to_candidates=True)
+
+        return qs
 
 
 class MyProjectListView(ListView):

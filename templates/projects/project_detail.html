@@ -41,8 +41,6 @@
       <ul style="padding-top: 10px;">
         {% for task in tasks %}
           {% include "includes/task-card.html" %}
-        {% empty %}
-          <li>No tasks yet.</li>
         {% endfor %}
       </ul>
     {% else %}

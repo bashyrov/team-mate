@@ -91,7 +91,7 @@ class Project(models.Model):
 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    domen = models.CharField(max_length=50, choices=DOMEN_CHOICES, default='backend')
+    domain = models.CharField(max_length=50, choices=DOMEN_CHOICES, default='backend')
     development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='backend')
     deploy_url = models.CharField(max_length=255, blank=True)
     owner = models.ForeignKey(Developer, related_name='owned_projects', on_delete=models.CASCADE)

@@ -7,10 +7,34 @@ from .models import Project, ProjectMembership, Task, ProjectRating, ProjectAppl
 user_model = get_user_model()
 
 
+class ProjectSearchForm(forms.Form):
+    name = forms.CharField(max_length=255,
+                           required=False,
+                           label='',
+                           widget=forms.TextInput(attrs=
+                                                  {
+                                                      'class': 'form-control',
+                                                      'placeholder': 'Project Name',
+                                                  }))
+    development_stage = forms.ChoiceField(
+        choices=[('', 'Select stage')] + list(Project.DEVELOPMENT_STAGE_CHOICES),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    domain = forms.ChoiceField(
+        choices=[('', 'Select domain')] + list(Project.DOMEN_CHOICES),
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
+    open_to_candidates = forms.BooleanField(required=False)
+
+
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name', 'description', 'domen', 'deploy_url', 'project_url']
+        fields = ['name', 'description', 'domain', 'deploy_url', 'project_url']
 
 
 class ProjectStageForm(forms.ModelForm):
