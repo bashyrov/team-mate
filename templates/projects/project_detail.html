@@ -19,8 +19,10 @@
       <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-warning mb-3">Edit Roles</a>
       <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
       <a href="{% url 'projects:project_edit_stage' project.pk%}" class="btn btn-secondary mb-3">Update Stage</a>
+      <a href="{% url 'projects:project_open_roles_create' project.pk%}" class="btn btn-secondary mb-3">Manage Open Roles</a>
 
       <h4>Team Members</h4>
+      {% if memberships %}
       <ul>
         {% for membership in memberships %}
           <li>
@@ -32,6 +34,9 @@
           <li>No members yet.</li>
         {% endfor %}
       </ul>
+      {% else %}
+        <p>No team mates yet.</p>
+      {% endif %}
   </div>
   <div class="bg-body-tertiary border rounded-3" style="padding: 15px">
     {% if  tasks %}
@@ -58,9 +63,7 @@
       {% include "includes/rate-project.html" %}
     </div>
   </div>
-{% endif %}
-
-{% if ratings %}
+{% elif ratings %}
 <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px; margin-top: 15px;">
   <h3>Ratings:</h3>
   {% include "includes/rate-project.html" %}
@@ -86,9 +89,6 @@
     </div>
   </div>
 </div>
-
-<hr>
-
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content" id="rating-dialog">

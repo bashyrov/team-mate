@@ -194,6 +194,8 @@ class DeveloperRatings(models.Model):
 class ProjectOpenRole(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="open_roles")
     role_name = models.CharField(max_length=100)
+    message = models.TextField(blank=True, max_length=500)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.project.name} - {self.role_name}"

@@ -1,8 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.forms import inlineformset_factory
-from .models import Project, ProjectMembership, Task, ProjectRating, ProjectApplication
-
+from .models import Project, ProjectMembership, Task, ProjectRating, ProjectApplication, ProjectOpenRole
 
 user_model = get_user_model()
 
@@ -96,6 +95,22 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'status', 'assignee', 'tags']
+
+
+class ProjectOpenRoleForm(forms.ModelForm):
+    role_name = forms.ChoiceField(
+        choices=[('', 'Select domain')] + list(ProjectMembership.ROLE_CHOICES),
+        required=True,
+        label='',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px;'
+        })
+    )
+
+    class Meta:
+        model = ProjectOpenRole
+        fields = ["role_name", "message"]
 
 
 class ProjectApplicationForm(forms.ModelForm):

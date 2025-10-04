@@ -4,9 +4,10 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
-from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication
+from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication, \
+    ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
-    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm
+    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db.models import Avg
 
@@ -125,6 +126,26 @@ class ProjectDetailView(DetailView):
         return context
 
 
+class ProjectOpenRoleCreateView(CreateView):
+    model = ProjectOpenRole
+    form_class = ProjectOpenRoleForm
+    template_name = "projects/open_roles_form.html"
+    success_url = reverse_lazy('projects:project_detail', )
+
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.project = self.project
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('projects:project_detail', kwargs={'pk': self.project.pk})
+
+
+
 class TaskListView(ListView):
     model = Task
     template_name = "projects/task_list.html"
@@ -177,7 +198,6 @@ class ProjectStageUpdateView(UpdateView):
     template_name = 'projects/project_stage_form.html'
 
     def dispatch(self, request, *args, **kwargs):
-        project = self.get_object()
         user = request.user
 
         allowed_roles = ['pm', 'mentor', 'lead']
@@ -200,6 +220,7 @@ class ProjectRatingCreateView(CreateView):
     template_name = 'projects/project_rating_form.html'
 
     def dispatch(self, request, *args, **kwargs):
+
         self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
 
         if not request.user.is_authenticated:
@@ -214,6 +235,7 @@ class ProjectRatingCreateView(CreateView):
             return HttpResponse(
                 "<div class='alert alert-warning'>You can only rate deployed projects.</div>"
             )
+
         if self.project.members.filter(id=request.user.id).exists() or self.project.owner == request.user:
             return HttpResponse(
                 "<div class='alert alert-warning'>You can only rate deployed projects.</div>"

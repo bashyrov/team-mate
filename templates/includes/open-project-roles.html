@@ -1,5 +1,11 @@
 <h3>We are open for:</h3>
-  <h5>Designer, Developer</h5>
+  <ul>
+    {% for role in open_roles %}
+      <li>
+        {{ role.role_name }} - {{ role.message }}
+      </li>
+    {% endfor %}
+  </ul>
   {% if can_applicate %}
     <button class="btn btn-primary"
           hx-get="{% url 'projects:apply' project.pk %}"
