@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseForbidden
 from django.urls import reverse_lazy
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
 from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication, \
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
@@ -139,11 +139,29 @@ class ProjectOpenRoleCreateView(CreateView):
     def form_valid(self, form):
         form.instance.project = self.project
         form.instance.user = self.request.user
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        self.project.open_to_candidates = True
+        self.project.save(update_fields=["open_to_candidates"])
+
+        return response
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.project.pk})
 
+
+class ProjectOpenRoleListView(ListView):
+    model = ProjectOpenRole
+    paginate_by = 10
+    template_name = "projects/project_open_roles_list.html"
+    context_object_name = 'open_roles'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.project.open_roles.all()
 
 
 class TaskListView(ListView):

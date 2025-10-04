@@ -5,6 +5,7 @@
         {{ role.role_name }} - {{ role.message }}
       </li>
     {% endfor %}
+    <a href="{% url 'projects:project_open_roles' project.pk %}" class="btn btn-primary mb-3">All opportunities</a>
   </ul>
   {% if can_applicate %}
     <button class="btn btn-primary"
