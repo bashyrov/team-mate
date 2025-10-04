@@ -1,0 +1,12 @@
+<h3>We are open for:</h3>
+  <h5>Designer, Developer</h5>
+  {% if can_applicate %}
+    <button class="btn btn-primary"
+          hx-get="{% url 'projects:apply' project.pk %}"
+          hx-target="#modal-body"
+          hx-trigger="click"
+          data-bs-toggle="modal"
+          data-bs-target="#applicationModal">
+      Applicate
+  </button>
+  {% endif %}
