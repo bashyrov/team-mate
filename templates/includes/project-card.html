@@ -1,0 +1,31 @@
+<li class="list-group-item" style="margin: 3px;">
+<div class="card">
+  <div class="card-header" style="position: relative;">
+    {{ project.domen }}
+    {% if project.development_stage == 'deployed' %}
+      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: red; border-radius: 50%;"></span>
+    {% elif project.development_stage == 'testing' %}
+      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: orange; border-radius: 50%;"></span>
+    {% elif project.development_stage == 'implementation' %}
+      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: yellow; border-radius: 50%;"></span>
+    {% else %}
+      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: greenyellow; border-radius: 50%;"></span>
+    {% endif %}
+  </div>
+  <div class="card-body">
+    <h5 class="card-title">
+        {{ project.name }}
+    </h5>
+    <p class="card-text">
+      {{ project.description }}
+    </p>
+    {% if project.development_stage == 'completed' %}
+      <h5>– Score: {{ project.score }}</h5>
+    {% endif %}
+    <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-primary">Go to Project</a>
+      {% if project.development_stage == 'deployed' and project.deploy_url %}
+        <a href="{{ project.deploy_url }}" class="btn btn-primary">Go to Deploy</a>
+      {% endif %}
+  </div>
+</div>
+</li>

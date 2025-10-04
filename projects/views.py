@@ -1,8 +1,14 @@
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView
-from .models import Project, Task, Developer, ProjectMembership
-from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm
+from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication
+from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
+    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm
 from django.shortcuts import redirect, get_object_or_404, render
+from django.db.models import Avg
 
 
 class ProjectListView(ListView):
@@ -29,7 +35,8 @@ class ProjectDetailView(DetailView):
         return Project.objects.prefetch_related(
             'tasks__assignee',
             'tasks__tags',
-            'projectmembership_set__user'
+            'projectmembership_set__user',
+            'ratings__user'
         )
 
     def get_context_data(self, **kwargs):
@@ -37,6 +44,8 @@ class ProjectDetailView(DetailView):
         project = self.object
 
         memberships = list(project.projectmembership_set.all())
+
+        tasks = Task.objects.filter(project=project)
 
         tasks_by_assignee = {}
         for task in project.tasks.all():
@@ -48,13 +57,27 @@ class ProjectDetailView(DetailView):
             None
         )
 
+        user = self.request.user
+        can_rate = True
+        can_applicate = True
+
+        if user.is_authenticated:
+            is_member = project.projectmembership_set.filter(user=user).exists()
+            is_owner = project.owner == user
+            is_rated = ProjectRating.objects.filter(project=project, user=user).exists()
+            can_rate = not is_member and not is_owner and not is_rated
+            can_applicate = not is_member and not is_owner
+
         context.update({
             'memberships': memberships,
+            'tasks': tasks,
             'tasks_by_assignee': tasks_by_assignee,
-            'current_membership': current_membership
+            'current_membership': current_membership,
+            'can_rate': can_rate,
+            'can_applicate': can_applicate,
+            'ratings': project.ratings.all().order_by('-created_at')
         })
         return context
-
 
 
 class TaskDetailView(DetailView):
@@ -87,15 +110,77 @@ class ProjectMembershipUpdateView(UpdateView):
     template_name = 'projects/project_roles_form.html'
     form_class = ProjectMembershipFormUpdate
 
+    def get_success_url(self):
+        return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})
+
+
+class ProjectStageUpdateView(UpdateView):
+    model = Project
+    form_class = ProjectStageForm
+    template_name = 'projects/project_stage_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        project = self.get_object()
+        user = request.user
+
+        allowed_roles = ['pm', 'mentor', 'lead']
+
+        if not user.is_authenticated:
+            raise PermissionDenied("Необходимо войти в систему.")
+
+        if not hasattr(user, "role") or user.role not in allowed_roles:
+            raise PermissionDenied("У вас нет прав для обновления стадии проекта.")
+
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})
+
+
+class ProjectRatingCreateView(CreateView):
+    model = ProjectRating
+    form_class = ProjectRatingForm
+    template_name = 'projects/project_rating_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(Project, pk=self.kwargs['pk'])
+
+        if not request.user.is_authenticated:
+            return HttpResponse("""
+                <div class='alert alert-warning'>
+                    You need to be logged in to perform this action.
+                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Войти</a>
+                </div>
+            """)
+
+        if self.project.members.filter(id=request.user.id).exists() or self.project.owner == request.user:
+            raise PermissionDenied("You cannot rate your own project.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.project = self.project
+        form.instance.user = self.request.user
+        form.save()
+        return HttpResponse(status=204)
+
+    def get_success_url(self):
+        return reverse_lazy('projects:project_detail', kwargs={'pk': self.project.pk})
 
 
 class ProjectRolesUpdateView(UpdateView):
     model = Project
     template_name = 'projects/project_roles_form.html'
     form_class = ProjectMembershipFormSet
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            raise PermissionDenied("You must be logged in to create tasks.")
+
+        self.object = self.get_object()
+        if self.object.owner != request.user:
+            raise PermissionDenied("Only the project owner can edit roles.")
+        return super().dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -105,17 +190,11 @@ class ProjectRolesUpdateView(UpdateView):
                 instance=self.object,
                 form_kwargs={'project': self.object}
             )
-            print("POST data:", dict(self.request.POST))
-            print("Formset bound:", formset.is_bound)
         else:
             formset = ProjectMembershipFormSet(
                 instance=self.object,
                 form_kwargs={'project': self.object}
             )
-            print("GET request: Formset forms count:", len(formset.forms))
-            for idx, form in enumerate(formset):
-                user = form.instance.user.username if form.instance.pk else "New"
-                print(f"Form {idx}: instance={form.instance}, user={user}")
         context['formset'] = formset
         return context
 
@@ -127,16 +206,8 @@ class ProjectRolesUpdateView(UpdateView):
             form_kwargs={'project': self.object}
         )
         if formset.is_valid():
-            print("Formset is valid! Saving...")
             formset.save()
             return redirect(self.get_success_url())
-        else:
-            print("Formset is INVALID!")
-            print("Non-form errors:", formset.non_form_errors())
-            for idx, form in enumerate(formset):
-                user = form.instance.user.username if form.instance.pk else "New"
-                print(f"Form {idx} errors: {form.errors}, user={user}")
-            print("Deleted forms:", [form.instance for form in formset.deleted_forms])
         return self.render_to_response(self.get_context_data(formset=formset))
 
     def get_success_url(self):
@@ -148,22 +219,150 @@ class DeveloperDetailView(DetailView):
     template_name = 'projects/profile.html'
     context_object_name = 'developer'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        developer = self.object
+
+        project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
+        context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
+
+        context['projects'] = Project.objects.filter(id__in=project_ids)
+        return context
+
 
 class TaskCreateView(CreateView):
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
 
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            raise PermissionDenied("You must be logged in to create tasks.")
+
+        self.project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
+
+        membership = ProjectMembership.objects.filter(
+            project=self.project, user=request.user
+        ).first()
+
+        if not membership or membership.role not in ['pm', 'mentor', 'lead']:
+            raise PermissionDenied("You don’t have permission to create tasks in this project.")
+
+        return super().dispatch(request, *args, **kwargs)
+
     def form_valid(self, form):
-        project_id = self.kwargs['project_pk']
-        form.instance.project_id = project_id
+        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
+        form.instance.project = project
+
+        assignee = form.cleaned_data.get("assignee")
+        if assignee:
+            if not ProjectMembership.objects.filter(project=project, user=assignee).exists():
+                raise PermissionDenied("Assignee must be a member of this project.")
+
         return super().form_valid(form)
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
+        form.fields['assignee'].queryset = get_user_model().objects.filter(
+        projectmembership__project=project
+    )
+        return form
+
+    def get_success_url(self):
+        return reverse_lazy('projects:project_detail', kwargs={'pk': self.kwargs['project_pk']})
 
 
 class TaskUpdateView(UpdateView):
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            raise PermissionDenied("You must be logged in to update tasks.")
+
+        self.project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
+        self.task = self.get_object()
+
+        self.membership = ProjectMembership.objects.filter(
+            project=self.project, user=request.user
+        ).first()
+
+        if not (
+            self.membership and self.membership.role in ['pm', 'mentor', 'lead']
+        ) and request.user != self.task.assignee:
+            raise PermissionDenied("You don’t have permission to update this task.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_form(self, *args, **kwargs):
+        form = super().get_form(*args, **kwargs)
+
+        if self.request.user == self.task.assignee and (
+            not self.membership or self.membership.role not in ['pm', 'mentor', 'lead']
+        ):
+            for field in form.fields:
+                if field != "status":
+                    form.fields[field].disabled = True
+
+        return form
+
+    def form_valid(self, form):
+        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
+        form.instance.project = project
+
+        assignee = form.cleaned_data.get("assignee")
+        if assignee:
+            if not ProjectMembership.objects.filter(project=project, user=assignee).exists():
+                raise PermissionDenied("Assignee must be a member of this project.")
+
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse_lazy('projects:project_detail', kwargs={'pk': self.kwargs['project_pk']})
+
+
+class LeaderboardView(ListView):
+    model = Developer
+    template_name = "projects/leaderboard.html"
+    context_object_name = "developers"
+
+    def get_queryset(self):
+        return Developer.objects.annotate(
+            avg_score=Avg("received_user_ratings__rating")
+        ).order_by("-avg_score")[:10]
+
+
+class ProjectApplicationCreateView(CreateView):
+    model = ProjectApplication
+    form_class = ProjectApplicationForm
+    template_name = "projects/project_application_form.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
+
+        if not request.user.is_authenticated:
+            return HttpResponse("""
+                <div class='alert alert-warning'>
+                    You need to be logged in to perform this action.
+                    <a href="{% url 'login' %}?next={request.path}" class="btn btn-primary">Войти</a>
+                </div>
+            """)
+
+        if self.project.members.filter(id=request.user.id).exists() or self.project.owner == request.user:
+            raise PermissionDenied("You cannot apply to your own project.")
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.instance.project_id = self.kwargs["pk"]
+        form.instance.user = self.request.user
+        form.save()
+        return HttpResponse(status=204)
+
+    def get_success_url(self):
+        return reverse_lazy("projects:project_detail", kwargs={"pk": self.project.pk})
 
 
 def index(request):

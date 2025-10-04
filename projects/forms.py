@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import get_user_model
 from django.forms import inlineformset_factory
-from .models import Project, ProjectMembership, Task
+from .models import Project, ProjectMembership, Task, ProjectRating, ProjectApplication
 
 
 user_model = get_user_model()
@@ -10,7 +10,31 @@ user_model = get_user_model()
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name', 'description']
+        fields = ['name', 'description', 'domen', 'deploy_url', 'project_url']
+
+
+class ProjectStageForm(forms.ModelForm):
+    development_stage = forms.ChoiceField(
+        choices=Project.DEVELOPMENT_STAGE_CHOICES,
+        label="Development Stage"
+    )
+
+    class Meta:
+        model = Project
+        fields = ['development_stage', 'deploy_url']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        stage = cleaned_data.get('development_stage')
+        deploy_url = cleaned_data.get('deploy_url')
+
+        if stage == 'deployed' and not deploy_url:
+            self.add_error(
+                'development_stage',
+                'Cannot set stage to "Deployed" without a deploy URL.'
+            )
+
+        return cleaned_data
 
 
 class ProjectMembershipFormUpdate(forms.ModelForm):
@@ -19,10 +43,26 @@ class ProjectMembershipFormUpdate(forms.ModelForm):
         fields = '__all__'
 
 
+class ProjectRatingForm(forms.ModelForm):
+    class Meta:
+        model = ProjectRating
+        fields = ['score', 'comment']
+        widgets = {
+            'score': forms.NumberInput(attrs={'min': 1, 'max': 5}),
+            'comment': forms.Textarea(attrs={'rows': 3}),
+        }
+
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'status', 'assignee', 'tags']
+
+
+class ProjectApplicationForm(forms.ModelForm):
+    class Meta:
+        model = ProjectApplication
+        fields = ["role", "message"]
 
 
 class ProjectMembershipForm(forms.ModelForm):

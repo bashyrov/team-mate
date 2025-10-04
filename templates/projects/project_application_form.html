@@ -1,0 +1,8 @@
+<form method="post"
+      hx-post="{% url 'projects:apply' project.pk %}"
+      hx-target="#modal-body"
+      hx-swap="innerHTML">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-success">Отправить</button>
+</form>
