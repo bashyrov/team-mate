@@ -71,7 +71,6 @@ class Project(models.Model):
         ('design', 'Design & Architecture'),
         ('implementation', 'Implementation / Development'),
         ('testing', 'Testing & QA'),
-        ('completed', 'Completed'),
         ('deployed', 'Deployed'),
     ]
 

@@ -1,42 +1,20 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>All Projects</h2>
-<a href="{% url 'projects:project_create' %}" class="btn btn-primary mb-3">Create Project</a>
-<ul class="list-group">
-    {% for project in projects %}
-    <li class="list-group-item">
-        <a href="{% url 'projects:project_detail' project.pk %}">{{ project.name }}</a>
-        <p>Score: {{ project.avg_score|floatformat:2|default:"–" }}</p>
-    </li>
-    {% empty %}
-    <li class="list-group-item">No projects yet.</li>
-    {% endfor %}
-</ul>
-<hr>
-<h4>Ratings & Comments</h4>
-
-{% if ratings %}
-  <ul class="list-group">
-    {% for rating in ratings %}
-      <li class="list-group-item">
-        <strong>{{ rating.user.username }}</strong> – ⭐ {{ rating.score }}
-        <br>
-        {% if rating.comment %}
-          <em>{{ rating.comment }}</em>
-        {% else %}
-          <em>No comment</em>
-        {% endif %}
-        <br>
-        <small>{{ rating.created_at|date:"Y-m-d H:i" }}</small>
-      </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No ratings yet.</p>
-{% endif %}
-
-{% if can_rate %}
-  <a href="{% url 'projects:project_add_rating' project.pk %}" class="btn btn-primary mt-3">Add Rating</a>
-{% endif %}
-
+<div class="d-grid gap-3" style="grid-template-columns: 1fr 2fr;">
+  <div class="bg-body-tertiary border rounded-3 sticky-top" style="min-height: 100px; padding: 15px;">
+    filters
+  </div>
+  <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px;">
+    <h2>All Projects</h2>
+    {% if projects %}
+      <ul class="list-group">
+        {% for project in projects %}
+          {% include "includes/project-card.html" %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <h2>No projects yet.</h2>
+    {% endif %}
+  </div>
+</div>
 {% endblock %}

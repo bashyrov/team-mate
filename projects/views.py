@@ -45,6 +45,8 @@ class ProjectDetailView(DetailView):
 
         memberships = list(project.projectmembership_set.all())
 
+        tasks = Task.objects.filter(project=project)
+
         tasks_by_assignee = {}
         for task in project.tasks.all():
             key = task.assignee.username if task.assignee else "Unassigned"
@@ -68,6 +70,7 @@ class ProjectDetailView(DetailView):
 
         context.update({
             'memberships': memberships,
+            'tasks': tasks,
             'tasks_by_assignee': tasks_by_assignee,
             'current_membership': current_membership,
             'can_rate': can_rate,
