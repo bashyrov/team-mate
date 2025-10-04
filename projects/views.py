@@ -15,6 +15,7 @@ class ProjectListView(ListView):
     model = Project
     template_name = 'projects/project_list.html'
     context_object_name = 'projects'
+    paginate_by = 10
 
 
 class MyProjectListView(ListView):

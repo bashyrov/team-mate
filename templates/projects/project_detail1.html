@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="md:flex">
-  <!-- Tabs menu -->
   <ul id="tabs" class="flex-column space-y-4 text-sm font-medium text-gray-500 dark:text-gray-400 md:me-4 mb-4 md:mb-0">
     <li>
       <button data-tab="profile" class="tab-link inline-flex items-center px-4 py-3 w-full rounded-lg transition-all duration-300 ease-in-out text-white bg-blue-700 dark:bg-blue-600">
@@ -71,7 +70,6 @@
         c.classList.remove("opacity-100");
       });
 
-      // activate selected
       tab.classList.add("text-white", "bg-blue-700", "dark:bg-blue-600");
       const activeContent = document.getElementById(tab.dataset.tab);
       activeContent.classList.remove("hidden", "opacity-0");
