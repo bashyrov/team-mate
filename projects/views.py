@@ -231,6 +231,7 @@ class TaskDetailView(DetailView):
     model = Task
     template_name = 'projects/task_detail.html'
     context_object_name = 'task'
+    pk_url_kwarg = 'task_pk'
 
 
 class ProjectCreateView(CreateView):
