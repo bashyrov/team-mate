@@ -41,8 +41,8 @@
 
                </div>
               {% if current_membership and current_membership.role in "LEAD,PM,Mentor" %}
-                    <a href="{% url 'projects:task_edit' task.pk %}">Edit</a>
+                    <a href="{% url 'projects:task_edit' project.pk task.pk %}">Edit</a>
               {% endif %}
-              <a href="{% url 'projects:task_edit' task.pk %}">Edit</a>
+              <a href="{% url 'projects:task_edit' project.pk task.pk %}">Edit</a>
             </div>
          </li>
