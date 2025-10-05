@@ -1,4 +1,5 @@
-
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
@@ -134,7 +135,6 @@ class ProjectOpenRoleCreateView(CreateView):
     model = ProjectOpenRole
     form_class = ProjectOpenRoleForm
     template_name = "projects/open_roles_form.html"
-    success_url = reverse_lazy('projects:project_detail', )
 
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
@@ -143,14 +143,21 @@ class ProjectOpenRoleCreateView(CreateView):
     def form_valid(self, form):
         form.instance.project = self.project
         form.instance.user = self.request.user
-        response = super().form_valid(form)
-
+        form.save()
         self.project.update_open_to_candidates()
 
-        return response
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            html = render_to_string(self.template_name, {'form': form}, self.request)
+            return JsonResponse({'success': False, 'html': html})
+        return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse_lazy('projects:project_open_roles_list', kwargs={'pk': self.project.pk})
+        return reverse_lazy('projects:project_open_roles_list', kwargs={'project_pk': self.project.pk})
 
 
 class ProjectOpenRoleListView(ListView):
@@ -181,14 +188,12 @@ class ProjectOpenRoleListView(ListView):
         context = super().get_context_data(**kwargs)
 
         project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
-        #open_roles = project.open_roles.all()
 
         role_name = self.request.GET.get('role_name', '')
 
         context['search_form'] = ProjectOpenRoleSearchForm(
             initial={'role_name': role_name}
         )
-        #context['open_roles'] = open_roles
         context['project'] = project
 
         return context

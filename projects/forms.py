@@ -112,7 +112,7 @@ class ProjectOpenRoleSearchForm(forms.Form):
 
 class ProjectOpenRoleForm(forms.ModelForm):
     role_name = forms.ChoiceField(
-        choices=[('', 'Select domain')] + list(ProjectMembership.ROLE_CHOICES),
+        choices=[('', 'Select role')] + list(ProjectMembership.ROLE_CHOICES),
         required=True,
         label='',
         widget=forms.Select(attrs={

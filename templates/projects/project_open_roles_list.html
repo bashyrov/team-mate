@@ -1,40 +1,59 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="d-grid gap-3" style="grid-template-columns: 1fr 3fr;">
-  <div class="bg-body-tertiary border rounded-3 sticky-top" style="min-height: 100px; padding: 15px;">
+  <div class="bg-body-tertiary border rounded-3 sticky-top p-3">
     <form action="" method="get">
       {{ search_form }}
-      <input type="submit">
+      <input type="submit" class="btn btn-outline-primary mt-2">
     </form>
+
+    <button class="btn btn-success mt-3"
+            data-bs-toggle="modal"
+            data-bs-target="#createRoleModal"
+            data-url="{% url 'projects:project_open_roles_create' project.pk %}">
+      + Add Role
+    </button>
   </div>
-  <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px;">
+
+  <div class="bg-body-tertiary border rounded-3 p-3">
     <h2>All Opportunities</h2>
     {% if open_roles %}
       <ul class="list-group">
         {% for role in open_roles %}
-          <li>
-            <h3>
-              {{ role.role_name }}
-            </h3>
-          <p>
-            {{ role.message }}
-          </p>
-          <button class="btn btn-danger mb-3"
-            data-bs-toggle="modal"
-            data-bs-target="#deleteModal"
-            data-url="{% url 'projects:project_open_roles_delete' project.pk role.pk %}">
-                Delete
-          </button>
+          <li class="list-group-item">
+            <h3>{{ role.role_name }}</h3>
+            <p>{{ role.message }}</p>
+            <button class="btn btn-danger"
+                    data-bs-toggle="modal"
+                    data-bs-target="#deleteModal"
+                    data-url="{% url 'projects:project_open_roles_delete' project.pk role.pk %}">
+              Delete
+            </button>
           </li>
         {% endfor %}
       </ul>
     {% else %}
       <h4>No opportunities yet.</h4>
     {% endif %}
-    {% include "includes/pagination.html" %}
   </div>
 </div>
 
+<!-- Modal for CREATE -->
+<div class="modal fade" id="createRoleModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Role</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="createRoleFormBody">
+        <!-- Форма будет загружена AJAX’ом -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for DELETE -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -52,29 +71,42 @@
     </div>
   </div>
 </div>
-  <script>
-    const deleteModal = document.getElementById('deleteModal');
-    let deleteUrl = null;
 
-    deleteModal.addEventListener('show.bs.modal', event => {
-      const button = event.relatedTarget;
-      deleteUrl = button.getAttribute('data-url');
-      const roleName = button.closest('li').querySelector('h3').textContent;
-      deleteModal.querySelector('.modal-body strong').textContent = roleName;
-    });
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const createModal = document.getElementById('createRoleModal');
+  const createFormBody = document.getElementById('createRoleFormBody');
 
-    document.getElementById('confirmDelete').addEventListener('click', () => {
-      if (!deleteUrl) return;
+  // Загружаем форму при открытии модального окна
+  createModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget;
+    const url = button.getAttribute('data-url');
 
-      fetch(deleteUrl, {
-        method: 'POST',
-        headers: {
-          'X-CSRFToken': '{{ csrf_token }}',
-        },
-      }).then(res => {
-        if (res.ok) location.reload();
-        else alert('Error deleting role');
+    fetch(url)
+      .then(res => res.text())
+      .then(html => {
+        createFormBody.innerHTML = html;
+        const form = createFormBody.querySelector('form');
+
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+
+          fetch(url, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            }
+          }).then(res => {
+            if (res.ok) {
+              location.reload();
+            } else {
+              res.text().then(html => createFormBody.innerHTML = html);
+            }
+          });
+        });
       });
-    });
-  </script>
+  });
+});
+</script>
 {% endblock %}
