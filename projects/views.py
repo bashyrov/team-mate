@@ -1,3 +1,4 @@
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
@@ -8,7 +9,8 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView, F
 from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication, \
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
-    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm
+    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
+    ProjectOpenRoleSearchForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db.models import Avg
 
@@ -158,27 +160,38 @@ class ProjectOpenRoleListView(ListView):
     context_object_name = 'open_roles'
     success_url = reverse_lazy('projects:open_roles_list')
 
-    def post(self, request, pk):
-        task = get_object_or_404(Task, pk=pk)
-
-        task.delete()
-        return JsonResponse({"status": "deleted"})
-
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.project.open_roles.all()
+
+        qs = ProjectOpenRole.objects.all().filter(project=self.project)
+
+        form = ProjectOpenRoleSearchForm(self.request.GET)
+
+        if form.is_valid():
+            role_name = form.cleaned_data.get('role_name')
+            if role_name:
+                qs = qs.filter(role_name=role_name)
+
+        return qs
 
     def get_context_data(self, **kwargs):
-        open_roles = self.project.open_roles.all()
-        project = Project.objects.get(pk=self.kwargs['project_pk'])
+        context = super().get_context_data(**kwargs)
 
-        return {
-            'open_roles': open_roles,
-            'project': project,
-        }
+        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
+        #open_roles = project.open_roles.all()
+
+        role_name = self.request.GET.get('role_name', '')
+
+        context['search_form'] = ProjectOpenRoleSearchForm(
+            initial={'role_name': role_name}
+        )
+        #context['open_roles'] = open_roles
+        context['project'] = project
+
+        return context
 
 
 class ProjectOpenRoleDeleteView(View):
@@ -342,6 +355,7 @@ class DeveloperDetailView(DetailView):
     model = Developer
     template_name = 'projects/profile.html'
     context_object_name = 'developer'
+    pk_url_kwarg = 'user_pk'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

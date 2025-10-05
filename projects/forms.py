@@ -97,6 +97,19 @@ class TaskForm(forms.ModelForm):
         fields = ['title', 'description', 'status', 'assignee', 'tags']
 
 
+class ProjectOpenRoleSearchForm(forms.Form):
+
+    role_name = forms.ChoiceField(
+        choices=[('', 'Select role')] + list(ProjectMembership.ROLE_CHOICES),
+        required=True,
+        label='',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px;'
+        })
+    )
+
+
 class ProjectOpenRoleForm(forms.ModelForm):
     role_name = forms.ChoiceField(
         choices=[('', 'Select domain')] + list(ProjectMembership.ROLE_CHOICES),

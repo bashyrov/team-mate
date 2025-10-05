@@ -6,6 +6,7 @@ app_name = 'projects'
 
 urlpatterns = [
     path('', views.ProjectListView.as_view(), name='dashboard'),
+    path('profile/<int:user_pk>/', views.DeveloperDetailView.as_view(), name='profile'),
     path('projects/', views.ProjectListView.as_view(), name='project_list'),
     path('my-projects/', views.MyProjectListView.as_view(), name='my_projects'),
     path('project/<int:project_pk>/', views.ProjectDetailView.as_view(), name='project_detail'),
@@ -15,7 +16,6 @@ urlpatterns = [
     path('project/rating/<int:project_pk>/', views.ProjectRatingCreateView.as_view(), name='project_rate'),
     path('project/<int:project_pk>/roles/edit/', views.ProjectRolesUpdateView.as_view(), name='project_edit_roles'),
     path('project/<int:project_pk>/stage/edit/', views.ProjectStageUpdateView.as_view(), name='project_edit_stage'),
-    path('profile/<int:project_pk>/', views.DeveloperDetailView.as_view(), name='profile'),
     path('project/<int:project_pk>/task/create/', views.TaskCreateView.as_view(), name='task_create'),
     path('project/<int:project_pk>/open-roles', views.ProjectOpenRoleListView.as_view(), name='project_open_roles_list'),
     path('project/<int:project_pk>/open-roles/create/', views.ProjectOpenRoleCreateView.as_view(), name='project_open_roles_create'),
