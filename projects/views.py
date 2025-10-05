@@ -10,11 +10,50 @@ from .models import Project, Task, ProjectMembership, ProjectRating, DeveloperRa
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
-    ProjectOpenRoleSearchForm
+    ProjectOpenRoleSearchForm, DeveloperSearchForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db.models import Avg
 
 UserModel = get_user_model()
+
+
+class LeaderboardView(ListView):
+    model = UserModel
+    template_name = "projects/leaderboard.html"
+    context_object_name = "developers"
+    paginate_by = 10
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(LeaderboardView, self).get_context_data(**kwargs)
+        username = self.request.GET.get('project_name', '')
+        context['search_form'] = DeveloperSearchForm(
+            initial={'username': username}
+        )
+        page_obj = context.get('page_obj')
+
+        if page_obj:
+            context['start_rank'] = (page_obj.number - 1) * self.paginate_by
+        else:
+            context['start_rank'] = 0
+
+        return context
+
+    def get_queryset(self):
+
+        qs = UserModel.objects.all()
+
+        form = DeveloperSearchForm(self.request.GET)
+
+        if form.is_valid():
+
+            username = self.request.GET.get('username', '')
+
+            if username:
+                qs = qs.filter(username__icontains=username)
+
+        qs = qs.annotate(avg_score=Avg('projects__score')).order_by('-avg_score', 'username')
+
+        return qs
 
 
 class ProjectListView(ListView):
@@ -443,17 +482,6 @@ class TaskUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.kwargs['project_pk']})
-
-
-class LeaderboardView(ListView):
-    model = UserModel
-    template_name = "projects/leaderboard.html"
-    context_object_name = "developers"
-
-    def get_queryset(self):
-        return UserModel.objects.annotate(
-            avg_score=Avg("received_user_ratings__rating")
-        ).order_by("-avg_score")[:10]
 
 
 class ProjectApplicationCreateView(CreateView):
