@@ -47,7 +47,6 @@ class ProjectManager(models.Manager):
 
 class ProjectRating(models.Model):
     project = models.ForeignKey('Project', related_name='ratings', on_delete=models.CASCADE)
-    user = models.ForeignKey(user_model, on_delete=models.CASCADE)
     user_added = models.ForeignKey(
         user_model,
         on_delete=models.CASCADE,

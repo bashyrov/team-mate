@@ -1,7 +1,7 @@
 {% if ratings %}
   <ul>
     {% for rating in ratings %}
-      <li>{{ rating.user.username }} – Score: {{ rating.score }}
+      <li>{{ rating.user_added.username }} – Score: {{ rating.score }}
           {% if rating.comment %}- Comment: {{ rating.comment }}{% endif %}
       </li>
     {% endfor %}
@@ -9,11 +9,12 @@
 {% else %}
   <h2>No ratings yet.</h2>
 {% endif %}
-
 {% if can_rate and is_deployed %}
-  <button class="btn btn-primary"
-          hx-get="{% url 'projects:project_rate' project.pk %}"
-          hx-target="#rating-dialog">
+<button type="button" class="btn btn-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#ratingModal"
+        hx-get="{% url 'projects:project_rate' project.pk %}"
+        hx-target="#ratingModal .modal-body">
     Rate this project
-  </button>
+</button>
 {% endif %}

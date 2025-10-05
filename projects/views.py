@@ -1,19 +1,20 @@
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
-from .models import Project, Task, Developer, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication, \
+from .models import Project, Task, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication, \
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
     ProjectOpenRoleSearchForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db.models import Avg
+
+UserModel = get_user_model()
 
 
 class ProjectListView(ListView):
@@ -83,7 +84,7 @@ class ProjectDetailView(DetailView):
             'tasks__assignee',
             'tasks__tags',
             'projectmembership_set__user',
-            'ratings__user'
+            'ratings__user_added'
         )
 
     def get_context_data(self, **kwargs):
@@ -289,14 +290,6 @@ class ProjectRatingCreateView(CreateView):
 
         self.project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
 
-        if not request.user.is_authenticated:
-            return HttpResponse("""
-                <div class='alert alert-warning'>
-                    You need to be logged in to perform this action.
-                    <a href="{% url 'login' %}?next={{ request.path }}" class="btn btn-primary">Войти</a>
-                </div>
-            """)
-
         if self.project.development_stage != 'deployed':
             return HttpResponse(
                 "<div class='alert alert-warning'>You can only rate deployed projects.</div>"
@@ -309,14 +302,28 @@ class ProjectRatingCreateView(CreateView):
 
         return super().dispatch(request, *args, **kwargs)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['project'] = self.project
+
+        return context
+
     def form_valid(self, form):
+
+        user = get_user_model().objects.first()
+
         form.instance.project = self.project
-        form.instance.user = self.request.user
+        form.instance.user_added = user #TODO: change for real user
         form.save()
-        return HttpResponse(status=204)
+
+        if self.request.headers.get("HX-Request"):
+            return render(self.request, "includes/rating-item.html", {"rating": form.instance})
+
+        return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('projects:project_detail', kwargs={'pk': self.project.pk})
+        return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.project.pk})
 
 
 class ProjectRolesUpdateView(UpdateView):
@@ -358,7 +365,7 @@ class ProjectRolesUpdateView(UpdateView):
 
 
 class DeveloperDetailView(DetailView):
-    model = Developer
+    model = UserModel
     template_name = 'projects/profile.html'
     context_object_name = 'developer'
     pk_url_kwarg = 'user_pk'
@@ -382,7 +389,6 @@ class TaskCreateView(CreateView):
     def dispatch(self, request, *args, **kwargs):
 
         self.project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
-
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -440,12 +446,12 @@ class TaskUpdateView(UpdateView):
 
 
 class LeaderboardView(ListView):
-    model = Developer
+    model = UserModel
     template_name = "projects/leaderboard.html"
     context_object_name = "developers"
 
     def get_queryset(self):
-        return Developer.objects.annotate(
+        return UserModel.objects.annotate(
             avg_score=Avg("received_user_ratings__rating")
         ).order_by("-avg_score")[:10]
 
