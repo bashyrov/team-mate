@@ -2,7 +2,8 @@
 {% block content %}
 {% if project %}
 <div class="d-grid gap-3" style="grid-template-columns: 1fr 2fr;">
-  <div class="bg-body-tertiary border rounded-3 sticky-top" style="min-height: 100px; padding: 15px;">
+  <div class="bg-body-tertiary border rounded-3 sticky-top"
+     style="padding: 15px; height: fit-content; top: 20px;">
     <h2>{{ project.name }}</h2>
       <p>{{ project.description }}</p>
       <p><strong>Stage:</strong> {{ project.development_stage }}</p>
