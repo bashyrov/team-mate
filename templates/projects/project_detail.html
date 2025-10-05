@@ -19,7 +19,7 @@
       <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-warning mb-3">Edit Roles</a>
       <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
       <a href="{% url 'projects:project_edit_stage' project.pk%}" class="btn btn-secondary mb-3">Update Stage</a>
-      <a href="{% url 'projects:project_open_roles_create' project.pk%}" class="btn btn-secondary mb-3">Manage Open Roles</a>
+      <a href="{% url 'projects:project_open_roles_list' project.pk%}" class="btn btn-secondary mb-3">Manage Open Roles</a>
 
       <h4>Team Members</h4>
       {% if memberships %}

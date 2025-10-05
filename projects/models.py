@@ -107,6 +107,16 @@ class Project(models.Model):
         related_name="projects"
     )
 
+    def update_open_to_candidates(self):
+        has_roles = self.open_roles.exists()
+        if self.open_to_candidates != has_roles:
+            self.open_to_candidates = has_roles
+
+            self.save(update_fields=['open_to_candidates'])
+
+        return self.open_to_candidates
+
+
     objects = ProjectManager()
 
     @property

@@ -142,13 +142,12 @@ class ProjectOpenRoleCreateView(CreateView):
         form.instance.user = self.request.user
         response = super().form_valid(form)
 
-        self.project.open_to_candidates = True
-        self.project.save(update_fields=["open_to_candidates"])
+        self.project.update_open_to_candidates()
 
         return response
 
     def get_success_url(self):
-        return reverse_lazy('projects:project_detail', kwargs={'pk': self.project.pk})
+        return reverse_lazy('projects:project_open_roles_list', kwargs={'pk': self.project.pk})
 
 
 class ProjectOpenRoleListView(ListView):
@@ -182,12 +181,19 @@ class ProjectOpenRoleListView(ListView):
 
 
 class ProjectOpenRoleDeleteView(View):
+
     def post(self, request, project_pk, role_pk):
         project = get_object_or_404(Project, pk=project_pk)
         role = get_object_or_404(ProjectOpenRole, pk=role_pk, project=project)
 
         role.delete()
+
+        project.update_open_to_candidates()
+
         return JsonResponse({"status": "deleted"})
+
+    def get_success_url(self):
+        return reverse_lazy('projects:project_open_roles_list', kwargs={'pk': self.project.pk})
 
 
 class TaskListView(ListView):
@@ -249,7 +255,7 @@ class ProjectStageUpdateView(UpdateView):
         if not user.is_authenticated:
             raise PermissionDenied("Необходимо войти в систему.")
 
-        if not hasattr(user, "role") or user.role not in allowed_roles:
+        if not hasattr(user, "position") or user.position not in allowed_roles:
             raise PermissionDenied("У вас нет прав для обновления стадии проекта.")
 
         return super().dispatch(request, *args, **kwargs)
