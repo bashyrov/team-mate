@@ -2,15 +2,38 @@
 <div class="card">
   <div class="card-header" style="position: relative;">
     {{ project.domain }}
-    {% if project.development_stage == 'deployed' %}
-      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: red; border-radius: 50%;"></span>
-    {% elif project.development_stage == 'testing' %}
-      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: orange; border-radius: 50%;"></span>
-    {% elif project.development_stage == 'implementation' %}
-      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: yellow; border-radius: 50%;"></span>
-    {% else %}
-      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: greenyellow; border-radius: 50%;"></span>
-    {% endif %}
+{#    {% if project.development_stage == 'deployed' %}#}
+{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: red; border-radius: 50%;"></span>#}
+{#    {% elif project.development_stage == 'testing' %}#}
+{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: orange; border-radius: 50%;"></span>#}
+{#    {% elif project.development_stage == 'implementation' %}#}
+{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: yellow; border-radius: 50%;"></span>#}
+{#    {% else %}#}
+{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: greenyellow; border-radius: 50%;"></span>#}
+{#    {% endif %}#}
+    <div style="position: absolute; top: 10px; right: 10px;">
+        {% if project.development_stage == 'deployed' %}
+          <span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
+            <span class="w-2 h-2 me-1 bg-green-500 rounded-full"></span>
+            deployed
+          </span>
+        {% elif project.development_stage == 'testing' %}
+          <span class="inline-flex items-center bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-yellow-900 dark:text-yellow-300">
+            <span class="w-2 h-2 me-1 bg-yellow-500 rounded-full"></span>
+            testing
+          </span>
+        {% elif project.development_stage == 'implementation' %}
+          <span class="inline-flex items-center bg-orange-100 text-orange-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-orange-900 dark:text-orange-300">
+            <span class="w-2 h-2 me-1 bg-orange-500 rounded-full"></span>
+            implementation
+          </span>
+        {% else %}
+          <span class="inline-flex items-center bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900 dark:text-red-300">
+            <span class="w-2 h-2 me-1 bg-red-500 rounded-full"></span>
+            {{ project.development_stage }}
+          </span>
+        {% endif %}
+      </div>
   </div>
   <div class="card-body">
     <h5 class="card-title">
