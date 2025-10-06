@@ -98,6 +98,10 @@ class ProjectMembership(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(user_model, on_delete=models.CASCADE, related_name='memberships')
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="DEV")
+    edit_project_info_perm = models.BooleanField(default=False)
+    add_task_perm = models.BooleanField(default=False)
+    update_project_stage_perm = models.BooleanField(default=False)
+    manage_open_roles_perm = models.BooleanField(default=False)
 
     joined_at = models.DateTimeField(auto_now_add=True)
 

@@ -10,6 +10,7 @@ from .models import Project, Task, ProjectMembership, ProjectRating, ProjectAppl
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
     ProjectOpenRoleSearchForm, TaskSearchForm
+from projects.mixins import TaskUpdatePermissionRequiredMixin
 from django.shortcuts import redirect, get_object_or_404, render
 
 UserModel = get_user_model()
@@ -416,7 +417,7 @@ class TaskCreateView(CreateView): #TODO: Change Roles
         form.instance.project = project
 
         assignee = form.cleaned_data.get("assignee")
-        user = get_user_model().objects.first()
+        user = self.request.user
 
         form.instance.created_by = user  #TODO:change for real
 
@@ -438,7 +439,7 @@ class TaskCreateView(CreateView): #TODO: Change Roles
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.kwargs['project_pk']})
 
 
-class TaskUpdateView(UpdateView): #TODO: Change Roles
+class TaskUpdateView(TaskUpdatePermissionRequiredMixin, UpdateView): #TODO: Change Roles
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
