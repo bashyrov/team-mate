@@ -56,7 +56,7 @@ class ProjectListView(ListView):
                 qs = qs.filter(development_stage=development_stage)
             if domain:
                 qs = qs.filter(domain=domain)
-            if open_to_candidates == 'on':
+            if open_to_candidates:
                 qs = qs.filter(open_to_candidates=True)
 
         return qs

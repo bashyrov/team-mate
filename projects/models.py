@@ -64,7 +64,7 @@ class Project(models.Model):
     development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='backend')
     deploy_url = models.CharField(max_length=255, blank=True)
     owner = models.ForeignKey(user_model, related_name='owned_projects', on_delete=models.CASCADE)
-    open_to_candidates = models.BooleanField(default=True)
+    open_to_candidates = models.BooleanField(default=False)
     unical_id = models.CharField(max_length=255, default='unical_id')
     score = models.FloatField(default=0)
     project_url = models.CharField(max_length=255, blank=True)
