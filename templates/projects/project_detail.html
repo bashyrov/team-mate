@@ -36,14 +36,14 @@
         {% endfor %}
       </ul>
       {% else %}
-        <p>No team mates yet.</p>
+        <p>No Team'Mates yet.</p>
       {% endif %}
   </div>
   <div class="bg-body-tertiary border rounded-3" style="padding: 15px; height: fit-content;">
     {% if  tasks %}
       <h4>Tasks for Team'Mates</h4>
-      {% if tasks.count > 5 %}
-        <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Check All Tasks</a>
+      {% if tasks.count > 7 %}
+        <a href="{% url 'projects:task_list' project.pk %}" class="btn btn-secondary mb-3">Check All Tasks</a>
       {% endif %}
       <ul style="padding-top: 10px;">
         {% for task in tasks %}

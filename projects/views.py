@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
@@ -10,7 +11,7 @@ from .models import Project, Task, ProjectMembership, ProjectRating, DeveloperRa
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
-    ProjectOpenRoleSearchForm, DeveloperSearchForm
+    ProjectOpenRoleSearchForm, DeveloperSearchForm, TaskSearchForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.db.models import Avg
 
@@ -132,7 +133,7 @@ class ProjectDetailView(DetailView):
 
         memberships = list(project.projectmembership_set.all())
 
-        tasks = Task.objects.filter(project=project)
+        tasks = Task.objects.filter(project=project)[:8]
 
         tasks_by_assignee = {}
         for task in project.tasks.all():
@@ -259,12 +260,47 @@ class TaskListView(ListView):
     model = Task
     template_name = "projects/task_list.html"
     context_object_name = "tasks"
+    paginate_by = 10
 
     def get_queryset(self):
-        project_id = get_object_or_404(Project, pk=self.kwargs['project_pk'])
-        return (
-            Task.objects.filter(project_id=project_id)
+
+        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
+
+        form = TaskSearchForm(self.request.GET, project=project)
+        qs = Task.objects.filter(project_id=project.id)
+
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            assignee = form.cleaned_data.get('assignee')
+            status = form.cleaned_data.get('status')
+
+            if title:
+                qs = qs.filter(title__icontains=title)
+            if assignee:
+                qs = qs.filter(assignee=assignee)
+            if status:
+                qs = qs.filter(status=status)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super(TaskListView, self).get_context_data(**kwargs)
+
+        project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        context["project"] = project
+
+        title = self.request.GET.get('title', '')
+        assignee = self.request.GET.get('assignee', '')
+        status = self.request.GET.get('status', '')
+
+        context["search_form"] = TaskSearchForm(
+            initial={'title': title,
+                     'assignee': assignee,
+                     'status': status,
+                     },
+            project=project
         )
+        return context
 
 
 class TaskDetailView(DetailView):

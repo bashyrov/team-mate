@@ -6,6 +6,49 @@ from .models import Project, ProjectMembership, Task, ProjectRating, ProjectAppl
 user_model = get_user_model()
 
 
+class TaskForm(forms.ModelForm):
+    class Meta:
+        model = Task
+        fields = ['title', 'description', 'status', 'assignee', 'tags']
+
+
+class TaskSearchForm(forms.Form):
+    title = forms.CharField(
+        max_length=255,
+        required=False,
+        label='',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Project Name',
+        })
+    )
+    assignee = forms.ModelChoiceField(
+        queryset=user_model.objects.none(),
+        required=False,
+        label='',
+        empty_label='Select user',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px;'
+        })
+    )
+    status = forms.ChoiceField(
+        choices=[('', 'Select status')] + list(Task.STATUS_CHOICES),
+        required=False,
+        label='',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px;'
+        })
+    )
+
+    def __init__(self, *args, project=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if project:
+            self.fields['assignee'].queryset = project.members.all()
+
+
 class ProjectSearchForm(forms.Form):
     project_name = forms.CharField(max_length=255,
                                    required=False,
@@ -97,6 +140,7 @@ class DeveloperSearchForm(forms.Form):
         })
     )
 
+
 class ProjectRatingForm(forms.ModelForm):
     class Meta:
         model = ProjectRating
@@ -107,17 +151,11 @@ class ProjectRatingForm(forms.ModelForm):
         }
 
 
-class TaskForm(forms.ModelForm):
-    class Meta:
-        model = Task
-        fields = ['title', 'description', 'status', 'assignee', 'tags']
-
-
 class ProjectOpenRoleSearchForm(forms.Form):
 
     role_name = forms.ChoiceField(
         choices=[('', 'Select role')] + list(ProjectMembership.ROLE_CHOICES),
-        required=True,
+        required=False,
         label='',
         widget=forms.Select(attrs={
             'class': 'form-control',

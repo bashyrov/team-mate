@@ -20,6 +20,7 @@ urlpatterns = [
     path('project/<int:project_pk>/open-roles/create/', views.ProjectOpenRoleCreateView.as_view(), name='project_open_roles_create'),
     path('project/<int:project_pk>/open-roles/<int:role_pk>/delete', views.ProjectOpenRoleDeleteView.as_view(), name='project_open_roles_delete'),
     path("projects/<int:project_pk>/apply/", views.ProjectApplicationCreateView.as_view(), name="apply"),
+    path('project/<int:project_pk>/task/', views.TaskListView.as_view(), name='task_list'),
     path('project/<int:project_pk>/task/create/', views.TaskCreateView.as_view(), name='task_create'),
     path("projects/<int:project_pk>/tasks/<int:task_pk>/edit/", views.TaskUpdateView.as_view(), name="task_edit"),
     path("projects/<int:project_pk>/tasks/<int:task_pk>/", views.TaskDetailView.as_view(), name="task_detail"),
