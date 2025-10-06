@@ -26,11 +26,6 @@ class ProjectRating(models.Model):
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    @staticmethod
-    def get_avg_rating(project):
-        return ProjectRating.objects.filter(project=project).aggregate(
-            avg=Avg("score"))["avg"] or 0
-
 
 class Project(models.Model):
 
@@ -76,6 +71,8 @@ class Project(models.Model):
         related_name="projects"
     )
 
+    objects = ProjectManager()
+
     def update_open_to_candidates(self):
         has_roles = self.open_roles.exists()
         if self.open_to_candidates != has_roles:
@@ -85,12 +82,10 @@ class Project(models.Model):
 
         return self.open_to_candidates
 
-
-    objects = ProjectManager()
-
-    @property
-    def avg_score(self):
-        return round(ProjectRating.get_avg_rating(self), 2)
+    def update_avg_score(self):
+        avg = self.ratings.aggregate(avg=Avg("score"))["avg"] or 0
+        self.score = round(avg, 2)
+        self.save(update_fields=['score'])
 
     def save(self, *args, **kwargs):
         Project.objects.validate_stage(self)

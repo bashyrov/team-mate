@@ -98,18 +98,49 @@
         <h5 class="modal-title">Rate Project</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body">
+      <div class="modal-body" id="ratingModalBody">
         <div class="text-center p-3">Loading...</div>
       </div>
     </div>
   </div>
 </div>
 
-
-
-
-
 {% else %}
   <p>We don’t find this project</p>
 {% endif %}
+  <script>
+document.addEventListener("DOMContentLoaded", () => {
+  const ratingModal = document.getElementById('ratingModal');
+  const modalBody = document.getElementById('ratingModalBody');
+
+  ratingModal.addEventListener('show.bs.modal', event => {
+    const url = "{% url 'projects:project_rate' project.pk %}";
+
+    fetch(url)
+      .then(res => res.text())
+      .then(html => {
+        modalBody.innerHTML = html;
+
+        const form = modalBody.querySelector('form');
+        form.addEventListener('submit', e => {
+          e.preventDefault();
+
+          fetch(url, {
+            method: 'POST',
+            body: new FormData(form),
+            headers: {
+              'X-CSRFToken': '{{ csrf_token }}'
+            }
+          }).then(res => {
+            if (res.ok) {
+              location.reload();
+            } else {
+              res.text().then(html => modalBody.innerHTML = html);
+            }
+          });
+        });
+      });
+  });
+});
+</script>
 {% endblock %}

@@ -351,7 +351,10 @@ class ProjectRatingCreateView(CreateView):
         form.save()
 
         if self.request.headers.get("HX-Request"):
-            return render(self.request, "includes/rating-item.html", {"rating": form.instance})
+            return render(self.request, "projects/project_rating_form.html",
+                          {"form": ProjectRatingForm(), "project": self.project})
+
+        self.project.update_avg_score()
 
         return super().form_valid(form)
 
