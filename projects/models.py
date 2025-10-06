@@ -1,18 +1,9 @@
 from team_mate import settings
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Avg
+from projects.service.managers import ProjectManager
 
 user_model = settings.AUTH_USER_MODEL
-
-
-class ProjectManager(models.Manager):
-    def validate_stage(self, project):
-        if project.development_stage == 'deployed' and not project.deploy_url:
-            raise ValidationError({
-                'stage': 'Cannot set stage to "Deployed" without a deploy URL.'
-            })
-        return True
 
 
 class ProjectRating(models.Model):
@@ -143,6 +134,7 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+
 
 class ProjectOpenRole(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="open_roles")
