@@ -1,60 +1,19 @@
-from django.contrib.auth.models import User
-from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
-from .models import Project, Task, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication, \
+from .models import Project, Task, ProjectMembership, ProjectRating, ProjectApplication, \
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
-    ProjectOpenRoleSearchForm, DeveloperSearchForm, TaskSearchForm
+    ProjectOpenRoleSearchForm, TaskSearchForm
+from projects.mixins import TaskUpdatePermissionRequiredMixin, ProjectPermissionRequiredMixin
 from django.shortcuts import redirect, get_object_or_404, render
-from django.db.models import Avg
 
 UserModel = get_user_model()
-
-
-class LeaderboardView(ListView):
-    model = UserModel
-    template_name = "projects/leaderboard.html"
-    context_object_name = "developers"
-    paginate_by = 10
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(LeaderboardView, self).get_context_data(**kwargs)
-        username = self.request.GET.get('project_name', '')
-        context['search_form'] = DeveloperSearchForm(
-            initial={'username': username}
-        )
-        page_obj = context.get('page_obj')
-
-        if page_obj:
-            context['start_rank'] = (page_obj.number - 1) * self.paginate_by
-        else:
-            context['start_rank'] = 0
-
-        return context
-
-    def get_queryset(self):
-
-        qs = UserModel.objects.all()
-
-        form = DeveloperSearchForm(self.request.GET)
-
-        if form.is_valid():
-
-            username = self.request.GET.get('username', '')
-
-            if username:
-                qs = qs.filter(username__icontains=username)
-
-        qs = qs.annotate(avg_score=Avg('projects__score')).order_by('-avg_score', 'username')
-
-        return qs
 
 
 class ProjectListView(ListView):
@@ -98,7 +57,7 @@ class ProjectListView(ListView):
                 qs = qs.filter(development_stage=development_stage)
             if domain:
                 qs = qs.filter(domain=domain)
-            if open_to_candidates == 'on':
+            if open_to_candidates:
                 qs = qs.filter(open_to_candidates=True)
 
         return qs
@@ -113,7 +72,7 @@ class MyProjectListView(ListView):
         return self.request.user.projects.all()
 
 
-class ProjectDetailView(DetailView):
+class ProjectDetailView(DetailView): #TODO: Change Roles
     model = Project
     template_name = 'projects/project_detail.html'
     context_object_name = 'project'
@@ -154,7 +113,7 @@ class ProjectDetailView(DetailView):
         if user.is_authenticated:
             is_member = project.projectmembership_set.filter(user=user).exists()
             is_owner = project.owner == user
-            is_rated = ProjectRating.objects.filter(project=project, user=user).exists()
+            is_rated = ProjectRating.objects.filter(project=project, user_added=user).exists()
             can_rate = not is_member and not is_owner and not is_rated
             can_applicate = not is_member and not is_owner
 
@@ -172,7 +131,7 @@ class ProjectDetailView(DetailView):
         return context
 
 
-class ProjectOpenRoleCreateView(CreateView):
+class ProjectOpenRoleCreateView(CreateView):  #TODO: Change Roles
     model = ProjectOpenRole
     form_class = ProjectOpenRoleForm
     template_name = "projects/open_roles_form.html"
@@ -240,7 +199,7 @@ class ProjectOpenRoleListView(ListView):
         return context
 
 
-class ProjectOpenRoleDeleteView(View):
+class ProjectOpenRoleDeleteView(View): #TODO: Change Roles
 
     def post(self, request, project_pk, role_pk):
         project = get_object_or_404(Project, pk=project_pk)
@@ -320,7 +279,7 @@ class ProjectCreateView(CreateView):
         return super().form_valid(form)
 
 
-class ProjectUpdateView(UpdateView):
+class ProjectUpdateView(UpdateView): #TODO: Change Roles
     model = Project
     form_class = ProjectForm
     template_name = 'projects/project_update.html'
@@ -339,7 +298,7 @@ class ProjectMembershipUpdateView(UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})
 
 
-class ProjectStageUpdateView(UpdateView):
+class ProjectStageUpdateView(UpdateView): #TODO: Change Roles
     model = Project
     form_class = ProjectStageForm
     template_name = 'projects/project_stage_form.html'
@@ -356,7 +315,7 @@ class ProjectStageUpdateView(UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
 
-class ProjectRatingCreateView(CreateView):
+class ProjectRatingCreateView(CreateView): #TODO: Change can_rate
     model = ProjectRating
     form_class = ProjectRatingForm
     template_name = 'projects/project_rating_form.html'
@@ -389,11 +348,14 @@ class ProjectRatingCreateView(CreateView):
         user = get_user_model().objects.first()
 
         form.instance.project = self.project
-        form.instance.user_added = user #TODO: change for real user
+        form.instance.user_added = user  #TODO: change for real user
         form.save()
 
         if self.request.headers.get("HX-Request"):
-            return render(self.request, "includes/rating-item.html", {"rating": form.instance})
+            return render(self.request, "projects/project_rating_form.html",
+                          {"form": ProjectRatingForm(), "project": self.project})
+
+        self.project.update_avg_score()
 
         return super().form_valid(form)
 
@@ -401,7 +363,7 @@ class ProjectRatingCreateView(CreateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.project.pk})
 
 
-class ProjectRolesUpdateView(UpdateView):
+class ProjectRolesUpdateView(UpdateView): #TODO: Change Roles
     model = Project
     template_name = 'projects/project_roles_form.html'
     form_class = ProjectMembershipFormSet
@@ -439,27 +401,11 @@ class ProjectRolesUpdateView(UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
 
-class DeveloperDetailView(DetailView):
-    model = UserModel
-    template_name = 'projects/profile.html'
-    context_object_name = 'developer'
-    pk_url_kwarg = 'user_pk'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        developer = self.object
-
-        project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
-        context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
-
-        context['projects'] = Project.objects.filter(id__in=project_ids)
-        return context
-
-
-class TaskCreateView(CreateView):
+class TaskCreateView(ProjectPermissionRequiredMixin, CreateView): #TODO: Change Roles
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
+    required_permission = 'add_task_perm'
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -472,6 +418,9 @@ class TaskCreateView(CreateView):
         form.instance.project = project
 
         assignee = form.cleaned_data.get("assignee")
+        user = self.request.user
+
+        form.instance.created_by = user  #TODO:change for real
 
         if assignee:
             if not ProjectMembership.objects.filter(project=project, user=assignee).exists():
@@ -483,7 +432,7 @@ class TaskCreateView(CreateView):
         form = super().get_form(*args, **kwargs)
         project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
         form.fields['assignee'].queryset = get_user_model().objects.filter(
-        projectmembership__project=project
+        memberships__project=project
     )
         return form
 
@@ -491,7 +440,7 @@ class TaskCreateView(CreateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.kwargs['project_pk']})
 
 
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(TaskUpdatePermissionRequiredMixin, UpdateView): #TODO: Change Roles
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
@@ -501,7 +450,7 @@ class TaskUpdateView(UpdateView):
         form = super().get_form(*args, **kwargs)
         project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
         form.fields['assignee'].queryset = get_user_model().objects.filter(
-            projectmembership__project=project
+            memberships__project=project
         )
         return form
 
@@ -520,7 +469,7 @@ class TaskUpdateView(UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.kwargs['project_pk']})
 
 
-class ProjectApplicationCreateView(CreateView):
+class ProjectApplicationCreateView(CreateView):  #TODO: Change can_applicate
     model = ProjectApplication
     form_class = ProjectApplicationForm
     template_name = "projects/project_application_form.html"

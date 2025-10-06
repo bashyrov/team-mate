@@ -2,15 +2,6 @@
 <div class="card">
   <div class="card-header" style="position: relative;">
     {{ project.domain }}
-{#    {% if project.development_stage == 'deployed' %}#}
-{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: red; border-radius: 50%;"></span>#}
-{#    {% elif project.development_stage == 'testing' %}#}
-{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: orange; border-radius: 50%;"></span>#}
-{#    {% elif project.development_stage == 'implementation' %}#}
-{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: yellow; border-radius: 50%;"></span>#}
-{#    {% else %}#}
-{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: greenyellow; border-radius: 50%;"></span>#}
-{#    {% endif %}#}
     <div style="position: absolute; top: 10px; right: 10px;">
         {% if project.development_stage == 'deployed' %}
           <span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
@@ -35,20 +26,29 @@
         {% endif %}
       </div>
   </div>
-  <div class="card-body">
-    <h5 class="card-title">
-        {{ project.name }}
-    </h5>
-    <p class="card-text">
-      {{ project.description }}
-    </p>
-    {% if project.development_stage == 'completed' %}
-      <h5>– Score: {{ project.score }}</h5>
-    {% endif %}
-    <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-primary">Go to Project</a>
-      {% if project.development_stage == 'deployed' and project.deploy_url %}
-        <a href="{{ project.deploy_url }}" class="btn btn-primary">Go to Deploy</a>
+  <div class="card-body d-flex flex-column">
+    <h5 class="card-title">{{ project.name }}</h5>
+    <p class="card-text">{{ project.description }}</p>
+
+    <div class="mt-auto d-flex justify-content-between align-items-center">
+      <div>
+        <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-primary">Go to Project</a>
+        {% if project.development_stage == 'deployed' and project.deploy_url %}
+          <a href="{{ project.deploy_url }}" class="btn btn-primary">Go to Deploy</a>
+        {% endif %}
+      </div>
+
+      {% if project.development_stage == 'deployed' and project.ratings and project.score %}
+      <div class="d-flex align-items-center">
+        <svg class="w-4 h-4 text-yellow-300 me-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 22 20">
+          <path d="M20.924 7.625a1.523 1.523 0 0 0-1.238-1.044l-5.051-.734-2.259-4.577a1.534 1.534 0 0 0-2.752 0L7.365 5.847l-5.051.734A1.535 1.535 0 0 0 1.463 9.2l3.656 3.563-.863 5.031a1.532 1.532 0 0 0 2.226 1.616L11 17.033l4.518 2.375a1.534 1.534 0 0 0 2.226-1.617l-.863-5.03L20.537 9.2a1.523 1.523 0 0 0 .387-1.575Z"/>
+        </svg>
+        <p class="mb-0 ms-2 text-sm font-bold text-gray-900 dark:text-white">{{ project.score }}</p>
+        <span class="w-1 h-1 mx-1.5 bg-gray-500 rounded-full dark:bg-gray-400"></span>
+        <p class="mb-0 text-sm font-medium text-gray-900 underline hover:no-underline dark:text-white">{{ project.ratings.count }} reviews</p>
+      </div>
       {% endif %}
   </div>
+</div>
 </div>
 </li>

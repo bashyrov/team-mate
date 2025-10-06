@@ -16,7 +16,7 @@
     {% for dev in developers %}
     <tr>
         <td>{{ forloop.counter0|add:start_rank|add:1 }}</td>
-        <td><a href="{% url 'projects:profile' dev.pk %}">{{ dev.username }}</a></td>
+        <td><a href="{% url 'users:profile' dev.pk %}">{{ dev.username }}</a></td>
         <td>{{ dev.get_position_display }}</td>
         <td>{{ dev.avg_score|floatformat:2|default:"–" }}</td>
     </tr>

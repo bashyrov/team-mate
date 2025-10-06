@@ -6,7 +6,6 @@ app_name = 'projects'
 
 urlpatterns = [
     path('', views.ProjectListView.as_view(), name='dashboard'),
-    path('profile/<int:user_pk>/', views.DeveloperDetailView.as_view(), name='profile'),
     path('projects/', views.ProjectListView.as_view(), name='project_list'),
     path('my-projects/', views.MyProjectListView.as_view(), name='my_projects'),
     path('project/<int:project_pk>/', views.ProjectDetailView.as_view(), name='project_detail'),
@@ -24,5 +23,4 @@ urlpatterns = [
     path('project/<int:project_pk>/task/create/', views.TaskCreateView.as_view(), name='task_create'),
     path("projects/<int:project_pk>/tasks/<int:task_pk>/edit/", views.TaskUpdateView.as_view(), name="task_edit"),
     path("projects/<int:project_pk>/tasks/<int:task_pk>/", views.TaskDetailView.as_view(), name="task_detail"),
-    path('leaderboard/', views.LeaderboardView.as_view(), name='leaderboard'),
 ]

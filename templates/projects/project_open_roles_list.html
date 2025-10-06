@@ -72,6 +72,7 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
+  // --- Create Role Modal ---
   const createModal = document.getElementById('createRoleModal');
   const createFormBody = document.getElementById('createRoleFormBody');
 
@@ -103,6 +104,33 @@ document.addEventListener("DOMContentLoaded", () => {
           });
         });
       });
+  });
+
+  // --- Delete Role Modal ---
+  const deleteModal = document.getElementById('deleteModal');
+  let deleteUrl = null;
+
+  deleteModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget;
+    deleteUrl = button.getAttribute('data-url');
+  });
+
+  const confirmDelete = document.getElementById('confirmDelete');
+  confirmDelete.addEventListener('click', () => {
+    if (!deleteUrl) return;
+
+    fetch(deleteUrl, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}'
+      }
+    }).then(res => {
+      if (res.ok) {
+        location.reload();
+      } else {
+        alert('Failed to delete');
+      }
+    });
   });
 });
 </script>
