@@ -5,6 +5,7 @@
 <p>{{ task.description }}</p>
 <p><strong>Status:</strong> {{ task.get_status_display }}</p>
 <p><strong>Deadline:</strong> {{ task.deadline }}</p>
+<p><strong>Assignee:</strong> {{ task.assignee }}</p>
 <p><strong>Created by:</strong> {{ task.created_by }}</p>
 <p><strong>Created at:</strong> {{ task.created_at }}</p>
 <p><strong>Updated at:</strong> {{ task.updated_at }}</p>
@@ -19,7 +20,7 @@
 <hr>
 {% if user.is_authenticated %}
   {% if membership and membership.role in "PM,Mentor,Lead" or task.assignee == user %}
-    <a href="{% url 'projects:task_edit' task.pk %}" class="btn btn-warning">Edit Task</a>
+    <a href="{% url 'projects:task_edit' project.pk task.pk %}" class="btn btn-warning">Edit Task</a>
   {% endif %}
 {% endif %}
 

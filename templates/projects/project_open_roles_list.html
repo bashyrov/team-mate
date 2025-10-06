@@ -72,42 +72,9 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  // --- Create Role Modal ---
-  const createModal = document.getElementById('createRoleModal');
-  const createFormBody = document.getElementById('createRoleFormBody');
-
-  createModal.addEventListener('show.bs.modal', event => {
-    const button = event.relatedTarget;
-    const url = button.getAttribute('data-url');
-
-    fetch(url)
-      .then(res => res.text())
-      .then(html => {
-        createFormBody.innerHTML = html;
-        const form = createFormBody.querySelector('form');
-
-        form.addEventListener('submit', e => {
-          e.preventDefault();
-
-          fetch(url, {
-            method: 'POST',
-            body: new FormData(form),
-            headers: {
-              'X-CSRFToken': '{{ csrf_token }}'
-            }
-          }).then(res => {
-            if (res.ok) {
-              location.reload();
-            } else {
-              res.text().then(html => createFormBody.innerHTML = html);
-            }
-          });
-        });
-      });
-  });
-
   // --- Delete Role Modal ---
   const deleteModal = document.getElementById('deleteModal');
+  const confirmDelete = document.getElementById('confirmDelete');
   let deleteUrl = null;
 
   deleteModal.addEventListener('show.bs.modal', event => {
@@ -115,23 +82,50 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteUrl = button.getAttribute('data-url');
   });
 
-  const confirmDelete = document.getElementById('confirmDelete');
-  confirmDelete.addEventListener('click', () => {
+  confirmDelete.addEventListener('click', async () => {
     if (!deleteUrl) return;
 
-    fetch(deleteUrl, {
+    const res = await fetch(deleteUrl, {
       method: 'POST',
       headers: {
-        'X-CSRFToken': '{{ csrf_token }}'
-      }
-    }).then(res => {
-      if (res.ok) {
-        location.reload();
-      } else {
-        alert('Failed to delete');
+        'X-CSRFToken': '{{ csrf_token }}',
+        'X-Requested-With': 'XMLHttpRequest'
       }
     });
+
+    if (res.ok) {
+      location.reload();
+    } else if (res.status === 403) {
+      const data = await res.json().catch(() => ({}));
+      showErrorModal(data.error || 'You do not have permission to delete this role.');
+    } else {
+      alert('Failed to delete role.');
+    }
   });
+
+  // --- Bootstrap Error Modal ---
+  function showErrorModal(message) {
+    // Если модалка уже есть — удаляем
+    const old = document.getElementById('errorModal');
+    if (old) old.remove();
+
+    const modalHtml = `
+      <div class="modal fade" id="errorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content border-danger">
+            <div class="modal-header bg-danger text-white">
+              <h5 class="modal-title">Error</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body"><p>${message}</p></div>
+          </div>
+        </div>
+      </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+    modal.show();
+  }
 });
 </script>
+
 {% endblock %}

@@ -1,7 +1,7 @@
 {% if ratings %}
   <ul>
     {% for rating in ratings %}
-      <li>{{ rating.user_added.username }} – Score: {{ rating.score }}
+      <li>{{ rating.rated_by.username }} – Score: {{ rating.score }}
           {% if rating.comment %}- Comment: {{ rating.comment }}{% endif %}
       </li>
     {% endfor %}

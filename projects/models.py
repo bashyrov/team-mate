@@ -8,7 +8,7 @@ user_model = settings.AUTH_USER_MODEL
 
 class ProjectRating(models.Model):
     project = models.ForeignKey('Project', related_name='ratings', on_delete=models.CASCADE)
-    user_added = models.ForeignKey(
+    rated_by = models.ForeignKey(
         user_model,
         on_delete=models.CASCADE,
         related_name='given_project_ratings'

@@ -1,8 +1,10 @@
+from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
 from .models import Project, Task, ProjectMembership, ProjectRating, ProjectApplication, \
@@ -10,7 +12,7 @@ from .models import Project, Task, ProjectMembership, ProjectRating, ProjectAppl
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
     ProjectOpenRoleSearchForm, TaskSearchForm
-from projects.mixins import TaskUpdatePermissionRequiredMixin, ProjectPermissionRequiredMixin
+from projects.mixins import TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingMixin
 from django.shortcuts import redirect, get_object_or_404, render
 
 UserModel = get_user_model()
@@ -83,7 +85,6 @@ class ProjectDetailView(DetailView): #TODO: Change Roles
             'tasks__assignee',
             'tasks__tags',
             'projectmembership_set__user',
-            'ratings__user_added'
         )
 
     def get_context_data(self, **kwargs):
@@ -113,7 +114,7 @@ class ProjectDetailView(DetailView): #TODO: Change Roles
         if user.is_authenticated:
             is_member = project.projectmembership_set.filter(user=user).exists()
             is_owner = project.owner == user
-            is_rated = ProjectRating.objects.filter(project=project, user_added=user).exists()
+            is_rated = ProjectRating.objects.filter(project=project, rated_by=user).exists() #TODO: change for real validate
             can_rate = not is_member and not is_owner and not is_rated
             can_applicate = not is_member and not is_owner
 
@@ -130,15 +131,22 @@ class ProjectDetailView(DetailView): #TODO: Change Roles
         })
         return context
 
-
-class ProjectOpenRoleCreateView(CreateView):  #TODO: Change Roles
+@method_decorator(login_required, name='dispatch')
+class ProjectOpenRoleCreateView(ProjectPermissionRequiredMixin,CreateView):  #TODO: Change Roles
     model = ProjectOpenRole
     form_class = ProjectOpenRoleForm
     template_name = "projects/open_roles_form.html"
+    pk_url_kwarg = "open_role_pk"
+    required_permission = 'manage_open_roles_perm'
 
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
         return super().dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project'] = self.project
+        return context
 
     def form_valid(self, form):
         form.instance.project = self.project
@@ -157,7 +165,7 @@ class ProjectOpenRoleCreateView(CreateView):  #TODO: Change Roles
         return super().form_invalid(form)
 
     def get_success_url(self):
-        return reverse_lazy('projects:project_open_roles_list', kwargs={'project_pk': self.project.pk})
+        return reverse_lazy('projects:project_open_roles_list', kwargs={'project_pk': self.project.pk,})
 
 
 class ProjectOpenRoleListView(ListView):
@@ -199,20 +207,40 @@ class ProjectOpenRoleListView(ListView):
         return context
 
 
-class ProjectOpenRoleDeleteView(View): #TODO: Change Roles
+@method_decorator(login_required, name='dispatch')
+class ProjectOpenRoleDeleteView(ProjectPermissionRequiredMixin, DeleteView):
+    model = ProjectOpenRole
+    required_permission = 'manage_open_roles_perm'
 
-    def post(self, request, project_pk, role_pk):
-        project = get_object_or_404(Project, pk=project_pk)
-        role = get_object_or_404(ProjectOpenRole, pk=role_pk, project=project)
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(Project, pk=kwargs['project_pk'])
+        self.user = request.user
 
+        if not self.has_required_permission():
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({"error": "You do not have permission to delete this role."}, status=403)
+            else:
+                return render(request, "projects/no_permission.html", {
+                    "message": "You do not have permission to delete this role.",
+                    "project": self.project,
+                })
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(ProjectOpenRole, pk=self.kwargs['role_pk'], project=self.project)
+
+    def delete(self, request, *args, **kwargs):
+        role = self.get_object()
         role.delete()
+        self.project.update_open_to_candidates()
 
-        project.update_open_to_candidates()
-
-        return JsonResponse({"status": "deleted"})
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({"status": "deleted"})
+        return super().delete(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('projects:project_open_roles_list', kwargs={'pk': self.project.pk})
+        return reverse_lazy('projects:project_open_roles_list', kwargs={'project_pk': self.project.pk})
 
 
 class TaskListView(ListView):
@@ -221,12 +249,13 @@ class TaskListView(ListView):
     context_object_name = "tasks"
     paginate_by = 10
 
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(Project, pk=kwargs['project_pk'])
+        return super().dispatch(request, *args, **kwargs)
+
     def get_queryset(self):
-
-        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
-
-        form = TaskSearchForm(self.request.GET, project=project)
-        qs = Task.objects.filter(project_id=project.id)
+        form = TaskSearchForm(self.request.GET, project=self.project)
+        qs = Task.objects.filter(project_id=self.project.id)
 
         if form.is_valid():
             title = form.cleaned_data.get('title')
@@ -245,8 +274,7 @@ class TaskListView(ListView):
     def get_context_data(self, **kwargs):
         context = super(TaskListView, self).get_context_data(**kwargs)
 
-        project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
-        context["project"] = project
+        context["project"] = self.project
 
         title = self.request.GET.get('title', '')
         assignee = self.request.GET.get('assignee', '')
@@ -257,18 +285,25 @@ class TaskListView(ListView):
                      'assignee': assignee,
                      'status': status,
                      },
-            project=project
+            project=self.project
         )
         return context
 
-
-class TaskDetailView(DetailView):
+@method_decorator(login_required, name='dispatch')
+class TaskDetailView(TaskPermissionRequiredMixin, DetailView):
     model = Task
     template_name = 'projects/task_detail.html'
     context_object_name = 'task'
     pk_url_kwarg = 'task_pk'
+    required_permission = 'view_task'
 
+    def get_context_data(self, **kwargs):
+        can_edit = False #TODO: use1
+        context = super().get_context_data(**kwargs)
+        context['project'] = self.project
+        return context
 
+@method_decorator(login_required, name='dispatch')
 class ProjectCreateView(CreateView):
     model = Project
     form_class = ProjectForm
@@ -278,77 +313,57 @@ class ProjectCreateView(CreateView):
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
+    def get_success_url(self):
+        return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
-class ProjectUpdateView(UpdateView): #TODO: Change Roles
+@method_decorator(login_required, name='dispatch')
+class ProjectUpdateView(ProjectPermissionRequiredMixin, UpdateView): #TODO: Change Roles
     model = Project
     form_class = ProjectForm
     template_name = 'projects/project_update.html'
     pk_url_kwarg = 'project_pk'
+    required_permission = 'edit_project_info_perm'
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
 
-class ProjectMembershipUpdateView(UpdateView):
+class ProjectMembershipUpdateView(UpdateView): #TODO:Realize, Validate
     model = ProjectMembership
     template_name = 'projects/project_roles_form.html'
     form_class = ProjectMembershipFormUpdate
+    required_permission = 'update_membership_roles_perm'
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})
 
-
-class ProjectStageUpdateView(UpdateView): #TODO: Change Roles
+@method_decorator(login_required, name='dispatch')
+class ProjectStageUpdateView(ProjectPermissionRequiredMixin, UpdateView): #TODO: Change Roles
     model = Project
     form_class = ProjectStageForm
     template_name = 'projects/project_stage_form.html'
     pk_url_kwarg = 'project_pk'
-
-    def dispatch(self, request, *args, **kwargs):
-        user = request.user
-
-        allowed_roles = ['pm', 'mentor', 'lead']
-
-        return super().dispatch(request, *args, **kwargs)
+    required_permission = 'update_project_stage_perm'
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
-
-class ProjectRatingCreateView(CreateView): #TODO: Change can_rate
+@method_decorator(login_required, name='dispatch')
+class ProjectRatingCreateView(ProjectRatingMixin, CreateView): #TODO: Change can_rate
     model = ProjectRating
     form_class = ProjectRatingForm
     template_name = 'projects/project_rating_form.html'
 
-    def dispatch(self, request, *args, **kwargs):
-
-        self.project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
-
-        if self.project.development_stage != 'deployed':
-            return HttpResponse(
-                "<div class='alert alert-warning'>You can only rate deployed projects.</div>"
-            )
-
-        if self.project.members.filter(id=request.user.id).exists() or self.project.owner == request.user:
-            return HttpResponse(
-                "<div class='alert alert-warning'>You can only rate deployed projects.</div>"
-            )
-
-        return super().dispatch(request, *args, **kwargs)
-
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
 
+        context = super().get_context_data(**kwargs)
         context['project'] = self.project
 
         return context
 
     def form_valid(self, form):
-
-        user = get_user_model().objects.first()
-
         form.instance.project = self.project
-        form.instance.user_added = user  #TODO: change for real user
+        form.instance.rated_by = self.user  #TODO: change for real user
         form.save()
 
         if self.request.headers.get("HX-Request"):
@@ -362,12 +377,13 @@ class ProjectRatingCreateView(CreateView): #TODO: Change can_rate
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.project.pk})
 
-
-class ProjectRolesUpdateView(UpdateView): #TODO: Change Roles
+@method_decorator(login_required, name='dispatch')
+class ProjectRolesUpdateView(ProjectPermissionRequiredMixin, UpdateView): #TODO: Change Roles
     model = Project
     template_name = 'projects/project_roles_form.html'
     form_class = ProjectMembershipFormSet
     pk_url_kwarg = 'project_pk'
+    required_permission = 'update_project_roles_perm'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -400,73 +416,63 @@ class ProjectRolesUpdateView(UpdateView): #TODO: Change Roles
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
-
+@method_decorator(login_required, name='dispatch')
 class TaskCreateView(ProjectPermissionRequiredMixin, CreateView): #TODO: Change Roles
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
     required_permission = 'add_task_perm'
 
-    def dispatch(self, request, *args, **kwargs):
-
-        self.project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
-
-        return super().dispatch(request, *args, **kwargs)
-
     def form_valid(self, form):
-        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
-        form.instance.project = project
-
         assignee = form.cleaned_data.get("assignee")
-        user = self.request.user
 
-        form.instance.created_by = user  #TODO:change for real
+        form.instance.project = self.project
 
-        if assignee:
-            if not ProjectMembership.objects.filter(project=project, user=assignee).exists():
+        form.instance.created_by = self.user
+
+        if assignee: #TODO:chech assignee in project members
+            if not ProjectMembership.objects.filter(project=self.project, user=assignee).exists():
                 raise PermissionDenied("Assignee must be a member of this project.")
 
         return super().form_valid(form)
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
-        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
         form.fields['assignee'].queryset = get_user_model().objects.filter(
-        memberships__project=project
+        memberships__project=self.project
     )
         return form
 
     def get_success_url(self):
-        return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.kwargs['project_pk']})
+        return reverse_lazy('projects:task_detail', kwargs={'project_pk': self.project.pk, 'task_pk': self.object.pk})
 
-
-class TaskUpdateView(TaskUpdatePermissionRequiredMixin, UpdateView): #TODO: Change Roles
+@method_decorator(login_required, name='dispatch')
+class TaskUpdateView(TaskPermissionRequiredMixin, UpdateView): #TODO: Change Roles
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
     pk_url_kwarg = "task_pk"
+    required_permission = 'change_task'
 
     def get_form(self, *args, **kwargs):
         form = super().get_form(*args, **kwargs)
-        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
         form.fields['assignee'].queryset = get_user_model().objects.filter(
-            memberships__project=project
+            memberships__project=self.project
         )
         return form
 
     def form_valid(self, form):
-        project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
-        form.instance.project = project
+        form.instance.project = self.project
 
         assignee = form.cleaned_data.get("assignee")
         if assignee:
-            if not ProjectMembership.objects.filter(project=project, user=assignee).exists():
+            if not ProjectMembership.objects.filter(project=self.project, user=assignee).exists():
                 raise PermissionDenied("Assignee must be a member of this project.")
 
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.kwargs['project_pk']})
+        return reverse_lazy('projects:task_detail', kwargs={'task_pk': self.kwargs['task_pk'], 'project_pk': self.kwargs['project_pk']})
 
 
 class ProjectApplicationCreateView(CreateView):  #TODO: Change can_applicate
