@@ -5,6 +5,7 @@ from projects.models import ProjectMembership, Project, Task
 
 
 class ProjectPermissionRequiredMixin:
+
     required_permission = None
 
     def has_required_permission(self, user, project):
@@ -15,10 +16,24 @@ class ProjectPermissionRequiredMixin:
 
         try:
             membership = ProjectMembership.objects.get(user=user, project=project)
-            has_permission = hasattr(membership, "name")
-            return has_permission
+            has_permission = hasattr(membership, self.required_permission)
         except ProjectMembership.DoesNotExist:
             return has_permission
+
+        print(has_permission)
+        return has_permission
+
+    def dispatch(self, request, *args, **kwargs):
+        project = get_object_or_404(Project, pk=kwargs['project_pk'])
+        print(1)
+
+        if not self.has_required_permission(request.user, project):
+            return render(request, "projects/no_permission.html", {
+                "message": "You do not have permission to access this page.",
+                "project": project,
+            })
+
+        return super().dispatch(request, *args, **kwargs)
 
 
 class TaskUpdatePermissionRequiredMixin:

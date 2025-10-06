@@ -3,6 +3,12 @@
 <div class="alert alert-danger mt-4">
     <h4>Access Denied</h4>
     <p>{{ message }}</p>
-    <a href="{% url 'projects:project_detail' task.project.pk %}" class="btn btn-primary">Back to Project</a>
+    {% if task %}
+      <a href="{% url 'projects:project_detail' task.project.pk %}" class="btn btn-primary">Back to Project</a>
+    {% elif project %}
+      <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-primary">Back to Project</a>
+    {% else %}
+      <a href="{% url 'projects:project_list' %}" class="btn btn-primary">Back to Homepage</a>
+    {% endif %}
 </div>
 {% endblock %}
