@@ -71,7 +71,7 @@ class MyProjectListView(ListView):
         return self.request.user.projects.all()
 
 
-class ProjectDetailView(DetailView):
+class ProjectDetailView(DetailView): #TODO: Change Roles
     model = Project
     template_name = 'projects/project_detail.html'
     context_object_name = 'project'
@@ -112,7 +112,7 @@ class ProjectDetailView(DetailView):
         if user.is_authenticated:
             is_member = project.projectmembership_set.filter(user=user).exists()
             is_owner = project.owner == user
-            is_rated = ProjectRating.objects.filter(project=project, user=user).exists()
+            is_rated = ProjectRating.objects.filter(project=project, user_added=user).exists()
             can_rate = not is_member and not is_owner and not is_rated
             can_applicate = not is_member and not is_owner
 
@@ -130,7 +130,7 @@ class ProjectDetailView(DetailView):
         return context
 
 
-class ProjectOpenRoleCreateView(CreateView):
+class ProjectOpenRoleCreateView(CreateView):  #TODO: Change Roles
     model = ProjectOpenRole
     form_class = ProjectOpenRoleForm
     template_name = "projects/open_roles_form.html"
@@ -198,7 +198,7 @@ class ProjectOpenRoleListView(ListView):
         return context
 
 
-class ProjectOpenRoleDeleteView(View):
+class ProjectOpenRoleDeleteView(View): #TODO: Change Roles
 
     def post(self, request, project_pk, role_pk):
         project = get_object_or_404(Project, pk=project_pk)
@@ -278,7 +278,7 @@ class ProjectCreateView(CreateView):
         return super().form_valid(form)
 
 
-class ProjectUpdateView(UpdateView):
+class ProjectUpdateView(UpdateView): #TODO: Change Roles
     model = Project
     form_class = ProjectForm
     template_name = 'projects/project_update.html'
@@ -297,7 +297,7 @@ class ProjectMembershipUpdateView(UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})
 
 
-class ProjectStageUpdateView(UpdateView):
+class ProjectStageUpdateView(UpdateView): #TODO: Change Roles
     model = Project
     form_class = ProjectStageForm
     template_name = 'projects/project_stage_form.html'
@@ -314,7 +314,7 @@ class ProjectStageUpdateView(UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
 
-class ProjectRatingCreateView(CreateView):
+class ProjectRatingCreateView(CreateView): #TODO: Change can_rate
     model = ProjectRating
     form_class = ProjectRatingForm
     template_name = 'projects/project_rating_form.html'
@@ -347,7 +347,7 @@ class ProjectRatingCreateView(CreateView):
         user = get_user_model().objects.first()
 
         form.instance.project = self.project
-        form.instance.user_added = user #TODO: change for real user
+        form.instance.user_added = user  #TODO: change for real user
         form.save()
 
         if self.request.headers.get("HX-Request"):
@@ -362,7 +362,7 @@ class ProjectRatingCreateView(CreateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.project.pk})
 
 
-class ProjectRolesUpdateView(UpdateView):
+class ProjectRolesUpdateView(UpdateView): #TODO: Change Roles
     model = Project
     template_name = 'projects/project_roles_form.html'
     form_class = ProjectMembershipFormSet
@@ -400,7 +400,7 @@ class ProjectRolesUpdateView(UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
 
-class TaskCreateView(CreateView):
+class TaskCreateView(CreateView): #TODO: Change Roles
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
@@ -416,6 +416,9 @@ class TaskCreateView(CreateView):
         form.instance.project = project
 
         assignee = form.cleaned_data.get("assignee")
+        user = get_user_model().objects.first()
+
+        form.instance.created_by = user  #TODO:change for real
 
         if assignee:
             if not ProjectMembership.objects.filter(project=project, user=assignee).exists():
@@ -435,7 +438,7 @@ class TaskCreateView(CreateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.kwargs['project_pk']})
 
 
-class TaskUpdateView(UpdateView):
+class TaskUpdateView(UpdateView): #TODO: Change Roles
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
@@ -464,7 +467,7 @@ class TaskUpdateView(UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.kwargs['project_pk']})
 
 
-class ProjectApplicationCreateView(CreateView):
+class ProjectApplicationCreateView(CreateView):  #TODO: Change can_applicate
     model = ProjectApplication
     form_class = ProjectApplicationForm
     template_name = "projects/project_application_form.html"

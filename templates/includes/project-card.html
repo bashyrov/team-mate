@@ -2,15 +2,6 @@
 <div class="card">
   <div class="card-header" style="position: relative;">
     {{ project.domain }}
-{#    {% if project.development_stage == 'deployed' %}#}
-{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: red; border-radius: 50%;"></span>#}
-{#    {% elif project.development_stage == 'testing' %}#}
-{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: orange; border-radius: 50%;"></span>#}
-{#    {% elif project.development_stage == 'implementation' %}#}
-{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: yellow; border-radius: 50%;"></span>#}
-{#    {% else %}#}
-{#      <span class="completed-badge" style="position: absolute; top: 10px; right: 10px; width: 15px; height: 15px; background-color: greenyellow; border-radius: 50%;"></span>#}
-{#    {% endif %}#}
     <div style="position: absolute; top: 10px; right: 10px;">
         {% if project.development_stage == 'deployed' %}
           <span class="inline-flex items-center bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900 dark:text-green-300">
