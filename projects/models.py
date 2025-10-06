@@ -1,39 +1,9 @@
-from django.contrib.auth import get_user_model
 from team_mate import settings
-from django.contrib.auth.models import AbstractUser
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Avg
 
 user_model = settings.AUTH_USER_MODEL
-
-
-class Developer(AbstractUser):
-
-    POSITION_CHOICES = [
-        ('backend', 'Backend'),
-        ('frontend', 'Frontend'),
-        ('qa', 'QA'),
-        ('designer', 'Designer'),
-        ('pm', 'PM'),
-        ('mentor', 'Mentor'),
-    ]
-
-    position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='backend')
-    score = models.FloatField(default=0)
-    tech_stack = models.CharField(max_length=255, blank=True)
-    linkedin_url = models.CharField(max_length=255, blank=True)
-    portfolio_url = models.CharField(max_length=255, blank=True)
-    telegram_contact = models.CharField(max_length=255, blank=True)
-    discord_contact = models.CharField(max_length=255, blank=True)
-
-    def __str__(self):
-        return self.username
-
-    def avg_project_score(self):
-        project_ids = ProjectMembership.objects.filter(user=self).values_list('project_id', flat=True)
-        avg_score = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg']
-        return avg_score or 0
 
 
 class ProjectManager(models.Manager):
@@ -93,7 +63,7 @@ class Project(models.Model):
     domain = models.CharField(max_length=50, choices=DOMEN_CHOICES, default='backend')
     development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='backend')
     deploy_url = models.CharField(max_length=255, blank=True)
-    owner = models.ForeignKey(Developer, related_name='owned_projects', on_delete=models.CASCADE)
+    owner = models.ForeignKey(user_model, related_name='owned_projects', on_delete=models.CASCADE)
     open_to_candidates = models.BooleanField(default=True)
     unical_id = models.CharField(max_length=255, default='unical_id')
     score = models.FloatField(default=0)
@@ -101,7 +71,7 @@ class Project(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     members = models.ManyToManyField(
-        get_user_model(),
+        user_model,
         through="ProjectMembership",
         related_name="projects"
     )
@@ -140,7 +110,7 @@ class ProjectMembership(models.Model):
     ]
 
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    user = models.ForeignKey(user_model, on_delete=models.CASCADE)
+    user = models.ForeignKey(user_model, on_delete=models.CASCADE, related_name='memberships')
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="DEV")
 
     joined_at = models.DateTimeField(auto_now_add=True)
@@ -178,27 +148,6 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
-
-
-class DeveloperRatings(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    user = models.ForeignKey(
-        user_model,
-        on_delete=models.CASCADE,
-        related_name='received_user_ratings'
-    )
-    user_added = models.ForeignKey(
-        user_model,
-        on_delete=models.CASCADE,
-        related_name='given_user_ratings'
-    )
-    rating = models.FloatField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    @staticmethod
-    def get_avg_rating(user):
-        return DeveloperRatings.objects.filter(user=user).aggregate(avg=Avg("rating"))["avg"] or 0
-
 
 class ProjectOpenRole(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="open_roles")

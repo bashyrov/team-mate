@@ -17,7 +17,7 @@
           <a class="nav-link" href="{% url 'projects:project_list' %}">Projects</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'projects:leaderboard' %}">Leaderboard</a>
+          <a class="nav-link" href="{% url 'users:leaderboard' %}">Leaderboard</a>
         </li>
         {% if user.is_authenticated %}
         <li class="nav-item">
@@ -34,7 +34,7 @@
             </span>
           </button>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'projects:profile' user.pk %}">Profile</a>
+          <a class="nav-link" href="{% url 'users:profile' user.pk %}">Profile</a>
         </li>
         {% endif %}
       </ul>
@@ -61,7 +61,7 @@
         </a>
       </li>
       <li class="nav-item">
-        <a href="{% url 'projects:leaderboard' %}" class="nav-link px-2 text-body-secondary">
+        <a href="{% url 'users:leaderboard' %}" class="nav-link px-2 text-body-secondary">
           Leaderboard
         </a>
       </li>

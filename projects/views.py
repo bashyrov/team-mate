@@ -1,60 +1,18 @@
-from django.contrib.auth.models import User
-from django.http import JsonResponse
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
-from .models import Project, Task, ProjectMembership, ProjectRating, DeveloperRatings, ProjectApplication, \
+from .models import Project, Task, ProjectMembership, ProjectRating, ProjectApplication, \
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
-    ProjectOpenRoleSearchForm, DeveloperSearchForm, TaskSearchForm
+    ProjectOpenRoleSearchForm, TaskSearchForm
 from django.shortcuts import redirect, get_object_or_404, render
-from django.db.models import Avg
 
 UserModel = get_user_model()
-
-
-class LeaderboardView(ListView):
-    model = UserModel
-    template_name = "projects/leaderboard.html"
-    context_object_name = "developers"
-    paginate_by = 10
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(LeaderboardView, self).get_context_data(**kwargs)
-        username = self.request.GET.get('project_name', '')
-        context['search_form'] = DeveloperSearchForm(
-            initial={'username': username}
-        )
-        page_obj = context.get('page_obj')
-
-        if page_obj:
-            context['start_rank'] = (page_obj.number - 1) * self.paginate_by
-        else:
-            context['start_rank'] = 0
-
-        return context
-
-    def get_queryset(self):
-
-        qs = UserModel.objects.all()
-
-        form = DeveloperSearchForm(self.request.GET)
-
-        if form.is_valid():
-
-            username = self.request.GET.get('username', '')
-
-            if username:
-                qs = qs.filter(username__icontains=username)
-
-        qs = qs.annotate(avg_score=Avg('projects__score')).order_by('-avg_score', 'username')
-
-        return qs
 
 
 class ProjectListView(ListView):
@@ -437,23 +395,6 @@ class ProjectRolesUpdateView(UpdateView):
 
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
-
-
-class DeveloperDetailView(DetailView):
-    model = UserModel
-    template_name = 'projects/profile.html'
-    context_object_name = 'developer'
-    pk_url_kwarg = 'user_pk'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        developer = self.object
-
-        project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
-        context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
-
-        context['projects'] = Project.objects.filter(id__in=project_ids)
-        return context
 
 
 class TaskCreateView(CreateView):

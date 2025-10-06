@@ -27,7 +27,7 @@
       <ul>
         {% for membership in memberships %}
           <li>
-            <a href="{% url 'projects:profile' membership.user.pk %}">
+            <a href="{% url 'users:profile' membership.user.pk %}">
               {{ membership.user.username }}
             </a> – {{ membership.get_role_display }}
           </li>
