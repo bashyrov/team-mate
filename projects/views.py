@@ -424,7 +424,7 @@ class TaskCreateView(CreateView):
         form = super().get_form(*args, **kwargs)
         project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
         form.fields['assignee'].queryset = get_user_model().objects.filter(
-        projectmembership__project=project
+        memberships__project=project
     )
         return form
 
@@ -442,7 +442,7 @@ class TaskUpdateView(UpdateView):
         form = super().get_form(*args, **kwargs)
         project = get_object_or_404(Project, pk=self.kwargs['project_pk'])
         form.fields['assignee'].queryset = get_user_model().objects.filter(
-            projectmembership__project=project
+            memberships__project=project
         )
         return form
 
