@@ -49,7 +49,6 @@ class ProjectPermissionRequiredMixin(BasePermissionMixin):
         try:
             user_obj = ProjectMembership.objects.filter(user=self.user, project=self.project).first()
             has_permission = getattr(user_obj, self.required_permission)
-            print(has_permission)
         except Exception as e:
             return has_permission
 

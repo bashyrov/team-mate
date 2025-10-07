@@ -1,11 +1,12 @@
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.contrib import messages
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
 from .models import Project, Task, ProjectMembership, ProjectRating, ProjectApplication, \
     ProjectOpenRole
@@ -427,7 +428,6 @@ class TaskCreateView(ProjectPermissionRequiredMixin, CreateView): #TODO: Change 
         assignee = form.cleaned_data.get("assignee")
 
         form.instance.project = self.project
-
         form.instance.created_by = self.user
 
         if assignee: #TODO:chech assignee in project members
@@ -481,7 +481,8 @@ class ProjectApplicationCreateView(CreateView):  #TODO: Change can_applicate
     template_name = "projects/project_application_form.html"
 
     def dispatch(self, request, *args, **kwargs):
-        self.project = get_object_or_404(Project, pk=self.kwargs["pk"])
+        self.project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
+        self.role = get_object_or_404(ProjectOpenRole, pk=self.kwargs["role_pk"])
 
         if not request.user.is_authenticated:
             return HttpResponse("""
@@ -491,20 +492,71 @@ class ProjectApplicationCreateView(CreateView):  #TODO: Change can_applicate
                 </div>
             """)
 
-        if self.project.members.filter(id=request.user.id).exists() or self.project.owner == request.user:
-            raise PermissionDenied("You cannot apply to your own project.")
-
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        form.instance.project_id = self.kwargs["pk"]
+        form.instance.project = self.project
         form.instance.user = self.request.user
         form.save()
-        return HttpResponse(status=204)
+        return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse_lazy("projects:project_detail", kwargs={"pk": self.project.pk})
+        return reverse_lazy("projects:project_detail", kwargs={"project_pk": self.project.pk})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project'] = self.project
+        context['role'] = self.role
+        return context
 
 
-def index(request):
-    return None
+class ProjectApplicationListView(ListView):  #TODO: Realize
+    model = ProjectApplication
+    template_name = "projects/project_application_list.html"
+    context_object_name = "applications"
+    paginate_by = 10
+
+    def dispatch(self, request, *args, **kwargs):
+        self.project = get_object_or_404(Project, pk=kwargs['project_pk'])
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return ProjectApplication.objects.filter(project=self.project)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['project'] = self.project
+        return context
+
+
+def application_approve(args, **kwargs):  #TODO: Change Roles
+    request = args
+    pk = kwargs.get('pk')
+    application = get_object_or_404(ProjectApplication, pk=pk)
+    project = application.project
+
+    if application.status in ['accepted', 'rejected']:
+        messages.warning(request, "This application has already been processed.")
+        return redirect('projects:applications_list', project.pk)
+
+    try:
+        with transaction.atomic():
+            if ProjectMembership.objects.filter(project=project, user=application.user).exists():
+                messages.warning(request, f"{application.user.username} is already a member of the project.")
+                return redirect('projects:applications_list', project.pk)
+
+            ProjectMembership.objects.create(
+                project=project,
+                user=application.user,
+                role=application.role,
+            )
+
+            application.status = 'accepted'
+            application.save(update_fields=['status'])
+
+            messages.success(request, f"{application.user.username} has been added to the project!")
+
+    except Exception as ex:
+        messages.error(request, "An error occurred while approving the application.")
+
+    return redirect('projects:applications_list', project.pk)

@@ -1,5 +1,5 @@
 <form method="post"
-      hx-post="{% url 'projects:apply' project.pk %}"
+      hx-post="{% url 'projects:apply' project.pk role.pk %}"
       hx-target="#modal-body"
       hx-swap="innerHTML">
   {% csrf_token %}

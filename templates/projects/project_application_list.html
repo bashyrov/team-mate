@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+  {% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert
+        {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}
+        alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<div class="d-grid gap-3" style="grid-template-columns: 1fr 3fr;">
+  <div class="bg-body-tertiary border rounded-3 sticky-top"
+     style="padding: 15px; height: fit-content; top: 20px;">
+    filters
+  </div>
+
+  <div class="bg-body-tertiary border rounded-3 p-3">
+    <h2>All Applications</h2>
+    {% if applications %}
+      <ul class="list-group">
+        {% for application in applications %}
+          <li class="list-group-item">
+            <h3>{{ application.user.username }} - {{ application.role }}</h3>
+            <h2>Status: {{ application.status }}</h2>
+            <p>{{ application.message }}</p>
+            <a href="{% url 'projects:application_approve' project.pk application.pk %}"> Detail </a>
+            <a href="{% url 'projects:application_approve' project.pk application.pk %}"> Approve </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <h4>No applications yet.</h4>
+    {% endif %}
+    {% include "includes/pagination.html" %}
+  </div>
+</div>
+
+
+{% endblock %}
