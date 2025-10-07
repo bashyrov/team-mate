@@ -158,7 +158,7 @@ class ProjectApplication(models.Model):
         ('rejected', 'Rejected'),
     ]
 
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="applications")
     user = models.ForeignKey(user_model, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=APPLICATION_STATUS_CHOICES, default='pending')
     message = models.TextField(blank=True)

@@ -13,7 +13,8 @@ from .models import Project, Task, ProjectMembership, ProjectRating, ProjectAppl
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
     ProjectOpenRoleSearchForm, TaskSearchForm
-from projects.mixins import TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingMixin
+from projects.mixins import TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingMixin, \
+    ApplicationPermissionRequiredMixin
 from django.shortcuts import redirect, get_object_or_404, render
 
 UserModel = get_user_model()
@@ -475,10 +476,11 @@ class TaskUpdateView(TaskPermissionRequiredMixin, UpdateView): #TODO: Change Rol
         return reverse_lazy('projects:task_detail', kwargs={'task_pk': self.kwargs['task_pk'], 'project_pk': self.kwargs['project_pk']})
 
 
-class ProjectApplicationCreateView(CreateView):  #TODO: Change can_applicate
+class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateView):  #TODO: Change can_applicate
     model = ProjectApplication
     form_class = ProjectApplicationForm
     template_name = "projects/project_application_form.html"
+    required_permission = 'add_project_application'
 
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(Project, pk=self.kwargs["project_pk"])
@@ -521,7 +523,7 @@ class ProjectApplicationListView(ListView):  #TODO: Realize
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return ProjectApplication.objects.filter(project=self.project)
+        return ProjectApplication.objects.filter(project=self.project, status='pending').select_related('user')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -541,9 +543,10 @@ def application_approve(args, **kwargs):  #TODO: Change Roles
 
     try:
         with transaction.atomic():
-            if ProjectMembership.objects.filter(project=project, user=application.user).exists():
+            if ProjectMembership.objects.filter(project=project, user=application.user).exists() or project.owner == application.user:
                 messages.warning(request, f"{application.user.username} is already a member of the project.")
                 return redirect('projects:applications_list', project.pk)
+
 
             ProjectMembership.objects.create(
                 project=project,

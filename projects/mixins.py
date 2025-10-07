@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, render
 
-from projects.models import ProjectMembership, Project, Task
+from projects.models import ProjectMembership, Project, Task, ProjectApplication
 
 class BasePermissionMixin:
     required_permission = None
@@ -10,6 +10,9 @@ class BasePermissionMixin:
 
     def is_member(self):
         return self.user == self.project.owner or self.project.members.filter(id=self.user.id).exists()
+
+    def applied_to_project(self):
+        return self.project.applications.filter(user=self.user, status='pending').exists()
 
     def is_rated(self):
         return self.user.given_project_ratings.filter(project=self.project).exists()
@@ -119,6 +122,33 @@ class TaskPermissionRequiredMixin(BasePermissionMixin):
             return render(request, "projects/no_permission.html", {
                 "message": "You do not have permission to access this page.",
                 "task": self.task,
+            })
+
+        return response
+
+
+class ApplicationPermissionRequiredMixin(BasePermissionMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        if self.is_owner():
+            return render(request, "projects/no_permission.html", {
+                "message": "You cannot apply your own project.",
+                "project": self.project,
+            })
+
+        if self.is_member():
+            return render(request, "projects/no_permission.html", {
+                "message": "You cannot apply your own project.",
+                "project": self.project,
+            })
+
+        if self.applied_to_project():
+            return render(request, "projects/no_permission.html", {
+                "message": "Your application to join this project is currently under review.",
+                "project": self.project,
             })
 
         return response
