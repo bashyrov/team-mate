@@ -22,6 +22,11 @@
 
   <div class="bg-body-tertiary border rounded-3 p-3">
     <h2>All Applications</h2>
+    {% if view_type == 'active' %}
+      <a href="{% url 'projects:application_archive' project.pk %}"> Archive </a>
+    {% elif view_type == 'archive' %}
+      <a href="{% url 'projects:applications_list' project.pk %}"> Back to Active </a>
+    {% endif %}
     {% if applications %}
       <ul class="list-group">
         {% for application in applications %}
@@ -29,8 +34,10 @@
             <h3>{{ application.user.username }} - {{ application.role }}</h3>
             <h2>Status: {{ application.status }}</h2>
             <p>{{ application.message }}</p>
-            <a href="{% url 'projects:application_approve' project.pk application.pk %}"> Detail </a>
-            <a href="{% url 'projects:application_approve' project.pk application.pk %}"> Approve </a>
+            {% if view_type == 'active' %}
+              <a href="{% url 'projects:application_reject' project.pk application.pk %}"> Reject </a>
+              <a href="{% url 'projects:application_approve' project.pk application.pk %}"> Approve </a>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>

@@ -517,24 +517,35 @@ class ProjectApplicationListView(ListView):  #TODO: Realize
     template_name = "projects/project_application_list.html"
     context_object_name = "applications"
     paginate_by = 10
+    view_type = 'active'
 
     def dispatch(self, request, *args, **kwargs):
         self.project = get_object_or_404(Project, pk=kwargs['project_pk'])
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return ProjectApplication.objects.filter(project=self.project, status='pending').select_related('user')
+
+        qs = ProjectApplication.objects.filter(project=self.project)
+        self.view_type = getattr(self, 'view_type', 'active')
+
+        if self.view_type == 'active':
+            qs = qs.filter(status='pending')
+        elif self.view_type == 'archive':
+            qs = qs.filter(status__in=['accepted', 'rejected'])
+
+        return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['view_type'] = self.view_type
         context['project'] = self.project
         return context
 
 
 def application_approve(args, **kwargs):  #TODO: Change Roles
     request = args
-    pk = kwargs.get('pk')
-    application = get_object_or_404(ProjectApplication, pk=pk)
+    application_pk = kwargs.get('pk')
+    application = get_object_or_404(ProjectApplication, pk=application_pk)
     project = application.project
 
     if application.status in ['accepted', 'rejected']:
@@ -561,5 +572,29 @@ def application_approve(args, **kwargs):  #TODO: Change Roles
 
     except Exception as ex:
         messages.error(request, "An error occurred while approving the application.")
+
+    return redirect('projects:applications_list', project.pk)
+
+
+def application_reject(args, **kwargs):  #TODO: Change Roles
+    request = args
+    application_pk = kwargs.get('pk')
+    application = get_object_or_404(ProjectApplication, pk=application_pk)
+    project = application.project
+
+    if application.status in ['accepted', 'rejected']:
+        messages.warning(request, "This application has already been processed.")
+        return redirect('projects:applications_list', project.pk)
+
+    try:
+        with transaction.atomic():
+
+            application.status = 'rejected'
+            application.save(update_fields=['status'])
+
+            messages.success(request, f"{application.user.username} application has rejected!")
+
+    except Exception as ex:
+        messages.error(request, "An error occurred while rejecting the application.")
 
     return redirect('projects:applications_list', project.pk)
