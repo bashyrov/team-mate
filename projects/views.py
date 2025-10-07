@@ -8,13 +8,15 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
+
+from .decorators import validate_permissions_application_review, validate_application_status, validate_is_member
 from .models import Project, Task, ProjectMembership, ProjectRating, ProjectApplication, \
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
     ProjectOpenRoleSearchForm, TaskSearchForm
-from projects.mixins import TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingMixin, \
-    ApplicationPermissionRequiredMixin
+from projects.mixins import TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingPermissionMixin, \
+    ApplicationPermissionRequiredMixin, MembershipPermissionRequiredMixin
 from django.shortcuts import redirect, get_object_or_404, render
 
 UserModel = get_user_model()
@@ -351,7 +353,7 @@ class ProjectStageUpdateView(ProjectPermissionRequiredMixin, UpdateView): #TODO:
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
 @method_decorator(login_required, name='dispatch')
-class ProjectRatingCreateView(ProjectRatingMixin, CreateView): #TODO: Change can_rate
+class ProjectRatingCreateView(ProjectRatingPermissionMixin, CreateView): #TODO: Change can_rate
     model = ProjectRating
     form_class = ProjectRatingForm
     template_name = 'projects/project_rating_form.html'
@@ -476,6 +478,7 @@ class TaskUpdateView(TaskPermissionRequiredMixin, UpdateView): #TODO: Change Rol
         return reverse_lazy('projects:task_detail', kwargs={'task_pk': self.kwargs['task_pk'], 'project_pk': self.kwargs['project_pk']})
 
 
+@method_decorator(login_required, name='dispatch')
 class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateView):  #TODO: Change can_applicate
     model = ProjectApplication
     form_class = ProjectApplicationForm
@@ -512,16 +515,14 @@ class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateVie
         return context
 
 
-class ProjectApplicationListView(ListView):  #TODO: Realize
+@method_decorator(login_required, name='dispatch')
+class ProjectApplicationListView(MembershipPermissionRequiredMixin, ListView):  #TODO: Realize
     model = ProjectApplication
     template_name = "projects/project_application_list.html"
     context_object_name = "applications"
     paginate_by = 10
     view_type = 'active'
-
-    def dispatch(self, request, *args, **kwargs):
-        self.project = get_object_or_404(Project, pk=kwargs['project_pk'])
-        return super().dispatch(request, *args, **kwargs)
+    required_permission = 'view_project_applications'
 
     def get_queryset(self):
 
@@ -541,24 +542,16 @@ class ProjectApplicationListView(ListView):  #TODO: Realize
         context['project'] = self.project
         return context
 
-
-def application_approve(args, **kwargs):  #TODO: Change Roles
-    request = args
-    application_pk = kwargs.get('pk')
-    application = get_object_or_404(ProjectApplication, pk=application_pk)
+@login_required
+@validate_permissions_application_review
+@validate_application_status
+@validate_is_member
+def application_approve(request, **kwargs):  #TODO: Change Roles
+    application = kwargs.get('application')
     project = application.project
-
-    if application.status in ['accepted', 'rejected']:
-        messages.warning(request, "This application has already been processed.")
-        return redirect('projects:applications_list', project.pk)
 
     try:
         with transaction.atomic():
-            if ProjectMembership.objects.filter(project=project, user=application.user).exists() or project.owner == application.user:
-                messages.warning(request, f"{application.user.username} is already a member of the project.")
-                return redirect('projects:applications_list', project.pk)
-
-
             ProjectMembership.objects.create(
                 project=project,
                 user=application.user,
@@ -575,20 +568,15 @@ def application_approve(args, **kwargs):  #TODO: Change Roles
 
     return redirect('projects:applications_list', project.pk)
 
-
-def application_reject(args, **kwargs):  #TODO: Change Roles
-    request = args
-    application_pk = kwargs.get('pk')
-    application = get_object_or_404(ProjectApplication, pk=application_pk)
+@validate_permissions_application_review
+@validate_application_status
+@login_required
+def application_reject(request, **kwargs):  #TODO: Change Roles
+    application = kwargs.get('application')
     project = application.project
-
-    if application.status in ['accepted', 'rejected']:
-        messages.warning(request, "This application has already been processed.")
-        return redirect('projects:applications_list', project.pk)
 
     try:
         with transaction.atomic():
-
             application.status = 'rejected'
             application.save(update_fields=['status'])
 

@@ -70,7 +70,7 @@ class ProjectPermissionRequiredMixin(BasePermissionMixin):
         return response
 
 
-class ProjectRatingMixin(BasePermissionMixin):
+class ProjectRatingPermissionMixin(BasePermissionMixin):
 
     def dispatch(self, request, *args, **kwargs):
 
@@ -151,4 +151,18 @@ class ApplicationPermissionRequiredMixin(BasePermissionMixin):
                 "project": self.project,
             })
 
+        return response
+
+
+class MembershipPermissionRequiredMixin(BasePermissionMixin):
+
+    def dispatch(self, request, *args, **kwargs):
+
+        response = super().dispatch(request, *args, **kwargs)
+
+        if not self.is_member():
+            return render(request, "projects/no_permission.html", {
+                "message": "You must be a project member to access this page.",
+                "project": self.project,
+            })
         return response
