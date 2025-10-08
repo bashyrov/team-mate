@@ -14,7 +14,7 @@ from .models import Project, Task, ProjectMembership, ProjectRating, ProjectAppl
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
-    ProjectOpenRoleSearchForm, TaskSearchForm, MyTaskSearchForm
+    ProjectOpenRoleSearchForm, TaskSearchForm
 from projects.mixins import TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingPermissionMixin, \
     ApplicationPermissionRequiredMixin, MembershipPermissionRequiredMixin, BasePermissionMixin
 from django.shortcuts import redirect, get_object_or_404, render
@@ -68,53 +68,6 @@ class ProjectListView(ListView):
                 qs = qs.filter(open_to_candidates=True)
 
         return qs
-
-@method_decorator(login_required, name='dispatch')
-class MyProjectListView(ListView):
-    model = Project
-    template_name = 'projects/my_projects.html'
-    context_object_name = 'projects'
-    paginate_by = 10
-
-    def get_queryset(self):
-        qs = (self.request.user.projects.all() | self.request.user.owned_projects.all()).distinct()
-        return qs
-
-
-@method_decorator(login_required, name='dispatch')
-class MyTasksListView(ListView):
-    model = Task
-    template_name = 'projects/my_task_list.html'
-    context_object_name = 'tasks'
-    paginate_by = 10
-    view_type = 'my_tasks'
-
-    def get_queryset(self):
-        user = self.request.user
-        qs = Task.objects.filter(assignee=user)
-
-        form = MyTaskSearchForm(self.request.GET, user=user)
-        if form.is_valid():
-            title = form.cleaned_data.get('title')
-            status = form.cleaned_data.get('status')
-
-            if title:
-                qs = qs.filter(title__icontains=title)
-            if status:
-                qs = qs.filter(status=status)
-
-        return qs
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        context['search_form'] = MyTaskSearchForm(
-            self.request.GET or None,
-            user=self.request.user
-        )
-
-        context['view_type'] = self.view_type
-        return context
 
 
 class ProjectDetailView(DetailView):
@@ -186,7 +139,7 @@ class ProjectDetailView(DetailView):
 class ProjectOpenRoleCreateView(ProjectPermissionRequiredMixin,CreateView):
     model = ProjectOpenRole
     form_class = ProjectOpenRoleForm
-    template_name = "projects/open_roles_form.html"
+    template_name = "projects/forms/open_roles_form.html"
     pk_url_kwarg = "open_role_pk"
     required_permission = 'manage_open_roles_perm'
 
@@ -385,7 +338,7 @@ class TaskDetailView(TaskPermissionRequiredMixin, DetailView):
 class ProjectCreateView(CreateView):
     model = Project
     form_class = ProjectForm
-    template_name = 'projects/project_form.html'
+    template_name = 'projects/forms/project_form.html'
 
     def form_valid(self, form):
         form.instance.owner = self.request.user
@@ -417,7 +370,7 @@ class ProjectUpdateView(ProjectPermissionRequiredMixin, UpdateView):
 @method_decorator(login_required, name='dispatch')
 class ProjectMembershipUpdateView(ProjectPermissionRequiredMixin, UpdateView):
     model = ProjectMembership
-    template_name = 'projects/project_roles_form.html'
+    template_name = 'projects/forms/project_roles_form.html'
     form_class = ProjectMembershipFormUpdate
     required_permission = 'update_membership_roles_perm'
 
@@ -428,7 +381,7 @@ class ProjectMembershipUpdateView(ProjectPermissionRequiredMixin, UpdateView):
 class ProjectStageUpdateView(ProjectPermissionRequiredMixin, UpdateView):
     model = Project
     form_class = ProjectStageForm
-    template_name = 'projects/project_stage_form.html'
+    template_name = 'projects/forms/project_stage_form.html'
     pk_url_kwarg = 'project_pk'
     required_permission = 'update_project_stage_perm'
 
@@ -439,7 +392,7 @@ class ProjectStageUpdateView(ProjectPermissionRequiredMixin, UpdateView):
 class ProjectRatingCreateView(ProjectRatingPermissionMixin, CreateView):
     model = ProjectRating
     form_class = ProjectRatingForm
-    template_name = 'projects/project_rating_form.html'
+    template_name = 'projects/forms/project_rating_form.html'
 
     def get_context_data(self, **kwargs):
 
@@ -454,7 +407,7 @@ class ProjectRatingCreateView(ProjectRatingPermissionMixin, CreateView):
         form.save()
 
         if self.request.headers.get("HX-Request"):
-            return render(self.request, "projects/project_rating_form.html",
+            return render(self.request, "projects/forms/project_rating_form.html",
                           {"form": ProjectRatingForm(), "project": self.project})
 
         self.project.update_avg_score()
@@ -467,7 +420,7 @@ class ProjectRatingCreateView(ProjectRatingPermissionMixin, CreateView):
 @method_decorator(login_required, name='dispatch')
 class ProjectRolesUpdateView(ProjectPermissionRequiredMixin, UpdateView):
     model = Project
-    template_name = 'projects/project_roles_form.html'
+    template_name = 'projects/forms/project_roles_form.html'
     form_class = ProjectMembershipFormSet
     pk_url_kwarg = 'project_pk'
     required_permission = 'update_project_roles_perm'
@@ -509,7 +462,7 @@ class ProjectRolesUpdateView(ProjectPermissionRequiredMixin, UpdateView):
 class TaskCreateView(ProjectPermissionRequiredMixin, CreateView):
     model = Task
     form_class = TaskForm
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/forms/task_form.html'
     required_permission = 'add_task_perm'
 
     def form_valid(self, form):
@@ -538,7 +491,7 @@ class TaskCreateView(ProjectPermissionRequiredMixin, CreateView):
 class TaskUpdateView(TaskPermissionRequiredMixin, UpdateView):
     model = Task
     form_class = TaskForm
-    template_name = 'projects/task_form.html'
+    template_name = 'projects/forms/task_form.html'
     pk_url_kwarg = "task_pk"
     required_permission = 'update_task'
 
@@ -573,7 +526,7 @@ class TaskUpdateView(TaskPermissionRequiredMixin, UpdateView):
 class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateView):
     model = ProjectApplication
     form_class = ProjectApplicationForm
-    template_name = "projects/project_application_form.html"
+    template_name = "projects/forms/project_application_form.html"
     required_permission = 'add_project_application'
 
     def dispatch(self, request, *args, **kwargs):

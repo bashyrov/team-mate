@@ -44,7 +44,7 @@
               <a href="{% url 'projects:task_detail' project.pk task.pk %}">Check</a>
             {% endif %}
             {% if view_type == 'my_tasks' %}
-              <a href="{% url 'projects:my_tasks_detail' task.pk %}">Check</a>
+              <a href="{% url 'users:my_tasks_detail' task.pk %}">Check</a>
             {% endif %}
             </div>
          </li>

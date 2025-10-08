@@ -2,7 +2,7 @@
 {% block content %}
 
   {% if view_type == 'my_tasks' %}
-    <a href="{% url 'projects:my_tasks' %}" class="btn btn-primary">Back to Tasks</a>
+    <a href="{% url 'users:my_tasks' %}" class="btn btn-primary">Back to Tasks</a>
   {% else %}
     <a href="{% url 'projects:task_list' project.pk %}" class="btn btn-primary">Back to Tasks</a>
   {% endif %}

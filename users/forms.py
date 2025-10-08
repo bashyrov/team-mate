@@ -1,6 +1,8 @@
 from django import forms
 from django.contrib.auth import get_user_model
 
+from projects.models import Task
+
 
 class DeveloperSearchForm(forms.Form):
     username = forms.CharField(
@@ -36,3 +38,27 @@ class DeveloperForm(forms.ModelForm):
             'telegram_contact': forms.TextInput(attrs={'class': 'form-control'}),
             'discord_contact': forms.TextInput(attrs={'class': 'form-control'}),
         }
+
+class MyTaskSearchForm(forms.Form):
+    title = forms.CharField(
+        max_length=255,
+        required=False,
+        label='',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Task Name',
+        })
+    )
+    status = forms.ChoiceField(
+        choices=[('', 'Select status')] + list(Task.STATUS_CHOICES),
+        required=False,
+        label='',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px;'
+        })
+    )
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
