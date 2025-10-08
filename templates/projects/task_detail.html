@@ -1,30 +1,31 @@
 {% extends "base.html" %}
 {% block content %}
-{% if task %}
-<h2>{{ task.title }}</h2>
-<p>{{ task.description }}</p>
-<p><strong>Status:</strong> {{ task.get_status_display }}</p>
-<p><strong>Deadline:</strong> {{ task.deadline }}</p>
-<p><strong>Assignee:</strong> {{ task.assignee }}</p>
-<p><strong>Created by:</strong> {{ task.created_by }}</p>
-<p><strong>Created at:</strong> {{ task.created_at }}</p>
-<p><strong>Updated at:</strong> {{ task.updated_at }}</p>
-<p><strong>Tags:</strong>
-  {% for tag in task.tags.all %}
-    {{ tag.name }}{% if not forloop.last %}, {% endif %}
-  {% empty %}
-    No tags
-  {% endfor %}
-</p>
 
-<hr>
-{% if user.is_authenticated %}
-  {% if membership and membership.role in "PM,Mentor,Lead" or task.assignee == user %}
-    <a href="{% url 'projects:task_edit' project.pk task.pk %}" class="btn btn-warning">Edit Task</a>
+  {% if view_type == 'my_tasks' %}
+    <a href="{% url 'projects:my_tasks' %}" class="btn btn-primary">Back to Tasks</a>
+  {% else %}
+    <a href="{% url 'projects:task_list' project.pk %}" class="btn btn-primary">Back to Tasks</a>
   {% endif %}
-{% endif %}
-
-{% else %}
-  <p>We don’t find this task</p>
-{% endif %}
+  {% if task %}
+    <h2>{{ task.title }}</h2>
+    <p>{{ task.description }}</p>
+    <p><strong>Status:</strong> {{ task.get_status_display }}</p>
+    <p><strong>Deadline:</strong> {{ task.deadline }}</p>
+    <p><strong>Assignee:</strong> {{ task.assignee }}</p>
+    <p><strong>Created by:</strong> {{ task.created_by }}</p>
+    <p><strong>Created at:</strong> {{ task.created_at }}</p>
+    <p><strong>Updated at:</strong> {{ task.updated_at }}</p>
+    <p><strong>Tags:</strong>
+      {% for tag in task.tags.all %}
+        {{ tag.name }}{% if not forloop.last %}, {% endif %}
+      {% empty %}
+        No tags
+      {% endfor %}
+    </p>
+     {% if update_task_perm %}
+        <a href="{% url 'projects:task_edit' project.pk task.pk %}" class="btn btn-warning">Edit Task</a>
+      {% endif %}
+  {% else %}
+    <p>We don’t find this task</p>
+  {% endif %}
 {% endblock %}

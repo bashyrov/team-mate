@@ -3,41 +3,8 @@
 <h2>{% if form.instance.pk %}Edit Project{% else %}Create Project{% endif %}</h2>
 
 <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-
-    <h3>Project Members & Roles</h3>
-    {{ formset.management_form }}
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Role</th>
-                <th>Delete</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for member_form in formset %}
-            <tr>
-                <td>
-                    {% if member_form.instance.pk %}
-                        {{ member_form.instance.user.username }}
-                        <input type="hidden" name="{{ member_form.prefix }}-user" value="{{ member_form.instance.user.pk }}">
-                    {% else %}
-                        {{ member_form.user }}
-                    {% endif %}
-                </td>
-                <td>{{ member_form.role }}</td>
-                <td>
-                    {% if member_form.instance.pk %}
-                        {{ member_form.DELETE }} Delete
-                    {% endif %}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <button type="submit" class="btn btn-primary">Save</button>
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Save</button>
 </form>
 {% endblock %}

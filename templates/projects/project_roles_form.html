@@ -1,57 +1,132 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Manage Project Roles</h2>
+<div class="container mt-5">
+    <!-- Manage Project Roles Section -->
+    <h2 class="mb-4 fw-bold">Manage Project Roles</h2>
 
-<form method="post">
-    {% csrf_token %}
-    {{ formset.management_form }}
+    <form method="post" class="card p-4 shadow-sm">
+        {% csrf_token %}
+        {{ formset.management_form }}
 
-    {% if formset.non_form_errors %}
-        <div class="alert alert-danger">
-            <ul>
-                {% for error in formset.non_form_errors %}
-                    <li>{{ error }}</li>
-                {% endfor %}
-            </ul>
+        {% if formset.non_form_errors %}
+            <div class="alert alert-danger" role="alert">
+                <ul class="mb-0">
+                    {% for error in formset.non_form_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">User</th>
+                        <th scope="col">Role</th>
+                        <th scope="col">Delete</th>
+                        <th scope="col">Edit Project Info</th>
+                        <th scope="col">Add Task</th>
+                        <th scope="col">Update Project Stage</th>
+                        <th scope="col">Recruitment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for member_form in formset %}
+                        {% if member_form.errors %}
+                            <tr>
+                                <td colspan="7" class="alert alert-warning" role="alert">
+                                    <ul class="mb-0">
+                                        {% for field, errors in member_form.errors.items %}
+                                            <li>{{ field }}: {% for error in errors %}{{ error }}{% endfor %}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </td>
+                            </tr>
+                        {% endif %}
+                        <tr>
+                            <td>
+                                {{ member_form.instance.user.username|default:"No user" }}
+                                {{ member_form.user.as_hidden }}
+                                {{ member_form.id }}
+                            </td>
+                            <td>{{ member_form.role }}</td>
+                            <td>{{ member_form.DELETE }}</td>
+                            <td>{{ member_form.edit_project_info_perm }}</td>
+                            <td>{{ member_form.add_task_perm }}</td>
+                            <td>{{ member_form.update_project_stage_perm }}</td>
+                            <td>{{ member_form.manage_open_roles_perm }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
-    {% endif %}
+        <button type="submit" class="btn btn-primary mt-3">Save Roles</button>
+    </form>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>User</th>
-                <th>Role</th>
-                <th>Delete</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for member_form in formset %}
-            {% if member_form.errors %}
-                <tr>
-                    <td colspan="3" class="alert alert-warning">
-                        <ul>
-                            {% for field, errors in member_form.errors.items %}
-                                <li>{{ field }}: {% for error in errors %}{{ error }}{% endfor %}</li>
-                            {% endfor %}
-                        </ul>
-                    </td>
-                </tr>
-            {% endif %}
-            <tr>
-                <td>
-                    {{ member_form.instance.user.username|default:"No user" }}
-                    {{ member_form.user.as_hidden }}
-                    {{ member_form.id }}
-                </td>
-                <td>{{ member_form.role }}</td>
-                <td>
-                    {{ member_form.DELETE }}
-                </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    <button type="submit" class="btn btn-primary">Save Roles</button>
-</form>
+    <!-- Project Permissions Section -->
+    <h2 class="mt-5 mb-4 fw-bold">🔐 Project Permissions</h2>
 
+    <div class="card shadow-sm">
+        <div class="card-body p-0">
+            <div class="list-group list-group-flush">
+                <!-- Edit project info -->
+                <a href="{% url 'projects:project_edit' project.pk %}" class="list-group-item list-group-item-action p-3">
+                    <div class="d-flex align-items-center">
+                        <span class="me-3 fs-4">📝</span>
+                        <div>
+                            <h5 class="mb-1 fw-semibold">Edit Project Info</h5>
+                            <p class="mb-1 text-muted">
+                                Allows updating basic project information: name, description, tags, cover, etc.
+                            </p>
+                            <small class="text-primary">Go to project settings</small>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Add task -->
+                <a href="{% url 'projects:task_list' project.pk %}" class="list-group-item list-group-item-action p-3">
+                    <div class="d-flex align-items-center">
+                        <span class="me-3 fs-4">✅</span>
+                        <div>
+                            <h5 class="mb-1 fw-semibold">Add Task</h5>
+                            <p class="mb-1 text-muted">
+                                Allows creating, editing, and deleting tasks associated with the project.
+                            </p>
+                            <small class="text-primary">Go to tasks</small>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Update project stage -->
+                <a href="{% url 'projects:project_edit_stage' project.pk %}" class="list-group-item list-group-item-action p-3">
+                    <div class="d-flex align-items-center">
+                        <span class="me-3 fs-4">🚀</span>
+                        <div>
+                            <h5 class="mb-1 fw-semibold">Update Project Stage</h5>
+                            <p class="mb-1 text-muted">
+                                Allows updating the project's development stage (e.g., planning, development, testing, release).
+                            </p>
+                            <small class="text-primary">Go to stage update</small>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Recruitment -->
+                <a href="{% url 'projects:applications_list' project.pk %}" class="list-group-item list-group-item-action p-3">
+                    <div class="d-flex align-items-center">
+                        <span class="me-3 fs-4">👥</span>
+                        <div>
+                            <h5 class="mb-1 fw-semibold">Recruitment</h5>
+                            <p class="mb-1 text-muted">
+                                Allows publishing open roles in the project and reviewing applications from participants.
+                            </p>
+                            <small class="text-primary">Go to applications</small>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

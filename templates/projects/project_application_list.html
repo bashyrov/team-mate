@@ -23,9 +23,9 @@
   <div class="bg-body-tertiary border rounded-3 p-3">
     <h2>All Applications</h2>
     {% if view_type == 'active' %}
-      <a href="{% url 'projects:application_archive' project.pk %}"> Archive </a>
+      <a href="{% url 'projects:application_archive' project.pk %}" class="btn btn-secondary"> Archive </a>
     {% elif view_type == 'archive' %}
-      <a href="{% url 'projects:applications_list' project.pk %}"> Back to Active </a>
+      <a href="{% url 'projects:applications_list' project.pk %}" class="btn btn-secondary"> Back to Active </a>
     {% endif %}
     {% if applications %}
       <ul class="list-group">
@@ -35,8 +35,8 @@
             <h2>Status: {{ application.status }}</h2>
             <p>{{ application.message }}</p>
             {% if view_type == 'active' %}
-              <a href="{% url 'projects:application_reject' project.pk application.pk %}"> Reject </a>
-              <a href="{% url 'projects:application_approve' project.pk application.pk %}"> Approve </a>
+              <a href="{% url 'projects:application_reject' project.pk application.pk %}" class="btn btn-danger"> Reject </a>
+              <a href="{% url 'projects:application_approve' project.pk application.pk %}" class="btn btn-success"> Approve </a>
             {% endif %}
           </li>
         {% endfor %}

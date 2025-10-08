@@ -172,7 +172,7 @@ class ProjectApplicationForm(forms.ModelForm):
 class ProjectMembershipForm(forms.ModelForm):
     class Meta:
         model = ProjectMembership
-        fields = ["user", "role"]
+        fields = ["user", "role", "edit_project_info_perm", "add_task_perm", "update_project_stage_perm", "manage_open_roles_perm"]
         widgets = {
             "role": forms.Select(),
         }

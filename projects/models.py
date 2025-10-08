@@ -47,7 +47,7 @@ class Project(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
     domain = models.CharField(max_length=50, choices=DOMEN_CHOICES, default='backend')
-    development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='backend')
+    development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='initiation')
     deploy_url = models.CharField(max_length=255, blank=True)
     owner = models.ForeignKey(user_model, related_name='owned_projects', on_delete=models.CASCADE)
     open_to_candidates = models.BooleanField(default=False)
@@ -72,6 +72,10 @@ class Project(models.Model):
             self.save(update_fields=['open_to_candidates'])
 
         return self.open_to_candidates
+
+
+    def get_members(self):
+        return self.members.all()
 
     def update_avg_score(self):
         avg = self.ratings.aggregate(avg=Avg("score"))["avg"] or 0
@@ -107,6 +111,9 @@ class ProjectMembership(models.Model):
 
     class Meta:
         unique_together = ("project", "user")
+
+    def has_permission(self, perm_name) -> bool:
+        return getattr(self, perm_name, False)
 
     def __str__(self):
         return f"{self.user.username} in {self.project.name} as {self.get_role_display()}"

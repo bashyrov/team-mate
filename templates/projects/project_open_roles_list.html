@@ -1,19 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
+
+{% if messages %}
+  <div class="container mt-3">
+    {% for message in messages %}
+      <div class="alert
+        {% if message.tags %}alert-{{ message.tags }}{% else %}alert-info{% endif %}
+        alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <div class="d-grid gap-3" style="grid-template-columns: 1fr 3fr;">
   <div class="bg-body-tertiary border rounded-3 sticky-top"
      style="padding: 15px; height: fit-content; top: 20px;">
+      <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-primary" style="width: 100%;">Back to Project</a>
     <form action="" method="get">
       {{ search_form }}
-      <input type="submit" class="btn btn-outline-primary mt-2">
+        <button type="submit" class="btn btn-primary mb-3" style="margin-top: 15px; width: 100%;">Find Opportunity</button>
     </form>
-
-    <button class="btn btn-success mt-3"
+    {% if manage_open_roles_perm or is_owner %}
+      <button class="btn btn-success"
             data-bs-toggle="modal"
             data-bs-target="#createRoleModal"
-            data-url="{% url 'projects:project_open_roles_create' project.pk %}">
-      + Add Role
-    </button>
+            data-url="{% url 'projects:project_open_roles_create' project.pk %}"
+            style="width: 100%;">
+        + Add Position
+      </button>
+      <a href="{% url 'projects:application_archive' project.pk %}" class="btn btn-secondary" style="margin-top: 15px; width: 100%;"> Manage Applications </a>
+    {% endif %}
   </div>
 
   <div class="bg-body-tertiary border rounded-3 p-3">
@@ -24,13 +42,17 @@
           <li class="list-group-item">
             <h3>{{ role.role_name }}</h3>
             <p>{{ role.message }}</p>
-            <button class="btn btn-danger"
-                    data-bs-toggle="modal"
-                    data-bs-target="#deleteModal"
-                    data-url="{% url 'projects:project_open_roles_delete' project.pk role.pk %}">
-              Delete
-            </button>
-            <a href="{% url 'projects:apply' project.pk role.pk %}"> Applicate </a>
+            ️️️{% if is_owner or manage_open_roles_perm %}
+              <button class="btn btn-danger"
+                      data-bs-toggle="modal"
+                      data-bs-target="#deleteModal"
+                      data-url="{% url 'projects:project_open_roles_delete' project.pk role.pk %}">
+                Delete
+              </button>
+            {% endif %}
+            {% if not is_member %}
+              <a href="{% url 'projects:apply' project.pk role.pk %}"> Applicate </a>
+            {% endif %}
           </li>
         {% endfor %}
       </ul>

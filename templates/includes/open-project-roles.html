@@ -7,6 +7,6 @@
     {% endfor %}
     <a href="{% url 'projects:project_open_roles_list' project.pk %}" class="btn btn-primary mb-3">All opportunities</a>
   </ul>
-  {% if can_applicate or 0 == 0 %}
+  {% if can_manage_application %}
     <a href="{% url 'projects:applications_list' project.pk %}" class="btn btn-primary mb-3">Check Applications</a>
   {% endif %}

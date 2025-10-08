@@ -34,6 +34,33 @@ class Developer(AbstractUser):
         avg_score = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg']
         return avg_score or 0
 
+    def get_member_of(self, project):
+        return ProjectMembership.objects.filter(user=self, project=project).first()
+
+    def is_owner(self, project):
+        return project.owner_id == self.id
+
+    def get_tasks(self, project=None):
+        qs = self.assigned_tasks.all()
+
+        if project:
+            qs = qs.filter(project=project)
+
+        return qs
+
+    def has_permission(self, project, permission):
+
+        if self.is_owner(project):
+            return True
+
+        user_membership = self.get_member_of(project)
+
+        if not user_membership:
+            return False
+
+        return getattr(user_membership, permission, False)
+
+
 
 class DeveloperRatings(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)

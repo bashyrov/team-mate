@@ -28,7 +28,7 @@ def validate_permissions_application_review(func):
 def validate_application_status(func):
     def wrapper(request, *args, **kwargs):
         print("Validating applications status...")
-        application_pk = kwargs.get('pk')
+        application_pk = kwargs.get('application_pk')
         application = get_object_or_404(ProjectApplication, pk=application_pk)
         project = application.project
 

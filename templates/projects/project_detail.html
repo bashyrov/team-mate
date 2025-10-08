@@ -9,18 +9,34 @@
       <p><strong>Stage:</strong> {{ project.development_stage }}</p>
       <p><strong>Domain:</strong> {{ project.domain }}</p>
       <p><strong>Owner:</strong> {{ project.owner.username }}</p>
-      <p><strong>Links:</strong> {{ project.project_url }}</p>
+      {% if project.project_url %}
+        <p><strong>Links:</strong> {{ project.project_url }}</p>
+      {% endif %}
       {% if project.deploy_url %}
         <p><strong>Deploy:</strong> {{ project.deploy_url }}</p>
       {% endif %}
       <p><strong>Created at:</strong> {{ project.created_at }}</p>
       <p><strong>Score:</strong> {{ project.score }}</p>
       <hr>
-      <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project Info</a>
-      <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-warning mb-3">Edit Roles</a>
-      <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
-      <a href="{% url 'projects:project_edit_stage' project.pk%}" class="btn btn-secondary mb-3">Update Stage</a>
-      <a href="{% url 'projects:project_open_roles_list' project.pk%}" class="btn btn-secondary mb-3">Manage Open Roles</a>
+      {% if is_owner %}
+        <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project Info</a>
+        <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-warning mb-3">Edit Roles</a>
+        <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
+        <a href="{% url 'projects:project_edit_stage' project.pk%}" class="btn btn-secondary mb-3">Update Stage</a>
+        <a href="{% url 'projects:project_open_roles_list' project.pk%}" class="btn btn-secondary mb-3">Manage Open Roles</a>
+      {% endif %}
+      {% if edit_project_info_perm %}
+        <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project Info</a>
+      {% endif %}
+      {% if add_task_perm %}
+        <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
+      {% endif %}
+      {% if update_project_stage_perm %}
+        <a href="{% url 'projects:project_edit_stage' project.pk%}" class="btn btn-secondary mb-3">Update Stage</a>
+      {% endif %}
+      {% if manage_open_roles_perm %}
+        <a href="{% url 'projects:project_open_roles_list' project.pk%}" class="btn btn-secondary mb-3">Manage Open Roles</a>
+      {% endif %}
 
       <h4>Team'Mates</h4>
       {% if memberships %}
@@ -66,10 +82,14 @@
     </div>
   </div>
 {% elif ratings %}
-<div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px; margin-top: 15px;">
-  <h3>Ratings:</h3>
-  {% include "includes/rate-project.html" %}
-</div>
+  <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px; margin-top: 15px;">
+    <h3>Ratings:</h3>
+    {% include "includes/rate-project.html" %}
+  </div>
+{% elif open_roles %}
+  <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px; margin-top: 15px;">
+    {% include "includes/open-project-roles.html" %}
+  </div>
 {% endif %}
 
 <div class="modal fade" id="applicationModal" tabindex="-1" aria-hidden="true">

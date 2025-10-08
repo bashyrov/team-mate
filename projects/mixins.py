@@ -1,4 +1,5 @@
-from django.shortcuts import get_object_or_404, render
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, render, redirect
 
 from projects.models import ProjectMembership, Project, Task, ProjectApplication
 
@@ -26,10 +27,6 @@ class BasePermissionMixin:
     def dispatch(self, request, *args, **kwargs):
 
         self.user = request.user
-        if not self.user.is_authenticated:
-            return render(request, "projects/no_permission.html", {
-                "message": "You must be logged in to access this page.",
-            })
 
         if 'project_pk' in kwargs:
             self.project = get_object_or_404(Project, pk=kwargs['project_pk'])
@@ -41,6 +38,7 @@ class BasePermissionMixin:
 class ProjectPermissionRequiredMixin(BasePermissionMixin):
 
     def has_required_permission(self):
+
         if not self.required_permission:
             return True
 
@@ -50,7 +48,7 @@ class ProjectPermissionRequiredMixin(BasePermissionMixin):
         has_permission = False
 
         try:
-            user_obj = ProjectMembership.objects.filter(user=self.user, project=self.project).first()
+            user_obj = self.user.get_member_of(self.project)
             has_permission = getattr(user_obj, self.required_permission)
         except Exception as e:
             return has_permission
@@ -110,7 +108,7 @@ class TaskPermissionRequiredMixin(BasePermissionMixin):
         if self.required_permission == 'view_task' and (self.is_owner() or self.is_member() or self.task.assignee == self.user):
             return True
 
-        if self.required_permission == 'can_edit_task' and self.can_edit_task():
+        if self.required_permission == 'update_task' and self.can_edit_task():
             return True
         return False
 
@@ -133,23 +131,13 @@ class ApplicationPermissionRequiredMixin(BasePermissionMixin):
 
         response = super().dispatch(request, *args, **kwargs)
 
-        if self.is_owner():
-            return render(request, "projects/no_permission.html", {
-                "message": "You cannot apply your own project.",
-                "project": self.project,
-            })
-
-        if self.is_member():
-            return render(request, "projects/no_permission.html", {
-                "message": "You cannot apply your own project.",
-                "project": self.project,
-            })
+        if self.is_member() or self.is_owner():
+            messages.warning(request, "You cannot apply your own project.")
+            return redirect('projects:project_open_roles_list', self.project.pk)
 
         if self.applied_to_project():
-            return render(request, "projects/no_permission.html", {
-                "message": "Your application to join this project is currently under review.",
-                "project": self.project,
-            })
+            messages.warning(request, "Your application to join this project is currently under review.")
+            return redirect('projects:project_open_roles_list', self.project.pk)
 
         return response
 

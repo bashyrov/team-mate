@@ -1,5 +1,6 @@
 from django.urls import path
 from users import views
+from projects import views as project_views
 
 
 app_name = 'users'
