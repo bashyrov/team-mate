@@ -48,6 +48,30 @@ class TaskSearchForm(forms.Form):
         if project:
             self.fields['assignee'].queryset = project.members.all()
 
+class MyTaskSearchForm(forms.Form):
+    title = forms.CharField(
+        max_length=255,
+        required=False,
+        label='',
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Task Name',
+        })
+    )
+    status = forms.ChoiceField(
+        choices=[('', 'Select status')] + list(Task.STATUS_CHOICES),
+        required=False,
+        label='',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px;'
+        })
+    )
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
 
 class ProjectSearchForm(forms.Form):
     project_name = forms.CharField(max_length=255,

@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect
 
-from projects.models import ProjectMembership, Project, Task, ProjectApplication
+from projects.models import ProjectMembership, Project, Task, ProjectApplication, ProjectOpenRole
+
 
 class BasePermissionMixin:
     required_permission = None
@@ -13,7 +14,7 @@ class BasePermissionMixin:
         return self.user == self.project.owner or self.project.members.filter(id=self.user.id).exists()
 
     def applied_to_project(self):
-        return self.project.applications.filter(user=self.user, status='pending').exists()
+        return self.project.applications.filter(user=self.user, status='pending', role=self.role.role_name).exists()
 
     def is_rated(self):
         return self.user.given_project_ratings.filter(project=self.project).exists()
@@ -32,6 +33,8 @@ class BasePermissionMixin:
             self.project = get_object_or_404(Project, pk=kwargs['project_pk'])
         if 'task_pk' in kwargs:
             self.task = get_object_or_404(Task, pk=kwargs['task_pk'])
+        if 'role_pk' in kwargs:
+            self.role = get_object_or_404(ProjectOpenRole, pk=kwargs['role_pk'])
 
         return super().dispatch(request, *args, **kwargs)
 

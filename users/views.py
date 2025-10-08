@@ -1,9 +1,11 @@
 from django.contrib.auth import get_user_model
-from django.views.generic import ListView, DetailView
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic import ListView, DetailView, UpdateView
 from django.db.models import Avg
 
 from projects.models import ProjectMembership, Project
-from users.forms import DeveloperSearchForm
+from users.forms import DeveloperSearchForm, DeveloperForm
 from team_mate import settings
 
 user_model = settings.AUTH_USER_MODEL
@@ -54,6 +56,37 @@ class DeveloperDetailView(DetailView):
     context_object_name = 'developer'
     pk_url_kwarg = 'user_pk'
 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        developer = self.object
+        is_developer = developer == self.request.user
+
+        project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
+
+        context['is_developer'] = is_developer
+        context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
+
+        context['projects'] = Project.objects.filter(id__in=project_ids).order_by('-score')[:5]
+
+        return context
+
+
+class DeveloperUpdateView(UpdateView):
+    model = get_user_model()
+    form_class = DeveloperForm
+    template_name = 'users/profile_update.html'
+    context_object_name = 'developer'
+    pk_url_kwarg = 'user_pk'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.pk != self.get_object().pk:
+            return redirect('users:profile', user_pk=request.user.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         developer = self.object
@@ -64,3 +97,6 @@ class DeveloperDetailView(DetailView):
         context['projects'] = Project.objects.filter(id__in=project_ids).order_by('-score')[:5]
 
         return context
+
+    def get_success_url(self):
+        return reverse_lazy('users:profile', kwargs={'user_pk': self.object.pk})

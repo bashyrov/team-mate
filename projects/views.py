@@ -14,7 +14,7 @@ from .models import Project, Task, ProjectMembership, ProjectRating, ProjectAppl
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
-    ProjectOpenRoleSearchForm, TaskSearchForm
+    ProjectOpenRoleSearchForm, TaskSearchForm, MyTaskSearchForm
 from projects.mixins import TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingPermissionMixin, \
     ApplicationPermissionRequiredMixin, MembershipPermissionRequiredMixin, BasePermissionMixin
 from django.shortcuts import redirect, get_object_or_404, render
@@ -90,17 +90,34 @@ class MyTasksListView(ListView):
     view_type = 'my_tasks'
 
     def get_queryset(self):
-        qs = self.request.user.assigned_tasks.all()
+        user = self.request.user
+        qs = Task.objects.filter(assignee=user)
+
+        form = MyTaskSearchForm(self.request.GET, user=user)
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            status = form.cleaned_data.get('status')
+
+            if title:
+                qs = qs.filter(title__icontains=title)
+            if status:
+                qs = qs.filter(status=status)
+
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["view_type"] = self.view_type
+        context['search_form'] = MyTaskSearchForm(
+            self.request.GET or None,
+            user=self.request.user
+        )
+
+        context['view_type'] = self.view_type
         return context
 
 
-class ProjectDetailView(DetailView): #TODO: Change Roles
+class ProjectDetailView(DetailView):
     model = Project
     template_name = 'projects/project_detail.html'
     context_object_name = 'project'
@@ -166,7 +183,7 @@ class ProjectDetailView(DetailView): #TODO: Change Roles
 
 
 @method_decorator(login_required, name='dispatch')
-class ProjectOpenRoleCreateView(ProjectPermissionRequiredMixin,CreateView):  #TODO: Change Roles
+class ProjectOpenRoleCreateView(ProjectPermissionRequiredMixin,CreateView):
     model = ProjectOpenRole
     form_class = ProjectOpenRoleForm
     template_name = "projects/open_roles_form.html"
@@ -198,7 +215,7 @@ class ProjectOpenRoleCreateView(ProjectPermissionRequiredMixin,CreateView):  #TO
         return reverse_lazy('projects:project_open_roles_list', kwargs={'project_pk': self.project.pk,})
 
 
-class ProjectOpenRoleListView(BasePermissionMixin, ListView):  #TODO: Change Roles
+class ProjectOpenRoleListView(BasePermissionMixin, ListView):
     model = ProjectOpenRole
     paginate_by = 10
     template_name = "projects/project_open_roles_list.html"
@@ -387,7 +404,7 @@ class ProjectCreateView(CreateView):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
 @method_decorator(login_required, name='dispatch')
-class ProjectUpdateView(ProjectPermissionRequiredMixin, UpdateView): #TODO: Change Roles
+class ProjectUpdateView(ProjectPermissionRequiredMixin, UpdateView):
     model = Project
     form_class = ProjectForm
     template_name = 'projects/project_update.html'
@@ -408,7 +425,7 @@ class ProjectMembershipUpdateView(ProjectPermissionRequiredMixin, UpdateView):
         return reverse_lazy('projects:project_detail', kwargs={'pk': self.object.pk})
 
 @method_decorator(login_required, name='dispatch')
-class ProjectStageUpdateView(ProjectPermissionRequiredMixin, UpdateView): #TODO: Change Roles
+class ProjectStageUpdateView(ProjectPermissionRequiredMixin, UpdateView):
     model = Project
     form_class = ProjectStageForm
     template_name = 'projects/project_stage_form.html'
@@ -419,7 +436,7 @@ class ProjectStageUpdateView(ProjectPermissionRequiredMixin, UpdateView): #TODO:
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
 @method_decorator(login_required, name='dispatch')
-class ProjectRatingCreateView(ProjectRatingPermissionMixin, CreateView): #TODO: Change can_rate
+class ProjectRatingCreateView(ProjectRatingPermissionMixin, CreateView):
     model = ProjectRating
     form_class = ProjectRatingForm
     template_name = 'projects/project_rating_form.html'
@@ -448,7 +465,7 @@ class ProjectRatingCreateView(ProjectRatingPermissionMixin, CreateView): #TODO: 
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.project.pk})
 
 @method_decorator(login_required, name='dispatch')
-class ProjectRolesUpdateView(ProjectPermissionRequiredMixin, UpdateView): #TODO: Change Roles
+class ProjectRolesUpdateView(ProjectPermissionRequiredMixin, UpdateView):
     model = Project
     template_name = 'projects/project_roles_form.html'
     form_class = ProjectMembershipFormSet
@@ -489,7 +506,7 @@ class ProjectRolesUpdateView(ProjectPermissionRequiredMixin, UpdateView): #TODO:
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
 @method_decorator(login_required, name='dispatch')
-class TaskCreateView(ProjectPermissionRequiredMixin, CreateView): #TODO: Change Roles
+class TaskCreateView(ProjectPermissionRequiredMixin, CreateView):
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
@@ -518,7 +535,7 @@ class TaskCreateView(ProjectPermissionRequiredMixin, CreateView): #TODO: Change 
         return reverse_lazy('projects:task_detail', kwargs={'project_pk': self.project.pk, 'task_pk': self.object.pk})
 
 @method_decorator(login_required, name='dispatch')
-class TaskUpdateView(TaskPermissionRequiredMixin, UpdateView): #TODO: Change Roles
+class TaskUpdateView(TaskPermissionRequiredMixin, UpdateView):
     model = Task
     form_class = TaskForm
     template_name = 'projects/task_form.html'
@@ -553,7 +570,7 @@ class TaskUpdateView(TaskPermissionRequiredMixin, UpdateView): #TODO: Change Rol
 
 
 @method_decorator(login_required, name='dispatch')
-class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateView):  #TODO: Change can_applicate
+class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateView):
     model = ProjectApplication
     form_class = ProjectApplicationForm
     template_name = "projects/project_application_form.html"
@@ -567,6 +584,7 @@ class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateVie
         form.instance.project = self.project
         form.instance.user = self.request.user
         form.save()
+
         return super().form_valid(form)
 
     def get_success_url(self):

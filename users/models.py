@@ -21,8 +21,8 @@ class Developer(AbstractUser):
     position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='backend')
     score = models.FloatField(default=0)
     tech_stack = models.CharField(max_length=255, blank=True)
-    linkedin_url = models.CharField(max_length=255, blank=True)
-    portfolio_url = models.CharField(max_length=255, blank=True)
+    linkedin_url = models.URLField(max_length=255, blank=True)
+    portfolio_url = models.URLField(max_length=255, blank=True)
     telegram_contact = models.CharField(max_length=255, blank=True)
     discord_contact = models.CharField(max_length=255, blank=True)
 
