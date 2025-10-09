@@ -14,7 +14,7 @@ class BasePermissionMixin:
         return self.user == self.project.owner or self.project.members.filter(id=self.user.id).exists()
 
     def applied_to_project(self):
-        return self.project.applications.filter(user=self.user, status='pending', role=self.role.role_name).exists()
+        return self.project.applications.filter(user=self.user, status='pending', role=self.role).exists()
 
     def is_rated(self):
         return self.user.given_project_ratings.filter(project=self.project).exists()

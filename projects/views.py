@@ -550,7 +550,7 @@ class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateVie
 
 
 @method_decorator(login_required, name='dispatch')
-class ProjectApplicationListView(MembershipPermissionRequiredMixin, ListView):  #TODO: Realize
+class ProjectApplicationListView(MembershipPermissionRequiredMixin, ListView):
     model = ProjectApplication
     template_name = "projects/project_application_list.html"
     context_object_name = "applications"
@@ -560,7 +560,7 @@ class ProjectApplicationListView(MembershipPermissionRequiredMixin, ListView):  
 
     def get_queryset(self):
 
-        qs = ProjectApplication.objects.filter(project=self.project)
+        qs = self.project.applications.all()
         self.view_type = getattr(self, 'view_type', 'active')
 
         if self.view_type == 'active':

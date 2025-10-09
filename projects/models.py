@@ -169,5 +169,5 @@ class ProjectApplication(models.Model):
     user = models.ForeignKey(user_model, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=APPLICATION_STATUS_CHOICES, default='pending')
     message = models.TextField(blank=True)
-    role = models.CharField(max_length=10, choices=ProjectMembership.ROLE_CHOICES, default="DEV")
+    role = models.ForeignKey(ProjectOpenRole, on_delete=models.CASCADE, related_name="applications")
     created_at = models.DateTimeField(auto_now_add=True)

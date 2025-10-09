@@ -31,7 +31,7 @@
       <ul class="list-group">
         {% for application in applications %}
           <li class="list-group-item">
-            <h3>{{ application.user.username }} - {{ application.role }}</h3>
+            <h3>{{ application.user.username }} - {{ application.role.role_name }}</h3>
             <h2>Status: {{ application.status }}</h2>
             <p>{{ application.message }}</p>
             {% if view_type == 'active' %}

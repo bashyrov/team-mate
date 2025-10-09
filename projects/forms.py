@@ -164,9 +164,22 @@ class ProjectOpenRoleForm(forms.ModelForm):
 
 
 class ProjectApplicationForm(forms.ModelForm):
+
+
     class Meta:
         model = ProjectApplication
         fields = ["message"]
+        widgets = {
+            'message': forms.Textarea(attrs={
+                'rows': 3,
+                'class': 'form-control',
+                'placeholder': 'Write your message to the project owner...',
+                'style': 'width: 50%;'
+            }),
+        }
+        labels = {
+            'message': '',  # убираем подпись, если не нужна
+        }
 
 
 class ProjectMembershipForm(forms.ModelForm):
