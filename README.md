@@ -51,7 +51,8 @@ To explore the platform with pre-populated data, load the `initial_data.json` fi
 
 python manage.py loaddata initial_data.json
 
-🔑 Superuser Access
+
+## 🔑 Superuser Access
 To experience the platform as an admin (who participates in projects and owns some), use the following credentials to log in to the Django admin panel (e.g., http://localhost:8000/admin/):
 
 Username: admin
