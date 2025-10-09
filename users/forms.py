@@ -28,13 +28,32 @@ class DeveloperForm(forms.ModelForm):
             'discord_contact',
         ]
         widgets = {
-            'position': forms.TextInput(attrs={'class': 'form-control'}),
-            'tech_stack': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'linkedin_url': forms.URLInput(attrs={'class': 'form-control'}),
-            'portfolio_url': forms.URLInput(attrs={'class': 'form-control'}),
-            'telegram_contact': forms.TextInput(attrs={'class': 'form-control'}),
-            'discord_contact': forms.TextInput(attrs={'class': 'form-control'}),
+            'position': forms.Select(attrs={
+                'class': 'form-control',
+            }),
+            'tech_stack': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Your tech stack, e.g. Python, Django, React'
+            }),
+            'linkedin_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'LinkedIn profile URL'
+            }),
+            'portfolio_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Portfolio URL'
+            }),
+            'telegram_contact': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Telegram username or link'
+            }),
+            'discord_contact': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Discord username or tag'
+            }),
         }
+
 
 class MyTaskSearchForm(forms.Form):
     title = forms.CharField(

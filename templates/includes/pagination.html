@@ -1,21 +1,37 @@
 {% load query_transform %}
 
 {% if is_paginated %}
-  <ul class="pagination">
+<nav aria-label="Page navigation" style="margin-top: 15px;">
+  <ul class="pagination justify-content-center mb-4">
     {% if page_obj.has_previous %}
       <li class="page-item">
-        <a href="?{% query_transform request page=page_obj.previous_page_number %}" class="page-link">prev</a>
+        <a class="page-link" href="?{% query_transform request page=page_obj.previous_page_number %}" aria-label="Previous">
+          <span aria-hidden="true">&laquo; Prev</span>
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">&laquo; Prev</span>
       </li>
     {% endif %}
 
     <li class="page-item active">
-      <span class="page-link">{{ page_obj.number }} of {{ paginator.num_pages }}</span>
+      <span class="page-link">
+        {{ page_obj.number }} / {{ paginator.num_pages }}
+      </span>
     </li>
 
     {% if page_obj.has_next %}
       <li class="page-item">
-        <a href="?{% query_transform request page=page_obj.next_page_number %}" class="page-link">next</a>
+        <a class="page-link" href="?{% query_transform request page=page_obj.next_page_number %}" aria-label="Next">
+          <span aria-hidden="true">Next &raquo;</span>
+        </a>
+      </li>
+    {% else %}
+      <li class="page-item disabled">
+        <span class="page-link">Next &raquo;</span>
       </li>
     {% endif %}
   </ul>
+</nav>
 {% endif %}
