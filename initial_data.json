@@ -1,0 +1,1311 @@
+[
+  {
+    "model": "users.Developer",
+    "pk": 1,
+    "fields": {
+      "username": "john_doe",
+      "email": "john@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "backend",
+      "score": 0,
+      "tech_stack": "Python, Django, PostgreSQL",
+      "linkedin_url": "https://linkedin.com/in/john_doe",
+      "portfolio_url": "https://johndoe.com",
+      "telegram_contact": "@JohnDoe",
+      "discord_contact": "john_doe#1234"
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 2,
+    "fields": {
+      "username": "jane_smith",
+      "email": "jane@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "frontend",
+      "score": 0,
+      "tech_stack": "React, JavaScript, CSS",
+      "linkedin_url": "https://linkedin.com/in/jane_smith",
+      "portfolio_url": "https://janesmith.com",
+      "telegram_contact": "@JaneSmith",
+      "discord_contact": "jane_smith#5678"
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 3,
+    "fields": {
+      "username": "alice_wong",
+      "email": "alice@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "qa",
+      "score": 0,
+      "tech_stack": "Selenium, pytest",
+      "linkedin_url": "",
+      "portfolio_url": "",
+      "telegram_contact": "@AliceWong",
+      "discord_contact": "alice_wong#9012"
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 4,
+    "fields": {
+      "username": "bob_jones",
+      "email": "bob@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "designer",
+      "score": 0,
+      "tech_stack": "Figma, Adobe XD",
+      "linkedin_url": "https://linkedin.com/in/bob_jones",
+      "portfolio_url": "https://bobjones.com",
+      "telegram_contact": "",
+      "discord_contact": "bob_jones#3456"
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 5,
+    "fields": {
+      "username": "emma_brown",
+      "email": "emma@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "pm",
+      "score": 0,
+      "tech_stack": "",
+      "linkedin_url": "https://linkedin.com/in/emma_brown",
+      "portfolio_url": "",
+      "telegram_contact": "@EmmaBrown",
+      "discord_contact": ""
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 6,
+    "fields": {
+      "username": "mike_wilson",
+      "email": "mike@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "backend",
+      "score": 0,
+      "tech_stack": "Node.js, MongoDB",
+      "linkedin_url": "",
+      "portfolio_url": "https://mikewilson.com",
+      "telegram_contact": "@MikeWilson",
+      "discord_contact": "mike_wilson#7890"
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 7,
+    "fields": {
+      "username": "sara_lee",
+      "email": "sara@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "frontend",
+      "score": 0,
+      "tech_stack": "Vue.js, TypeScript",
+      "linkedin_url": "https://linkedin.com/in/sara_lee",
+      "portfolio_url": "",
+      "telegram_contact": "",
+      "discord_contact": "sara_lee#2345"
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 8,
+    "fields": {
+      "username": "david_kim",
+      "email": "david@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "mentor",
+      "score": 0,
+      "tech_stack": "Python, Java",
+      "linkedin_url": "https://linkedin.com/in/david_kim",
+      "portfolio_url": "https://davidkim.com",
+      "telegram_contact": "@DavidKim",
+      "discord_contact": ""
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 9,
+    "fields": {
+      "username": "lisa_taylor",
+      "email": "lisa@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "backend",
+      "score": 0,
+      "tech_stack": "Ruby, Rails",
+      "linkedin_url": "",
+      "portfolio_url": "",
+      "telegram_contact": "@LisaTaylor",
+      "discord_contact": "lisa_taylor#6789"
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 10,
+    "fields": {
+      "username": "chris_evans",
+      "email": "chris@example.com",
+      "password": "pbkdf2_sha256$260000$randomsalt$hashedpassword",
+      "position": "qa",
+      "score": 0,
+      "tech_stack": "Cypress, JUnit",
+      "linkedin_url": "https://linkedin.com/in/chris_evans",
+      "portfolio_url": "",
+      "telegram_contact": "",
+      "discord_contact": "chris_evans#0123"
+    }
+  },
+  {
+    "model": "users.Developer",
+    "pk": 11,
+    "fields": {
+      "username": "admin",
+      "email": "admin@example.com",
+      "password": "pbkdf2_sha256$1000000$pO1g3Lc0ACdfw2wIUI572D$2Z/uCu4Harlvdm2OnnLkHFwT3MqxDpXzbaUPk/Q5jq0=",
+      "position": "backend",
+      "score": 0,
+      "tech_stack": "",
+      "linkedin_url": "",
+      "portfolio_url": "",
+      "telegram_contact": "",
+      "discord_contact": "",
+      "is_superuser": true,
+      "is_staff": true,
+      "is_active": true
+    }
+  },
+  {
+    "model": "projects.Project",
+    "pk": 1,
+    "fields": {
+      "name": "Crypto Wallet",
+      "description": "A secure blockchain-based wallet",
+      "domain": "blockchain",
+      "development_stage": "deployed",
+      "deploy_url": "https://cryptowallet.com",
+      "owner": 1,
+      "open_to_candidates": true,
+      "unical_id": "proj_1",
+      "score": 4.66,
+      "project_url": "https://github.com/cryptowallet",
+      "created_at": "2025-01-15T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.Project",
+    "pk": 2,
+    "fields": {
+      "name": "E-Commerce Platform",
+      "description": "Online shopping platform",
+      "domain": "e_commerce",
+      "development_stage": "deployed",
+      "deploy_url": "https://shopnow.com",
+      "owner": 2,
+      "open_to_candidates": true,
+      "unical_id": "proj_2",
+      "score": 2.00,
+      "project_url": "https://github.com/shopnow",
+      "created_at": "2025-02-01T12:00:00Z"
+    }
+  },
+  {
+    "model": "projects.Project",
+    "pk": 3,
+    "fields": {
+      "name": "EdTech App",
+      "description": "Learning management system",
+      "domain": "ed_tech",
+      "development_stage": "implementation",
+      "deploy_url": "",
+      "owner": 3,
+      "open_to_candidates": true,
+      "unical_id": "proj_3",
+      "score": 0,
+      "project_url": "https://github.com/edtechapp",
+      "created_at": "2025-03-10T09:00:00Z"
+    }
+  },
+  {
+    "model": "projects.Project",
+    "pk": 4,
+    "fields": {
+      "name": "Food Delivery",
+      "description": "Food delivery service",
+      "domain": "food_tech",
+      "development_stage": "testing",
+      "deploy_url": "",
+      "owner": 4,
+      "open_to_candidates": false,
+      "unical_id": "proj_4",
+      "score": 0,
+      "project_url": "",
+      "created_at": "2025-04-05T14:00:00Z"
+    }
+  },
+  {
+    "model": "projects.Project",
+    "pk": 5,
+    "fields": {
+      "name": "FinTech API",
+      "description": "Payment processing API",
+      "domain": "fintech",
+      "development_stage": "deployed",
+      "deploy_url": "https://fintechapi.com",
+      "owner": 5,
+      "open_to_candidates": true,
+      "unical_id": "proj_5",
+      "score": 4.50,
+      "project_url": "https://github.com/fintechapi",
+      "created_at": "2025-05-20T11:00:00Z"
+    }
+  },
+  {
+    "model": "projects.Project",
+    "pk": 6,
+    "fields": {
+      "name": "ML Model Dashboard",
+      "description": "Dashboard for ML models",
+      "domain": "ml",
+      "development_stage": "design",
+      "deploy_url": "",
+      "owner": 6,
+      "open_to_candidates": true,
+      "unical_id": "proj_6",
+      "score": 0,
+      "project_url": "",
+      "created_at": "2025-06-15T15:00:00Z"
+    }
+  },
+  {
+    "model": "projects.Project",
+    "pk": 7,
+    "fields": {
+      "name": "SaaS Analytics",
+      "description": "Analytics platform for SaaS",
+      "domain": "saas",
+      "development_stage": "planning",
+      "deploy_url": "",
+      "owner": 7,
+      "open_to_candidates": true,
+      "unical_id": "proj_7",
+      "score": 0,
+      "project_url": "",
+      "created_at": "2025-07-01T08:00:00Z"
+    }
+  },
+  {
+    "model": "projects.Project",
+    "pk": 8,
+    "fields": {
+      "name": "Admin Project 1",
+      "description": "First project owned by admin",
+      "domain": "technology",
+      "development_stage": "implementation",
+      "deploy_url": "",
+      "owner": 11,
+      "open_to_candidates": true,
+      "unical_id": "proj_8",
+      "score": 0,
+      "project_url": "https://github.com/adminproj1",
+      "created_at": "2025-08-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.Project",
+    "pk": 9,
+    "fields": {
+      "name": "Admin Project 2",
+      "description": "Second project owned by admin",
+      "domain": "saas",
+      "development_stage": "deployed",
+      "deploy_url": "https://adminproj2.com",
+      "owner": 11,
+      "open_to_candidates": true,
+      "unical_id": "proj_9",
+      "score": 4.50,
+      "project_url": "https://github.com/adminproj2",
+      "created_at": "2025-09-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 1,
+    "fields": {
+      "project": 1,
+      "user": 1,
+      "role": "PM",
+      "edit_project_info_perm": true,
+      "add_task_perm": true,
+      "update_project_stage_perm": true,
+      "manage_open_roles_perm": true,
+      "joined_at": "2025-01-16T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 2,
+    "fields": {
+      "project": 1,
+      "user": 2,
+      "role": "DEV",
+      "edit_project_info_perm": false,
+      "add_task_perm": false,
+      "update_project_stage_perm": false,
+      "manage_open_roles_perm": false,
+      "joined_at": "2025-01-17T12:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 3,
+    "fields": {
+      "project": 2,
+      "user": 2,
+      "role": "LEAD",
+      "edit_project_info_perm": true,
+      "add_task_perm": true,
+      "update_project_stage_perm": false,
+      "manage_open_roles_perm": true,
+      "joined_at": "2025-02-02T14:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 4,
+    "fields": {
+      "project": 2,
+      "user": 3,
+      "role": "DEV",
+      "edit_project_info_perm": false,
+      "add_task_perm": false,
+      "update_project_stage_perm": false,
+      "manage_open_roles_perm": false,
+      "joined_at": "2025-02-03T09:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 5,
+    "fields": {
+      "project": 3,
+      "user": 3,
+      "role": "PM",
+      "edit_project_info_perm": true,
+      "add_task_perm": true,
+      "update_project_stage_perm": true,
+      "manage_open_roles_perm": true,
+      "joined_at": "2025-03-11T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 6,
+    "fields": {
+      "project": 5,
+      "user": 5,
+      "role": "Mentor",
+      "edit_project_info_perm": false,
+      "add_task_perm": true,
+      "update_project_stage_perm": false,
+      "manage_open_roles_perm": false,
+      "joined_at": "2025-05-21T11:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 7,
+    "fields": {
+      "project": 5,
+      "user": 6,
+      "role": "DEV",
+      "edit_project_info_perm": false,
+      "add_task_perm": false,
+      "update_project_stage_perm": false,
+      "manage_open_roles_perm": false,
+      "joined_at": "2025-05-22T12:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 8,
+    "fields": {
+      "project": 6,
+      "user": 6,
+      "role": "PM",
+      "edit_project_info_perm": true,
+      "add_task_perm": true,
+      "update_project_stage_perm": true,
+      "manage_open_roles_perm": true,
+      "joined_at": "2025-06-16T15:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 9,
+    "fields": {
+      "project": 7,
+      "user": 7,
+      "role": "PM",
+      "edit_project_info_perm": true,
+      "add_task_perm": true,
+      "update_project_stage_perm": true,
+      "manage_open_roles_perm": true,
+      "joined_at": "2025-07-02T08:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 10,
+    "fields": {
+      "project": 8,
+      "user": 11,
+      "role": "PM",
+      "edit_project_info_perm": true,
+      "add_task_perm": true,
+      "update_project_stage_perm": true,
+      "manage_open_roles_perm": true,
+      "joined_at": "2025-08-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 11,
+    "fields": {
+      "project": 8,
+      "user": 4,
+      "role": "DEV",
+      "edit_project_info_perm": false,
+      "add_task_perm": false,
+      "update_project_stage_perm": false,
+      "manage_open_roles_perm": false,
+      "joined_at": "2025-08-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 12,
+    "fields": {
+      "project": 8,
+      "user": 5,
+      "role": "DEV",
+      "edit_project_info_perm": false,
+      "add_task_perm": false,
+      "update_project_stage_perm": false,
+      "manage_open_roles_perm": false,
+      "joined_at": "2025-08-03T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 13,
+    "fields": {
+      "project": 9,
+      "user": 11,
+      "role": "LEAD",
+      "edit_project_info_perm": true,
+      "add_task_perm": true,
+      "update_project_stage_perm": true,
+      "manage_open_roles_perm": true,
+      "joined_at": "2025-09-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 14,
+    "fields": {
+      "project": 9,
+      "user": 7,
+      "role": "DEV",
+      "edit_project_info_perm": false,
+      "add_task_perm": false,
+      "update_project_stage_perm": false,
+      "manage_open_roles_perm": false,
+      "joined_at": "2025-09-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 15,
+    "fields": {
+      "project": 9,
+      "user": 8,
+      "role": "Mentor",
+      "edit_project_info_perm": false,
+      "add_task_perm": true,
+      "update_project_stage_perm": false,
+      "manage_open_roles_perm": false,
+      "joined_at": "2025-09-03T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectMembership",
+    "pk": 16,
+    "fields": {
+      "project": 7,
+      "user": 11,
+      "role": "LEAD",
+      "edit_project_info_perm": true,
+      "add_task_perm": true,
+      "update_project_stage_perm": true,
+      "manage_open_roles_perm": true,
+      "joined_at": "2025-07-03T08:00:00Z"
+    }
+  },
+  {
+    "model": "projects.Tag",
+    "pk": 1,
+    "fields": {
+      "name": "Backend"
+    }
+  },
+  {
+    "model": "projects.Tag",
+    "pk": 2,
+    "fields": {
+      "name": "Frontend"
+    }
+  },
+  {
+    "model": "projects.Tag",
+    "pk": 3,
+    "fields": {
+      "name": "Testing"
+    }
+  },
+  {
+    "model": "projects.Tag",
+    "pk": 4,
+    "fields": {
+      "name": "Design"
+    }
+  },
+  {
+    "model": "projects.Tag",
+    "pk": 5,
+    "fields": {
+      "name": "Database"
+    }
+  },
+  {
+    "model": "projects.Tag",
+    "pk": 6,
+    "fields": {
+      "name": "API"
+    }
+  },
+  {
+    "model": "projects.Tag",
+    "pk": 7,
+    "fields": {
+      "name": "Security"
+    }
+  },
+  {
+    "model": "projects.Tag",
+    "pk": 8,
+    "fields": {
+      "name": "Planning"
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 1,
+    "fields": {
+      "title": "Implement authentication",
+      "description": "Add JWT-based authentication",
+      "status": "in_progress",
+      "assignee": 1,
+      "created_by": 1,
+      "deadline": "2025-10-15T00:00:00Z",
+      "created_at": "2025-01-20T10:00:00Z",
+      "updated_at": "2025-01-21T10:00:00Z",
+      "project": 1,
+      "tags": [1, 6]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 2,
+    "fields": {
+      "title": "Design UI",
+      "description": "Create responsive UI for homepage",
+      "status": "todo",
+      "assignee": 2,
+      "created_by": 2,
+      "deadline": "2025-02-15T00:00:00Z",
+      "created_at": "2025-02-05T12:00:00Z",
+      "updated_at": "2025-02-05T12:00:00Z",
+      "project": 2,
+      "tags": [2, 4]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 3,
+    "fields": {
+      "title": "Write tests",
+      "description": "Unit tests for API endpoints",
+      "status": "done",
+      "assignee": 3,
+      "created_by": 3,
+      "deadline": "2025-03-20T00:00:00Z",
+      "created_at": "2025-03-12T09:00:00Z",
+      "updated_at": "2025-03-15T09:00:00Z",
+      "project": 3,
+      "tags": [3, 6]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 4,
+    "fields": {
+      "title": "Optimize database",
+      "description": "Add indexes to improve query performance",
+      "status": "in_progress",
+      "assignee": 1,
+      "created_by": 5,
+      "deadline": "2025-05-30T00:00:00Z",
+      "created_at": "2025-05-25T11:00:00Z",
+      "updated_at": "2025-05-26T11:00:00Z",
+      "project": 5,
+      "tags": [1, 5]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 5,
+    "fields": {
+      "title": "Secure API endpoints",
+      "description": "Implement rate limiting and validation",
+      "status": "todo",
+      "assignee": 6,
+      "created_by": 6,
+      "deadline": "2025-06-30T00:00:00Z",
+      "created_at": "2025-06-17T15:00:00Z",
+      "updated_at": "2025-06-17T15:00:00Z",
+      "project": 6,
+      "tags": [6, 7]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 6,
+    "fields": {
+      "title": "Create dashboard",
+      "description": "Build analytics dashboard",
+      "status": "in_progress",
+      "assignee": 2,
+      "created_by": 5,
+      "deadline": "2025-06-10T00:00:00Z",
+      "created_at": "2025-05-23T11:00:00Z",
+      "updated_at": "2025-05-24T11:00:00Z",
+      "project": 5,
+      "tags": [2, 4]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 7,
+    "fields": {
+      "title": "Plan project",
+      "description": "Create project roadmap",
+      "status": "done",
+      "assignee": 7,
+      "created_by": 7,
+      "deadline": "2025-07-10T00:00:00Z",
+      "created_at": "2025-07-02T08:00:00Z",
+      "updated_at": "2025-07-05T08:00:00Z",
+      "project": 7,
+      "tags": []
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 8,
+    "fields": {
+      "title": "Admin task in project 8",
+      "description": "Manage team in project 8",
+      "status": "in_progress",
+      "assignee": 11,
+      "created_by": 11,
+      "deadline": "2025-08-15T00:00:00Z",
+      "created_at": "2025-08-04T10:00:00Z",
+      "updated_at": "2025-08-05T10:00:00Z",
+      "project": 8,
+      "tags": [8]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 9,
+    "fields": {
+      "title": "Design task for bob",
+      "description": "Design UI components",
+      "status": "todo",
+      "assignee": 4,
+      "created_by": 11,
+      "deadline": "2025-08-20T00:00:00Z",
+      "created_at": "2025-08-04T10:00:00Z",
+      "updated_at": "2025-08-04T10:00:00Z",
+      "project": 8,
+      "tags": [4]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 10,
+    "fields": {
+      "title": "PM task for emma",
+      "description": "Coordinate meetings",
+      "status": "done",
+      "assignee": 5,
+      "created_by": 11,
+      "deadline": "2025-08-10T00:00:00Z",
+      "created_at": "2025-08-04T10:00:00Z",
+      "updated_at": "2025-08-06T10:00:00Z",
+      "project": 8,
+      "tags": []
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 11,
+    "fields": {
+      "title": "Lead task in project 9",
+      "description": "Lead development in project 9",
+      "status": "in_progress",
+      "assignee": 11,
+      "created_by": 11,
+      "deadline": "2025-09-15T00:00:00Z",
+      "created_at": "2025-09-04T10:00:00Z",
+      "updated_at": "2025-09-05T10:00:00Z",
+      "project": 9,
+      "tags": [1]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 12,
+    "fields": {
+      "title": "Frontend task for sara",
+      "description": "Implement Vue components",
+      "status": "todo",
+      "assignee": 7,
+      "created_by": 11,
+      "deadline": "2025-09-20T00:00:00Z",
+      "created_at": "2025-09-04T10:00:00Z",
+      "updated_at": "2025-09-04T10:00:00Z",
+      "project": 9,
+      "tags": [2]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 13,
+    "fields": {
+      "title": "Mentor task for david",
+      "description": "Review code",
+      "status": "done",
+      "assignee": 8,
+      "created_by": 11,
+      "deadline": "2025-09-10T00:00:00Z",
+      "created_at": "2025-09-04T10:00:00Z",
+      "updated_at": "2025-09-06T10:00:00Z",
+      "project": 9,
+      "tags": [6]
+    }
+  },
+  {
+    "model": "projects.Task",
+    "pk": 14,
+    "fields": {
+      "title": "Additional task in project 7 for admin",
+      "description": "Assist in planning",
+      "status": "in_progress",
+      "assignee": 11,
+      "created_by": 7,
+      "deadline": "2025-07-15T00:00:00Z",
+      "created_at": "2025-07-04T08:00:00Z",
+      "updated_at": "2025-07-05T08:00:00Z",
+      "project": 7,
+      "tags": [8]
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 1,
+    "fields": {
+      "project": 1,
+      "role_name": "Backend Developer",
+      "message": "Looking for a Python developer",
+      "created_at": "2025-01-16T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 2,
+    "fields": {
+      "project": 2,
+      "role_name": "Frontend Developer",
+      "message": "Need a React expert",
+      "created_at": "2025-02-02T12:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 3,
+    "fields": {
+      "project": 3,
+      "role_name": "QA Engineer",
+      "message": "Looking for a QA specialist",
+      "created_at": "2025-03-11T09:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 4,
+    "fields": {
+      "project": 5,
+      "role_name": "DevOps Engineer",
+      "message": "Need someone with AWS experience",
+      "created_at": "2025-05-21T11:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 5,
+    "fields": {
+      "project": 6,
+      "role_name": "Data Scientist",
+      "message": "Looking for ML expertise",
+      "created_at": "2025-06-16T15:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 6,
+    "fields": {
+      "project": 1,
+      "role_name": "Security Specialist",
+      "message": "Need cybersecurity expertise",
+      "created_at": "2025-01-17T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 7,
+    "fields": {
+      "project": 2,
+      "role_name": "UI Designer",
+      "message": "Looking for a creative designer",
+      "created_at": "2025-02-03T12:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 8,
+    "fields": {
+      "project": 7,
+      "role_name": "Analyst",
+      "message": "Need data analyst",
+      "created_at": "2025-07-03T08:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 9,
+    "fields": {
+      "project": 8,
+      "role_name": "Tester",
+      "message": "Looking for QA tester",
+      "created_at": "2025-08-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 10,
+    "fields": {
+      "project": 8,
+      "role_name": "Backend Dev",
+      "message": "Python expert needed",
+      "created_at": "2025-08-03T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 11,
+    "fields": {
+      "project": 9,
+      "role_name": "Frontend Dev",
+      "message": "Vue.js developer",
+      "created_at": "2025-09-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectOpenRole",
+    "pk": 12,
+    "fields": {
+      "project": 9,
+      "role_name": "DevOps",
+      "message": "AWS specialist",
+      "created_at": "2025-09-03T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 1,
+    "fields": {
+      "project": 1,
+      "user": 9,
+      "status": "pending",
+      "message": "Interested in backend role",
+      "role": 1,
+      "created_at": "2025-01-18T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 2,
+    "fields": {
+      "project": 2,
+      "user": 7,
+      "status": "accepted",
+      "message": "Experienced with React",
+      "role": 2,
+      "created_at": "2025-02-04T12:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 3,
+    "fields": {
+      "project": 3,
+      "user": 10,
+      "status": "pending",
+      "message": "QA expert applying",
+      "role": 3,
+      "created_at": "2025-03-12T09:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 4,
+    "fields": {
+      "project": 5,
+      "user": 8,
+      "status": "rejected",
+      "message": "DevOps experience with AWS",
+      "role": 4,
+      "created_at": "2025-05-22T11:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 5,
+    "fields": {
+      "project": 6,
+      "user": 9,
+      "status": "pending",
+      "message": "Interested in ML role",
+      "role": 5,
+      "created_at": "2025-06-17T15:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 6,
+    "fields": {
+      "project": 1,
+      "user": 10,
+      "status": "accepted",
+      "message": "Cybersecurity expertise",
+      "role": 6,
+      "created_at": "2025-01-19T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 7,
+    "fields": {
+      "project": 2,
+      "user": 4,
+      "status": "pending",
+      "message": "Applying for UI design role",
+      "role": 7,
+      "created_at": "2025-02-05T12:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 8,
+    "fields": {
+      "project": 8,
+      "user": 3,
+      "status": "pending",
+      "message": "Applying for tester role",
+      "role": 9,
+      "created_at": "2025-08-05T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 9,
+    "fields": {
+      "project": 8,
+      "user": 1,
+      "status": "accepted",
+      "message": "Backend experience",
+      "role": 10,
+      "created_at": "2025-08-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 10,
+    "fields": {
+      "project": 9,
+      "user": 2,
+      "status": "rejected",
+      "message": "Frontend skills",
+      "role": 11,
+      "created_at": "2025-09-05T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 11,
+    "fields": {
+      "project": 9,
+      "user": 6,
+      "status": "pending",
+      "message": "DevOps application",
+      "role": 12,
+      "created_at": "2025-09-06T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectApplication",
+    "pk": 12,
+    "fields": {
+      "project": 7,
+      "user": 9,
+      "status": "pending",
+      "message": "Analyst role interest",
+      "role": 8,
+      "created_at": "2025-07-04T08:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectRating",
+    "pk": 1,
+    "fields": {
+      "project": 1,
+      "rated_by": 2,
+      "score": 5,
+      "comment": "Great wallet functionality",
+      "created_at": "2025-01-25T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectRating",
+    "pk": 2,
+    "fields": {
+      "project": 1,
+      "rated_by": 9,
+      "score": 4,
+      "comment": "Secure but needs UI improvements",
+      "created_at": "2025-01-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectRating",
+    "pk": 3,
+    "fields": {
+      "project": 2,
+      "rated_by": 3,
+      "score": 1,
+      "comment": "Excellent shopping experience",
+      "created_at": "2025-02-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectRating",
+    "pk": 4,
+    "fields": {
+      "project": 2,
+      "rated_by": 7,
+      "score": 3,
+      "comment": "Fast and reliable",
+      "created_at": "2025-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectRating",
+    "pk": 5,
+    "fields": {
+      "project": 5,
+      "rated_by": 6,
+      "score": 4,
+      "comment": "Good API but needs better docs",
+      "created_at": "2025-05-25T11:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectRating",
+    "pk": 6,
+    "fields": {
+      "project": 5,
+      "rated_by": 8,
+      "score": 5,
+      "comment": "Reliable payment processing",
+      "created_at": "2025-05-26T11:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectRating",
+    "pk": 7,
+    "fields": {
+      "project": 1,
+      "rated_by": 10,
+      "score": 5,
+      "comment": "Very secure platform",
+      "created_at": "2025-01-27T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectRating",
+    "pk": 8,
+    "fields": {
+      "project": 9,
+      "rated_by": 7,
+      "score": 4,
+      "comment": "Good SaaS project",
+      "created_at": "2025-09-10T10:00:00Z"
+    }
+  },
+  {
+    "model": "projects.ProjectRating",
+    "pk": 9,
+    "fields": {
+      "project": 9,
+      "rated_by": 8,
+      "score": 5,
+      "comment": "Excellent leadership",
+      "created_at": "2025-09-11T10:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 1,
+    "fields": {
+      "project": 1,
+      "user": 1,
+      "user_added": 2,
+      "rating": 3,
+      "created_at": "2025-01-25T10:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 2,
+    "fields": {
+      "project": 1,
+      "user": 2,
+      "user_added": 1,
+      "rating": 1,
+      "created_at": "2025-01-26T10:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 3,
+    "fields": {
+      "project": 2,
+      "user": 2,
+      "user_added": 3,
+      "rating": 4,
+      "created_at": "2025-02-10T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 4,
+    "fields": {
+      "project": 2,
+      "user": 3,
+      "user_added": 2,
+      "rating": 5,
+      "created_at": "2025-02-11T12:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 5,
+    "fields": {
+      "project": 5,
+      "user": 5,
+      "user_added": 6,
+      "rating": 4,
+      "created_at": "2025-05-25T11:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 6,
+    "fields": {
+      "project": 5,
+      "user": 6,
+      "user_added": 5,
+      "rating": 3,
+      "created_at": "2025-05-26T11:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 7,
+    "fields": {
+      "project": 1,
+      "user": 1,
+      "user_added": 10,
+      "rating": 2,
+      "created_at": "2025-01-27T10:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 8,
+    "fields": {
+      "project": 9,
+      "user": 11,
+      "user_added": 7,
+      "rating": 5,
+      "created_at": "2025-09-10T10:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 9,
+    "fields": {
+      "project": 9,
+      "user": 7,
+      "user_added": 11,
+      "rating": 4,
+      "created_at": "2025-09-11T10:00:00Z"
+    }
+  },
+  {
+    "model": "users.DeveloperRatings",
+    "pk": 10,
+    "fields": {
+      "project": 9,
+      "user": 8,
+      "user_added": 11,
+      "rating": 5,
+      "created_at": "2025-09-12T10:00:00Z"
+    }
+  }
+]
