@@ -30,7 +30,7 @@
             style="width: 100%;">
         + Add Position
       </button>
-      <a href="{% url 'projects:application_archive' project.pk %}" class="btn btn-secondary" style="margin-top: 15px; width: 100%;"> Manage Applications </a>
+      <a href="{% url 'projects:applications_list' project.pk %}" class="btn btn-secondary" style="margin-top: 15px; width: 100%;"> Manage Applications </a>
     {% endif %}
   </div>
 
@@ -51,7 +51,7 @@
               </button>
             {% endif %}
             {% if not is_member %}
-              <a href="{% url 'projects:apply' project.pk role.pk %}"> Applicate </a>
+              <a href="{% url 'projects:apply' project.pk role.pk %}" class="btn btn-primary"> Applicate </a>
             {% endif %}
           </li>
         {% endfor %}

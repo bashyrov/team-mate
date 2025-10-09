@@ -1,31 +1,44 @@
 {% extends "base.html" %}
 {% block content %}
 
-  {% if view_type == 'my_tasks' %}
-    <a href="{% url 'users:my_tasks' %}" class="btn btn-primary">Back to Tasks</a>
-  {% else %}
-    <a href="{% url 'projects:task_list' project.pk %}" class="btn btn-primary">Back to Tasks</a>
-  {% endif %}
-  {% if task %}
-    <h2>{{ task.title }}</h2>
-    <p>{{ task.description }}</p>
-    <p><strong>Status:</strong> {{ task.get_status_display }}</p>
-    <p><strong>Deadline:</strong> {{ task.deadline }}</p>
-    <p><strong>Assignee:</strong> {{ task.assignee }}</p>
-    <p><strong>Created by:</strong> {{ task.created_by }}</p>
-    <p><strong>Created at:</strong> {{ task.created_at }}</p>
-    <p><strong>Updated at:</strong> {{ task.updated_at }}</p>
-    <p><strong>Tags:</strong>
-      {% for tag in task.tags.all %}
-        {{ tag.name }}{% if not forloop.last %}, {% endif %}
-      {% empty %}
-        No tags
-      {% endfor %}
-    </p>
-     {% if update_task_perm %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    {% if view_type == 'my_tasks' %}
+        <a href="{% url 'users:my_tasks' %}" class="btn btn-primary">← Back to Tasks</a>
+    {% else %}
+        <a href="{% url 'projects:task_list' project.pk %}" class="btn btn-primary">← Back to Tasks</a>
+    {% endif %}
+    {% if update_task_perm and task %}
         <a href="{% url 'projects:task_edit' project.pk task.pk %}" class="btn btn-warning">Edit Task</a>
-      {% endif %}
-  {% else %}
-    <p>We don’t find this task</p>
-  {% endif %}
+    {% endif %}
+</div>
+
+{% if task %}
+<div class="card shadow-sm p-4 mb-3">
+    <h2 class="card-title mb-2">{{ task.title }}</h2>
+    <p class="text-muted mb-2">{{ task.description|default:"No description" }}</p>
+
+    <ul class="list-unstyled mb-0">
+        <li><strong>Status:</strong> {{ task.get_status_display }}</li>
+        <li><strong>Deadline:</strong> {{ task.deadline|date:"Y-m-d H:i" }}</li>
+        <li><strong>Assignee:</strong> {{ task.assignee }}</li>
+        <li><strong>Created by:</strong> {{ task.created_by }}</li>
+        <li><strong>Created at:</strong> {{ task.created_at|date:"Y-m-d H:i" }}</li>
+        <li><strong>Updated at:</strong> {{ task.updated_at|date:"Y-m-d H:i" }}</li>
+        <li><strong>Tags:</strong>
+            {% if task.tags.exists %}
+                {% for tag in task.tags.all %}
+                    <span class="badge bg-secondary">{{ tag.name }}</span>
+                {% endfor %}
+            {% else %}
+                No tags
+            {% endif %}
+        </li>
+    </ul>
+</div>
+{% else %}
+<div class="alert alert-warning">
+    We don’t find this task.
+</div>
+{% endif %}
+
 {% endblock %}

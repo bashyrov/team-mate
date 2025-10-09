@@ -46,7 +46,7 @@ class Project(models.Model):
 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    domain = models.CharField(max_length=50, choices=DOMEN_CHOICES, default='backend')
+    domain = models.CharField(max_length=50, choices=DOMEN_CHOICES, default='technology')
     development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='initiation')
     deploy_url = models.CharField(max_length=255, blank=True)
     owner = models.ForeignKey(user_model, related_name='owned_projects', on_delete=models.CASCADE)
@@ -66,6 +66,7 @@ class Project(models.Model):
 
     def update_open_to_candidates(self):
         has_roles = self.open_roles.exists()
+
         if self.open_to_candidates != has_roles:
             self.open_to_candidates = has_roles
 
@@ -152,6 +153,11 @@ class ProjectOpenRole(models.Model):
     role_name = models.CharField(max_length=100)
     message = models.TextField(blank=True, max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def delete(self, using=None, keep_parents=False):
+        super().delete(using=using, keep_parents=keep_parents)
+
+        self.project.update_open_to_candidates()
 
     def __str__(self):
         return f"{self.project.name} - {self.role_name}"

@@ -14,7 +14,7 @@ from .models import Project, Task, ProjectMembership, ProjectRating, ProjectAppl
     ProjectOpenRole
 from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
-    ProjectOpenRoleSearchForm, TaskSearchForm
+    ProjectOpenRoleSearchForm, TaskSearchForm, ProjectApplicationSearchForm
 from projects.mixins import TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingPermissionMixin, \
     ApplicationPermissionRequiredMixin, MembershipPermissionRequiredMixin, BasePermissionMixin
 from django.shortcuts import redirect, get_object_or_404, render
@@ -129,7 +129,7 @@ class ProjectDetailView(DetailView):
             'is_member': is_member,
             'can_rate': can_rate,
             'is_deployed': is_deployed,
-            'ratings': project.ratings.all().order_by('-created_at'),
+            'ratings': project.ratings.all().order_by('-created_at')[:3],
         })
 
         return context
@@ -230,15 +230,6 @@ class ProjectOpenRoleDeleteView(ProjectPermissionRequiredMixin, DeleteView):
 
     def get_object(self, queryset=None):
         return get_object_or_404(ProjectOpenRole, pk=self.kwargs['role_pk'], project=self.project)
-
-    def delete(self, request, *args, **kwargs):
-        role = self.get_object()
-        role.delete()
-        self.project.update_open_to_candidates()
-
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({"status": "deleted"})
-        return super().delete(request, *args, **kwargs)
 
     def get_success_url(self):
         return reverse_lazy('projects:project_open_roles_list', kwargs={'project_pk': self.project.pk})
@@ -544,6 +535,7 @@ class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateVie
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         context['project'] = self.project
         context['open_role'] = self.role
         return context
@@ -563,15 +555,32 @@ class ProjectApplicationListView(MembershipPermissionRequiredMixin, ListView):
         qs = self.project.applications.all()
         self.view_type = getattr(self, 'view_type', 'active')
 
+        form = ProjectApplicationSearchForm(self.request.GET)
+
         if self.view_type == 'active':
             qs = qs.filter(status='pending')
         elif self.view_type == 'archive':
             qs = qs.filter(status__in=['accepted', 'rejected'])
 
+        if form.is_valid():
+
+            self.user_username = self.request.GET.get('username', '')
+            self.role = self.request.GET.get('role', '')
+
+            if self.user_username:
+                qs = qs.filter(user__username__icontains=self.user_username)
+            if self.role:
+                qs = qs.filter(role__role_name=self.role)
+
         return qs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        context['search_form'] = ProjectApplicationSearchForm(
+            initial={'username': self.user_username
+                    , 'role': self.role}
+        )
         context['view_type'] = self.view_type
         context['project'] = self.project
         return context
@@ -580,7 +589,7 @@ class ProjectApplicationListView(MembershipPermissionRequiredMixin, ListView):
 @validate_permissions_application_review
 @validate_application_status
 @validate_is_member
-def application_approve(request, **kwargs):  #TODO: Change Roles
+def application_approve(request, **kwargs):
     application = kwargs.get('application')
     project = application.project
 
@@ -605,7 +614,7 @@ def application_approve(request, **kwargs):  #TODO: Change Roles
 @validate_permissions_application_review
 @validate_application_status
 @login_required
-def application_reject(request, **kwargs):  #TODO: Change Roles
+def application_reject(request, **kwargs):
     application = kwargs.get('application')
     project = application.project
 

@@ -1,29 +1,29 @@
 {% extends "base.html" %}
 {% block content %}
 
-  <div class="d-grid gap-3" style="grid-template-columns: 1fr 3fr;">
-    <div class="bg-body-tertiary border rounded-3 sticky-top"
-       style="padding: 15px; height: fit-content; top: 20px;">
-      <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-primary" style="width: 100%">Back to Project</a>
-      <form action="" method="get" style="margin-top: 15px;">
-        {{ search_form }}
-        <button type="submit" class="btn btn-primary mb-3" style="margin-top: 15px; width: 49%;">Find Tasks</button>
-        {% if add_task_perm or is_owner %}
-          <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3" style="margin-top: 15px; width: 49%;">Add Task</a>
-        {% endif %}
-      </form>
-
-    </div>
-    <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px;">
-      <h2>All Tasks</h2>
-      {% if tasks %}
-        {% for task in tasks %}
-          {% include 'includes/task-card.html' %}
-        {% endfor %}
-      {% else %}
-        <h2>No projects yet.</h2>
+<div class="d-grid gap-3" style="grid-template-columns: 1fr 3fr;">
+  <div class="bg-body-tertiary border rounded-3 sticky-top"
+     style="padding: 15px; height: fit-content; top: 20px;">
+    <a href="{% url 'projects:project_detail' project.pk %}" class="btn btn-primary" style="width: 100%">Back to Project</a>
+    <form action="" method="get" style="margin-top: 15px;">
+      {{ search_form }}
+      <button type="submit" class="btn btn-primary mb-3" style="margin-top: 15px; width: 49%;">Find Tasks</button>
+      {% if add_task_perm or is_owner %}
+        <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3" style="margin-top: 15px; width: 49%;">Add Task</a>
       {% endif %}
-      {% include "includes/pagination.html" %}
-    </div>
+    </form>
+
   </div>
+  <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px;">
+    <h2>All Tasks</h2>
+    {% if tasks %}
+      {% for task in tasks %}
+        {% include 'includes/task-card.html' %}
+      {% endfor %}
+    {% else %}
+      <h2>No projects yet.</h2>
+    {% endif %}
+    {% include "includes/pagination.html" %}
+  </div>
+</div>
 {% endblock %}

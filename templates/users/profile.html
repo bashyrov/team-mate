@@ -6,17 +6,39 @@
 {% endif %}
 <div class="d-grid gap-3" style="grid-template-columns: 1fr 2fr;">
   <div class="bg-body-tertiary border rounded-3 sticky-top" style="min-height: 100px; padding: 15px;">
-    <h2>{{ developer.username }}</h2>
-      <p>Position: {{ developer.get_position_display }}</p>
-      <p>Tech Stack: {{ developer.tech_stack }}</p>
-      <p>LinkedIn: {{ developer.linkedin_url }}</p>
-      <p>Portfolio: {{ portfolio_url }}</p>
-      <p>Email: {{ developer.email }}</p>
-      <p>Avg. rating: {{ developer.score }} (Soon) </p>
-      <p>Avg. projects rating: {{ avg_project_score }}</p>
-      {% if is_developer %}
-        <a href="{% url 'users:profile_update' developer.pk %}" class="btn btn-secondary mb-3">Edit Info</a>
-      {% endif %}
+  <div class="card-body">
+    <h4 class="card-title mb-2">{{ developer.username }}</h4>
+    <p class="mb-1"><strong>Position:</strong> {{ developer.get_position_display }}</p>
+    <p class="mb-1"><strong>Tech Stack:</strong> {{ developer.tech_stack }}</p>
+
+    {% if developer.linkedin_url %}
+      <p class="mb-1">
+        <strong>LinkedIn:</strong>
+        <a href="{{ developer.linkedin_url }}" target="_blank" class="text-decoration-underline text-secondary">
+          {{ developer.linkedin_url }}
+        </a>
+      </p>
+    {% endif %}
+
+    {% if developer.portfolio_url %}
+      <p class="mb-1">
+        <strong>Portfolio:</strong>
+        <a href="{{ developer.portfolio_url }}" target="_blank" class="text-decoration-underline text-secondary">
+          {{ developer.portfolio_url }}
+        </a>
+      </p>
+    {% endif %}
+
+    <p class="mb-1"><strong>Email:</strong> {{ developer.email }}</p>
+    <p class="mb-1"><strong>Avg. rating:</strong> {{ developer.score }} (Soon)</p>
+    <p class="mb-1"><strong>Avg. projects rating:</strong> {{ avg_project_score }}</p>
+
+    {% if is_developer %}
+      <a href="{% url 'users:profile_update' developer.pk %}" class="btn btn-sm btn-secondary mt-2 w-100">
+        Edit Info
+      </a>
+    {% endif %}
+  </div>
   </div>
   <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px;">
     <h3>Best Projects:</h3>

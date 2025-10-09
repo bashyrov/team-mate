@@ -6,10 +6,47 @@ from .models import Project, ProjectMembership, Task, ProjectRating, ProjectAppl
 user_model = get_user_model()
 
 
+from django import forms
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = ['title', 'description', 'status', 'assignee', 'tags']
+
+    def __init__(self, *args, project=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        field_attrs = {'class': 'form-control form-control-sm mb-2'}
+
+        self.fields['title'].widget.attrs.update({
+            **field_attrs,
+            'placeholder': 'Task Title',
+        })
+
+        self.fields['description'].widget.attrs.update({
+            **field_attrs,
+            'placeholder': 'Task Description',
+            'rows': 2,
+        })
+
+        self.fields['status'].widget.attrs.update({
+            **field_attrs,
+        })
+
+        if project:
+            self.fields['assignee'].queryset = project.members.values_list('user', flat=True)
+        else:
+            self.fields['assignee'].queryset = Task._meta.get_field('assignee').related_model.objects.none()
+        self.fields['assignee'].widget.attrs.update({
+            **field_attrs,
+        })
+        self.fields['assignee'].empty_label = 'Select user'
+
+        self.fields['tags'].widget.attrs.update({
+            **field_attrs,
+        })
+
+
 
 
 class TaskSearchForm(forms.Form):
@@ -82,8 +119,28 @@ class ProjectSearchForm(forms.Form):
         required=False,
         label='Open to candidates',
         widget=forms.CheckboxInput(attrs={
+            'class': 'form-check-input',
+            'style': 'margin-top: 5px;',
+        })
+    )
+
+
+class ProjectApplicationSearchForm(forms.Form):
+    username = forms.CharField(max_length=255,
+                                   required=False,
+                                   label='',
+                                   widget=forms.TextInput(attrs=
+                                                          {
+                                      'class': 'form-control',
+                                      'placeholder': 'Username',
+                                  }))
+    role = forms.ChoiceField(
+        choices=[('', 'Select role')] + list(ProjectMembership.ROLE_CHOICES),
+        required=False,
+        label='',
+        widget=forms.Select(attrs={
             'class': 'form-control',
-            'style': 'margin-top: 15px; height:30px; width:30px;',
+            'style': 'margin-top: 15px;'
         })
     )
 
@@ -91,7 +148,43 @@ class ProjectSearchForm(forms.Form):
 class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
-        fields = ['name', 'description', 'domain', 'deploy_url', 'project_url']
+        fields = ['name', 'description', 'domain', 'development_stage', 'deploy_url', 'project_url']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['name'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Project Name',
+        })
+
+        self.fields['description'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Project Description',
+            'rows': 3,
+            'style': 'margin-top: 10px;',
+        })
+
+        self.fields['domain'].widget.attrs.update({
+            'class': 'form-select',
+            'style': 'margin-top: 10px;',
+        })
+
+        self.fields['development_stage'].widget.attrs.update({
+            'class': 'form-select',
+            'style': 'margin-top: 10px;',
+        })
+
+        self.fields['deploy_url'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Deploy URL',
+            'style': 'margin-top: 10px;',
+        })
+        self.fields['project_url'].widget.attrs.update({
+            'class': 'form-control',
+            'placeholder': 'Project URL (Github, etc.)',
+            'style': 'margin-top: 10px;',
+        })
 
 
 class ProjectStageForm(forms.ModelForm):
@@ -178,7 +271,7 @@ class ProjectApplicationForm(forms.ModelForm):
             }),
         }
         labels = {
-            'message': '',  # убираем подпись, если не нужна
+            'message': '',
         }
 
 

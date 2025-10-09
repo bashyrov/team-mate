@@ -1,50 +1,51 @@
 <li class="pb-3 sm:pb-4">
-            <div class="flex items-center space-x-4 rtl:space-x-reverse">
-               <div class="shrink-0">
-                <img class="w-12 h-12 rounded-full" src="https://i.pinimg.com/736x/d3/1c/40/d31c40b147ac2535e50f57017e8fa1d9.jpg" alt="Neil image">
-               </div>
-               <div class="flex-1 min-w-0">
-                  <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
-                     {{ task.title }}
-                  </p>
-                 {% if task.tags.all %}
-                   <p class="text-sm text-gray-500 truncate dark:text-gray-400">
-                    (Tags: {% for tag in task.tags.all %}
-                      {{ tag.name }}{% if not forloop.last %}, {% endif %}
-                  {% endfor %})
-                  </p>
-                {% endif %}
-               </div>
-               <div class="inline-flex items-center text-base font-semibold text-gray-900 dark:text-white">
-                 {% if task.status == 'done' %}
-                    <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
-                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"></path>
-                        </svg>
-                        <span class="sr-only">Check icon</span>
-                    </div>
-                 {% elif task.status == 'in_progress' %}
-                  <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-orange-500 bg-orange-100 rounded-lg dark:bg-orange-700 dark:text-orange-200">
-                      <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"></path>
-                      </svg>
-                      <span class="sr-only">Warning icon</span>
-                  </div>
-                 {% else %}
-                    <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
-                        <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"></path>
-                        </svg>
-                        <span class="sr-only">Error icon</span>
-                    </div>
-                 {% endif %}
+  <div class="flex items-center justify-between space-x-4 rtl:space-x-reverse bg-white dark:bg-gray-800 p-3 rounded-lg shadow-sm">
 
-               </div>
-            {% if is_member %}
-              <a href="{% url 'projects:task_detail' project.pk task.pk %}">Check</a>
-            {% endif %}
-            {% if view_type == 'my_tasks' %}
-              <a href="{% url 'users:my_tasks_detail' task.pk %}">Check</a>
-            {% endif %}
-            </div>
-         </li>
+    <div class="shrink-0">
+      <img class="w-12 h-12 rounded-full" src="https://i.pinimg.com/736x/d3/1c/40/d31c40b147ac2535e50f57017e8fa1d9.jpg" alt="{{ task.title }} image">
+    </div>
+
+    <div class="flex-1 min-w-0">
+      <p class="text-sm font-medium text-gray-900 truncate dark:text-white">
+        {{ task.title }}
+      </p>
+      {% if task.tags.all %}
+        <p class="text-sm text-gray-500 truncate dark:text-gray-400">
+          Tags: {% for tag in task.tags.all %}{{ tag.name }}{% if not forloop.last %}, {% endif %}{% endfor %}
+        </p>
+      {% endif %}
+    </div>
+
+    <div>
+      {% if task.status == 'done' %}
+        <span class="inline-flex items-center justify-center w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"></path>
+          </svg>
+        </span>
+      {% elif task.status == 'in_progress' %}
+        <span class="inline-flex items-center justify-center w-8 h-8 text-orange-500 bg-orange-100 rounded-lg dark:bg-orange-700 dark:text-orange-200">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"></path>
+          </svg>
+        </span>
+      {% else %}
+        <span class="inline-flex items-center justify-center w-8 h-8 text-red-500 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 11.793a1 1 0 1 1-1.414 1.414L10 11.414l-2.293 2.293a1 1 0 0 1-1.414-1.414L8.586 10 6.293 7.707a1 1 0 0 1 1.414-1.414L10 8.586l2.293-2.293a1 1 0 0 1 1.414 1.414L11.414 10l2.293 2.293Z"></path>
+          </svg>
+        </span>
+      {% endif %}
+    </div>
+
+    <div class="ml-3">
+      {% if is_member %}
+        <a href="{% url 'projects:task_detail' project.pk task.pk %}" class="btn btn-sm btn-primary">Check</a>
+      {% endif %}
+      {% if view_type == 'my_tasks' %}
+        <a href="{% url 'users:my_tasks_detail' task.pk %}" class="btn btn-sm btn-primary">Check</a>
+      {% endif %}
+    </div>
+
+  </div>
+</li>
