@@ -49,7 +49,12 @@ Built on **Django**, the project combines simplicity, flexibility, and team spir
 
 To explore the platform with pre-populated data, load the `initial_data.json` fixture. This includes sample users, projects, tasks, ratings, and more to help you get started.
 
-### Steps to Load the Fixture
-1. Ensure your Django environment is set up and the virtual environment is activated:
-   ```bash
-   .\venv\Scripts\activate  # On Windows
+python manage.py loaddata initial_data.json
+
+🔑 Superuser Access
+To experience the platform as an admin (who participates in projects and owns some), use the following credentials to log in to the Django admin panel (e.g., http://localhost:8000/admin/):
+
+Username: admin
+Password: admin
+
+The admin user is fully integrated into the platform, participating in projects (e.g., as a Team Lead in "SaaS Analytics" and "Admin Project 2") and owning projects ("Admin Project 1" and "Admin Project 2"). This allows you to explore the platform from an admin's perspective.
