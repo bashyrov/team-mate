@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container mt-5">
-    <!-- Manage Project Roles Section -->
     <h2 class="mb-4 fw-bold">Manage Project Roles</h2>
 
     <form method="post" class="card p-4 shadow-sm">
@@ -64,13 +63,13 @@
         <button type="submit" class="btn btn-primary mt-3">Save Roles</button>
     </form>
 
-    <!-- Project Permissions Section -->
     <h2 class="mt-5 mb-4 fw-bold">🔐 Project Permissions</h2>
-
+    <p class="text-muted small mb-4">
+      Administrators automatically have full access to all project actions and permissions.
+    </p>
     <div class="card shadow-sm">
         <div class="card-body p-0">
             <div class="list-group list-group-flush">
-                <!-- Edit project info -->
                 <a href="{% url 'projects:project_edit' project.pk %}" class="list-group-item list-group-item-action p-3">
                     <div class="d-flex align-items-center">
                         <span class="me-3 fs-4">📝</span>
@@ -84,7 +83,6 @@
                     </div>
                 </a>
 
-                <!-- Add task -->
                 <a href="{% url 'projects:task_list' project.pk %}" class="list-group-item list-group-item-action p-3">
                     <div class="d-flex align-items-center">
                         <span class="me-3 fs-4">✅</span>
@@ -98,7 +96,6 @@
                     </div>
                 </a>
 
-                <!-- Update project stage -->
                 <a href="{% url 'projects:project_edit_stage' project.pk %}" class="list-group-item list-group-item-action p-3">
                     <div class="d-flex align-items-center">
                         <span class="me-3 fs-4">🚀</span>
@@ -112,7 +109,6 @@
                     </div>
                 </a>
 
-                <!-- Recruitment -->
                 <a href="{% url 'projects:applications_list' project.pk %}" class="list-group-item list-group-item-action p-3">
                     <div class="d-flex align-items-center">
                         <span class="me-3 fs-4">👥</span>
