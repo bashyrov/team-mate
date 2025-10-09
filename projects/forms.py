@@ -190,8 +190,21 @@ class ProjectForm(forms.ModelForm):
 class ProjectStageForm(forms.ModelForm):
     development_stage = forms.ChoiceField(
         choices=Project.DEVELOPMENT_STAGE_CHOICES,
-        label="Development Stage"
+        label="Development Stage",
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+            'style': 'margin-top: 15px;'
+        })
     )
+
+    deploy_url = forms.URLField(
+        required=False,
+        label="Deploy URL",
+        widget=forms.URLInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Deploy URL',
+            'style': 'margin-top: 10px;',
+        }))
 
     class Meta:
         model = Project
