@@ -166,7 +166,7 @@ class ProjectOpenRoleForm(forms.ModelForm):
 class ProjectApplicationForm(forms.ModelForm):
     class Meta:
         model = ProjectApplication
-        fields = ["role", "message"]
+        fields = ["message"]
 
 
 class ProjectMembershipForm(forms.ModelForm):

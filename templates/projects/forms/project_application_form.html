@@ -1,5 +1,8 @@
+
+<h2>You applicate to role - {{ open_role.role_name }}</h2>
+<h4>Requirements: {{ open_role.message }}</h4>
 <form method="post"
-      hx-post="{% url 'projects:apply' project.pk role.pk %}"
+      hx-post="{% url 'projects:apply' project.pk open_role.pk %}"
       hx-target="#modal-body"
       hx-swap="innerHTML">
   {% csrf_token %}

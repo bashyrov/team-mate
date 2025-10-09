@@ -206,7 +206,9 @@ class ProjectOpenRoleListView(BasePermissionMixin, ListView):
                     'manage_open_roles_perm'
                 ]
 
-                user_permissions = {perm: getattr(membership, perm, False) for perm in permissions}
+                user_permissions = {
+                    perm: getattr(membership, perm, False) for perm in permissions
+                }
 
         context['search_form'] = ProjectOpenRoleSearchForm(
             initial={'role_name': role_name}
@@ -529,13 +531,10 @@ class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateVie
     template_name = "projects/forms/project_application_form.html"
     required_permission = 'add_project_application'
 
-    def dispatch(self, request, *args, **kwargs):
-        self.role = get_object_or_404(ProjectOpenRole, pk=self.kwargs["role_pk"])
-        return super().dispatch(request, *args, **kwargs)
-
     def form_valid(self, form):
         form.instance.project = self.project
         form.instance.user = self.request.user
+        form.instance.role = self.role
         form.save()
 
         return super().form_valid(form)
@@ -546,7 +545,7 @@ class ProjectApplicationCreateView(ApplicationPermissionRequiredMixin, CreateVie
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['project'] = self.project
-        context['role'] = self.role
+        context['open_role'] = self.role
         return context
 
 
