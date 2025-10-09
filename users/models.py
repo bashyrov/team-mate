@@ -21,8 +21,8 @@ class Developer(AbstractUser):
     position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='backend')
     score = models.FloatField(default=0)
     tech_stack = models.CharField(max_length=255, blank=True)
-    linkedin_url = models.CharField(max_length=255, blank=True)
-    portfolio_url = models.CharField(max_length=255, blank=True)
+    linkedin_url = models.URLField(max_length=255, blank=True)
+    portfolio_url = models.URLField(max_length=255, blank=True)
     telegram_contact = models.CharField(max_length=255, blank=True)
     discord_contact = models.CharField(max_length=255, blank=True)
 
@@ -31,8 +31,35 @@ class Developer(AbstractUser):
 
     def avg_project_score(self):
         project_ids = ProjectMembership.objects.filter(user=self).values_list('project_id', flat=True)
-        avg_score = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg']
-        return avg_score or 0
+        avg_score = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
+        return round(avg_score, 2)
+
+    def get_member_of(self, project):
+        return ProjectMembership.objects.filter(user=self, project=project).first()
+
+    def is_owner(self, project):
+        return project.owner_id == self.id
+
+    def get_tasks(self, project=None):
+        qs = self.assigned_tasks.all()
+
+        if project:
+            qs = qs.filter(project=project)
+
+        return qs
+
+    def has_permission(self, project, permission):
+
+        if self.is_owner(project):
+            return True
+
+        user_membership = self.get_member_of(project)
+
+        if not user_membership:
+            return False
+
+        return getattr(user_membership, permission, False)
+
 
 
 class DeveloperRatings(models.Model):
@@ -49,7 +76,3 @@ class DeveloperRatings(models.Model):
     )
     rating = models.FloatField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
-
-    @staticmethod
-    def get_avg_rating(user):
-        return DeveloperRatings.objects.filter(user=user).aggregate(avg=Avg("rating"))["avg"] or 0

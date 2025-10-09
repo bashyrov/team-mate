@@ -1,19 +1,30 @@
-<h3>We are open for:</h3>
-  <ul>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="mb-0">We are open for:</h3>
+  <div class="d-flex gap-2">
+    <a href="{% url 'projects:project_open_roles_list' project.pk %}" class="btn btn-primary btn-sm">
+      All Opportunities
+    </a>
+    {% if can_manage_application %}
+      <a href="{% url 'projects:applications_list' project.pk %}" class="btn btn-primary btn-sm">
+        Check Applications
+      </a>
+    {% endif %}
+  </div>
+</div>
+
+{% if open_roles %}
+  <div class="list-group">
     {% for role in open_roles %}
-      <li>
-        {{ role.role_name }} - {{ role.message }}
-      </li>
+      <div class="list-group-item list-group-item-action mb-2 shadow-sm rounded">
+        <div class="d-flex justify-content-between align-items-center">
+          <strong>{{ role.role_name }}</strong>
+        </div>
+        {% if role.message %}
+          <p class="mb-0 text-muted">{{ role.message }}</p>
+        {% endif %}
+      </div>
     {% endfor %}
-    <a href="{% url 'projects:project_open_roles_list' project.pk %}" class="btn btn-primary mb-3">All opportunities</a>
-  </ul>
-  {% if can_applicate %}
-    <button class="btn btn-primary"
-          hx-get="{% url 'projects:apply' project.pk %}"
-          hx-target="#modal-body"
-          hx-trigger="click"
-          data-bs-toggle="modal"
-          data-bs-target="#applicationModal">
-      Applicate
-  </button>
-  {% endif %}
+  </div>
+{% else %}
+  <p class="text-muted">No open roles yet.</p>
+{% endif %}

@@ -8,7 +8,7 @@ user_model = settings.AUTH_USER_MODEL
 
 class ProjectRating(models.Model):
     project = models.ForeignKey('Project', related_name='ratings', on_delete=models.CASCADE)
-    user_added = models.ForeignKey(
+    rated_by = models.ForeignKey(
         user_model,
         on_delete=models.CASCADE,
         related_name='given_project_ratings'
@@ -46,8 +46,8 @@ class Project(models.Model):
 
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
-    domain = models.CharField(max_length=50, choices=DOMEN_CHOICES, default='backend')
-    development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='backend')
+    domain = models.CharField(max_length=50, choices=DOMEN_CHOICES, default='technology')
+    development_stage = models.CharField(max_length=50, choices=DEVELOPMENT_STAGE_CHOICES, default='initiation')
     deploy_url = models.CharField(max_length=255, blank=True)
     owner = models.ForeignKey(user_model, related_name='owned_projects', on_delete=models.CASCADE)
     open_to_candidates = models.BooleanField(default=False)
@@ -66,12 +66,17 @@ class Project(models.Model):
 
     def update_open_to_candidates(self):
         has_roles = self.open_roles.exists()
+
         if self.open_to_candidates != has_roles:
             self.open_to_candidates = has_roles
 
             self.save(update_fields=['open_to_candidates'])
 
         return self.open_to_candidates
+
+
+    def get_members(self):
+        return self.members.all()
 
     def update_avg_score(self):
         avg = self.ratings.aggregate(avg=Avg("score"))["avg"] or 0
@@ -107,6 +112,9 @@ class ProjectMembership(models.Model):
 
     class Meta:
         unique_together = ("project", "user")
+
+    def has_permission(self, perm_name) -> bool:
+        return getattr(self, perm_name, False)
 
     def __str__(self):
         return f"{self.user.username} in {self.project.name} as {self.get_role_display()}"
@@ -146,13 +154,26 @@ class ProjectOpenRole(models.Model):
     message = models.TextField(blank=True, max_length=500)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def delete(self, using=None, keep_parents=False):
+        super().delete(using=using, keep_parents=keep_parents)
+
+        self.project.update_open_to_candidates()
+
     def __str__(self):
         return f"{self.project.name} - {self.role_name}"
 
 
 class ProjectApplication(models.Model):
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+
+    APPLICATION_STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('accepted', 'Accepted'),
+        ('rejected', 'Rejected'),
+    ]
+
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name="applications")
     user = models.ForeignKey(user_model, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=APPLICATION_STATUS_CHOICES, default='pending')
     message = models.TextField(blank=True)
-    role = models.CharField(max_length=10, choices=ProjectMembership.ROLE_CHOICES, default="DEV")
+    role = models.ForeignKey(ProjectOpenRole, on_delete=models.CASCADE, related_name="applications")
     created_at = models.DateTimeField(auto_now_add=True)

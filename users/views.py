@@ -1,9 +1,13 @@
 from django.contrib.auth import get_user_model
-from django.views.generic import ListView, DetailView
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.generic import ListView, DetailView, UpdateView
 from django.db.models import Avg
 
-from projects.models import ProjectMembership, Project
-from users.forms import DeveloperSearchForm
+from projects.models import ProjectMembership, Project, Task
+from users.forms import DeveloperSearchForm, DeveloperForm, MyTaskSearchForm
 from team_mate import settings
 
 user_model = settings.AUTH_USER_MODEL
@@ -54,6 +58,37 @@ class DeveloperDetailView(DetailView):
     context_object_name = 'developer'
     pk_url_kwarg = 'user_pk'
 
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        developer = self.object
+        is_developer = developer == self.request.user
+
+        project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
+
+        context['is_developer'] = is_developer
+        context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
+
+        context['projects'] = Project.objects.filter(id__in=project_ids).order_by('-score')[:5]
+
+        return context
+
+
+class DeveloperUpdateView(UpdateView):
+    model = get_user_model()
+    form_class = DeveloperForm
+    template_name = 'users/profile_update.html'
+    context_object_name = 'developer'
+    pk_url_kwarg = 'user_pk'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.pk != self.get_object().pk:
+            return redirect('users:profile', user_pk=request.user.pk)
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         developer = self.object
@@ -61,5 +96,57 @@ class DeveloperDetailView(DetailView):
         project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
         context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
 
-        context['projects'] = Project.objects.filter(id__in=project_ids)
+        context['projects'] = Project.objects.filter(id__in=project_ids).order_by('-score')[:5]
+
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('users:profile', kwargs={'user_pk': self.object.pk})
+
+
+@method_decorator(login_required, name='dispatch')
+class MyProjectListView(ListView):
+    model = Project
+    template_name = 'users/my_projects.html'
+    context_object_name = 'projects'
+    paginate_by = 10
+
+    def get_queryset(self):
+        qs = (self.request.user.projects.all() | self.request.user.owned_projects.all()).distinct()
+        return qs
+
+
+@method_decorator(login_required, name='dispatch')
+class MyTasksListView(ListView):
+    model = Task
+    template_name = 'users/my_task_list.html'
+    context_object_name = 'tasks'
+    paginate_by = 10
+    view_type = 'my_tasks'
+
+    def get_queryset(self):
+        user = self.request.user
+        qs = Task.objects.filter(assignee=user)
+
+        form = MyTaskSearchForm(self.request.GET, user=user)
+        if form.is_valid():
+            title = form.cleaned_data.get('title')
+            status = form.cleaned_data.get('status')
+
+            if title:
+                qs = qs.filter(title__icontains=title)
+            if status:
+                qs = qs.filter(status=status)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['search_form'] = MyTaskSearchForm(
+            self.request.GET or None,
+            user=self.request.user
+        )
+
+        context['view_type'] = self.view_type
         return context

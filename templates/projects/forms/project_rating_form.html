@@ -1,8 +1,10 @@
+{% load crispy_forms_tags %}
+
 <form method="post"
       hx-post="{% url 'projects:project_rate' project.pk %}"
       hx-target="this"
       hx-swap="innerHTML">
   {% csrf_token %}
-  {{ form.as_p }}
+  {{ form|crispy }}
   <button type="submit" class="btn btn-success">Submit Rating</button>
 </form>

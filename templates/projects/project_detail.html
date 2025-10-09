@@ -2,58 +2,112 @@
 {% block content %}
 {% if project %}
 <div class="d-grid gap-3" style="grid-template-columns: 1fr 2fr;">
-  <div class="bg-body-tertiary border rounded-3 sticky-top"
-     style="padding: 15px; height: fit-content; top: 20px;">
-    <h2>{{ project.name }}</h2>
-      <p>{{ project.description }}</p>
-      <p><strong>Stage:</strong> {{ project.development_stage }}</p>
-      <p><strong>Domain:</strong> {{ project.domain }}</p>
-      <p><strong>Owner:</strong> {{ project.owner.username }}</p>
-      <p><strong>Links:</strong> {{ project.project_url }}</p>
-      {% if project.deploy_url %}
-        <p><strong>Deploy:</strong> {{ project.deploy_url }}</p>
-      {% endif %}
-      <p><strong>Created at:</strong> {{ project.created_at }}</p>
-      <p><strong>Score:</strong> {{ project.score }}</p>
-      <hr>
-      <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project Info</a>
-      <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-warning mb-3">Edit Roles</a>
-      <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
-      <a href="{% url 'projects:project_edit_stage' project.pk%}" class="btn btn-secondary mb-3">Update Stage</a>
-      <a href="{% url 'projects:project_open_roles_list' project.pk%}" class="btn btn-secondary mb-3">Manage Open Roles</a>
+  <div class="bg-body-tertiary border rounded-3 shadow-sm sticky-top p-3" style="height: fit-content; top: 20px;">
+    <h2 class="mb-3">{{ project.name }}</h2>
+    <p class="text-muted mb-3">{{ project.description }}</p>
 
-      <h4>Team'Mates</h4>
-      {% if memberships %}
-      <ul>
-        {% for membership in memberships %}
-          <li>
-            <a href="{% url 'users:profile' membership.user.pk %}">
-              {{ membership.user.username }}
-            </a> – {{ membership.get_role_display }}
-          </li>
-        {% empty %}
-          <li>No members yet.</li>
-        {% endfor %}
-      </ul>
-      {% else %}
-        <p>No Team'Mates yet.</p>
-      {% endif %}
-  </div>
-  <div class="bg-body-tertiary border rounded-3" style="padding: 15px; height: fit-content;">
-    {% if  tasks %}
-      <h4>Tasks for Team'Mates</h4>
-      {% if tasks.count > 7 %}
-        <a href="{% url 'projects:task_list' project.pk %}" class="btn btn-secondary mb-3">Check All Tasks</a>
-      {% endif %}
-      <ul style="padding-top: 10px;">
-        {% for task in tasks %}
-          {% include "includes/task-card.html" %}
-        {% endfor %}
-      </ul>
-    {% else %}
-      <h2>No tasks yet.</h2>
+    <div class="mb-2 d-flex align-items-center">
+      <span class="me-2">🏗️</span>
+      <strong>Stage:</strong> <span class="ms-1">{{ project.development_stage }}</span>
+    </div>
+    <div class="mb-2 d-flex align-items-center">
+      <span class="me-2">🌐</span>
+      <strong>Domain:</strong> <span class="ms-1">{{ project.domain }}</span>
+    </div>
+    <div class="mb-2 d-flex align-items-center">
+      <span class="me-2">👤</span>
+      <strong>Owner:</strong> <span class="ms-1">{{ project.owner.username }}</span>
+    </div>
+    {% if project.project_url %}
+      <div class="mb-2 d-flex align-items-center">
+        <span class="me-2">🔗</span>
+        <strong>Project URL:</strong>
+        <a href="{{ project.project_url }}" target="_blank" class="ms-1 text-decoration-underline">{{ project.project_url }}</a>
+      </div>
+    {% endif %}
+    {% if project.deploy_url %}
+      <div class="mb-2 d-flex align-items-center">
+        <span class="me-2">🚀</span>
+        <strong>Deploy:</strong>
+        <a href="{{ project.deploy_url }}" target="_blank" class="ms-1 text-decoration-underline">{{ project.deploy_url }}</a>
+      </div>
+    {% endif %}
+    <div class="mb-2 d-flex align-items-center">
+      <span class="me-2">📅</span>
+      <strong>Created at:</strong> <span class="ms-1">{{ project.created_at|date:"d M Y" }}</span>
+    </div>
+    <div class="mb-2 d-flex align-items-center">
+      <span class="me-2">⭐</span>
+      <strong>Score:</strong> <span class="ms-1">{{ project.score }}</span>
+    </div>
+
+  <div class="d-flex flex-wrap gap-2 mb-2">
+    {% if is_owner or edit_project_info_perm %}
+      <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary btn-sm flex-grow-1">Edit Info</a>
+    {% endif %}
+    {% if is_owner or add_task_perm %}
+      <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary btn-sm flex-grow-1">Add Task</a>
+    {% endif %}
+    {% if is_owner or update_project_stage_perm %}
+      <a href="{% url 'projects:project_edit_stage' project.pk %}" class="btn btn-warning btn-sm flex-grow-1">Update Stage</a>
+    {% endif %}
+    {% if is_owner or manage_open_roles_perm %}
+      <a href="{% url 'projects:project_open_roles_list' project.pk %}" class="btn btn-secondary btn-sm flex-grow-1">Manage Roles</a>
+    {% endif %}
+    {% if is_owner %}
+      <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-info btn-sm flex-grow-1">Edit Roles</a>
     {% endif %}
   </div>
+
+
+<h4 class="mb-3">Team'Mates</h4>
+{% if memberships %}
+  <div class="d-flex flex-column gap-2">
+    {% for membership in memberships %}
+      <div class="card shadow-sm p-2" style="font-size: 0.85rem; max-width: 400px;">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <strong>
+              <a href="{% url 'users:profile' membership.user.pk %}" class="text-secondary text-decoration-underline">
+                {{ membership.user.username }}
+              </a>
+            </strong>
+            <span class="text-muted ms-2">
+              {{ membership.get_role_display }}
+            </span>
+          </div>
+          <a href="{% url 'users:profile' membership.user.pk %}" class="btn btn-sm btn-primary">
+            View
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No Team'Mates yet.</p>
+{% endif %}
+
+
+</div>
+<div class="bg-body-tertiary border rounded-3" style="padding: 15px; height: fit-content;">
+  {% if  tasks %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Tasks for Team'Mates</h4>
+      {% if tasks.count > 7 %}
+        <a href="{% url 'projects:task_list' project.pk %}" class="btn btn-secondary">
+          Check All Tasks
+        </a>
+      {% endif %}
+    </div>
+    <ul style="padding-top: 10px;">
+      {% for task in tasks %}
+        {% include "includes/task-card.html" %}
+      {% endfor %}
+    </ul>
+  {% else %}
+    <h2>No tasks yet.</h2>
+  {% endif %}
+</div>
 </div>
 {% if open_roles and ratings %}
   <div class="d-grid gap-3" style="grid-template-columns: 1fr 2fr;">
@@ -66,31 +120,15 @@
     </div>
   </div>
 {% elif ratings %}
-<div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px; margin-top: 15px;">
-  <h3>Ratings:</h3>
-  {% include "includes/rate-project.html" %}
-</div>
-{% endif %}
-
-{% if current_membership and current_membership.role in "LEAD,PM,Mentor" %}
-  <a href="{% url 'projects:project_edit' project.pk %}" class="btn btn-secondary mb-3">Edit Project Info</a>
-  <a href="{% url 'projects:project_edit_stage' project.pk%}">Update Stage</a>
-  <a href="{% url 'projects:task_create' project.pk %}" class="btn btn-primary mb-3">Add Task</a>
-{% endif %}
-
-<div class="modal fade" id="applicationModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">Applicate</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
-      </div>
-      <div class="modal-body" id="modal-body">
-        <div class="text-center p-3">Loading...</div>
-      </div>
-    </div>
+  <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px; margin-top: 15px;">
+    <h3>Ratings:</h3>
+    {% include "includes/rate-project.html" %}
   </div>
-</div>
+{% elif open_roles %}
+  <div class="bg-body-tertiary border rounded-3" style="min-height: 100px; padding: 15px; margin-top: 15px;">
+    {% include "includes/open-project-roles.html" %}
+  </div>
+{% endif %}
 
 <div class="modal fade" id="ratingModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">

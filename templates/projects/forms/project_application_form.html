@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container mt-4">
+  <div class="card shadow-lg border-0 rounded-3">
+    <div class="card-body p-4">
+
+      <h2 class="card-title mb-3 text-primary">
+        Application for Role: <span class="fw-bold">{{ open_role.role_name }}</span>
+      </h2>
+
+      <h5 class="text-muted mb-4">
+        <strong>Requirements:</strong> {{ open_role.message }}
+      </h5>
+
+      <hr class="mb-4">
+
+      <form method="post"
+            hx-post="{% url 'projects:apply' project.pk open_role.pk %}"
+            hx-target="#modal-body"
+            hx-swap="innerHTML">
+
+        {% csrf_token %}
+
+        <div class="mb-3">
+          {{ form.message.label_tag }}
+          {{ form.message }}
+          {% if form.message.errors %}
+            <div class="text-danger small mt-1">
+              {{ form.message.errors }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-success px-4">Send Application</button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
