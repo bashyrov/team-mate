@@ -9,12 +9,16 @@ def validate_permissions_application_review(func):
         user = request.user
         project = get_object_or_404(Project, pk=kwargs['project_pk'])
 
+        if user.is_anonymous:
+            messages.warning(request, "You must be logged in to review applications.")
+            return redirect('projects:applications_list', project.pk)
+
         membership_opj =  ProjectMembership.objects.filter(
             user=user,
             project=project
         ).first()
 
-        has_permission = membership_opj and getattr(membership_opj, 'manage_open_roles_perm', False)
+        has_permission = membership_opj.has_permission('manage_open_roles_perm')
         if not has_permission:
             messages.warning(request, "You do not have permission to review this application.")
             return redirect('projects:applications_list', project.pk)

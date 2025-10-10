@@ -1,20 +1,30 @@
-venv/
-venv1/
-
-db.sqlite3
-
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
 
+# Virtual environments
+venv/
+venv1/
+.env/
+.env*/
+*.env
+
+# Databases
+db.sqlite3
+
+# IDEs
 .idea/
 .vscode/
 *.iml
 
+# macOS / Windows
 .DS_Store
 Thumbs.db
 
+# Logs
 *.log
 
+# Static / Media
 media/
 staticfiles/

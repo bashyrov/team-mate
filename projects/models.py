@@ -17,6 +17,20 @@ class ProjectRating(models.Model):
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+
+        if self.rated_by.given_project_ratings.filter(project=self.project).exists():
+            return
+
+        if self.rated_by.get_member_of(self.project):
+            return
+
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new:
+            self.project.update_avg_score()
+
 
 class Project(models.Model):
 
@@ -84,8 +98,15 @@ class Project(models.Model):
         self.save(update_fields=['score'])
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
         Project.objects.validate_stage(self)
         super().save(*args, **kwargs)
+
+        if is_new:
+            ProjectMembership.objects.get_or_create(
+                project=self,
+                user=self.owner,
+            )
 
     def __str__(self):
         return self.name
@@ -114,6 +135,8 @@ class ProjectMembership(models.Model):
         unique_together = ("project", "user")
 
     def has_permission(self, perm_name) -> bool:
+        if self.user == self.project.owner:
+            return True
         return getattr(self, perm_name, False)
 
     def __str__(self):
@@ -158,6 +181,14 @@ class ProjectOpenRole(models.Model):
         super().delete(using=using, keep_parents=keep_parents)
 
         self.project.update_open_to_candidates()
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+
+        super().save(*args, **kwargs)
+
+        if is_new:
+            self.project.update_open_to_candidates()
 
     def __str__(self):
         return f"{self.project.name} - {self.role_name}"
