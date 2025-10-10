@@ -22,7 +22,7 @@ class ProjectRating(models.Model):
         if self.rated_by.given_project_ratings.filter(project=self.project).exists():
             return
 
-        if self.rated_by.is_member(self.project):
+        if self.rated_by.get_member_of(self.project):
             return
 
         is_new = self.pk is None
