@@ -26,7 +26,7 @@ class ModelsTestCase(TestCase):
         ProjectMembership.objects.create(project=project, user=user_4, role='PM')
 
         members = project.get_members()
-        expected_members = user_model.objects.filter(pk__in=[user_2.pk, user_3.pk, user_4.pk])
+        expected_members = user_model.objects.filter(pk__in=[user_1.pk, user_2.pk, user_3.pk, user_4.pk])
 
         self.assertSetEqual(set(members), set(expected_members))
 
@@ -59,5 +59,3 @@ class ModelsTestCase(TestCase):
         project.update_avg_score()
 
         self.assertEqual(project.score, 4.0)
-
-    def test_

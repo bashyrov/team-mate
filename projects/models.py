@@ -84,8 +84,17 @@ class Project(models.Model):
         self.save(update_fields=['score'])
 
     def save(self, *args, **kwargs):
+        is_new = self.pk is None
         Project.objects.validate_stage(self)
         super().save(*args, **kwargs)
+
+        if is_new:
+            ProjectMembership.objects.get_or_create(
+                project=self,
+                user=self.owner,
+            )
+
+
 
     def __str__(self):
         return self.name
