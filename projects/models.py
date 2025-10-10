@@ -94,8 +94,6 @@ class Project(models.Model):
                 user=self.owner,
             )
 
-
-
     def __str__(self):
         return self.name
 
@@ -123,6 +121,8 @@ class ProjectMembership(models.Model):
         unique_together = ("project", "user")
 
     def has_permission(self, perm_name) -> bool:
+        if self.user == self.project.owner:
+            return True
         return getattr(self, perm_name, False)
 
     def __str__(self):

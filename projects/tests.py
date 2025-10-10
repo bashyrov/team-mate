@@ -59,3 +59,30 @@ class ModelsTestCase(TestCase):
         project.update_avg_score()
 
         self.assertEqual(project.score, 4.0)
+
+    def test_has_permission(self):
+        user_admin = user_model.objects.create(username='admin', email='admin@mail.com', password='pass')
+        user_test = user_model.objects.create(username='dev', email='dev@mail.com', password='pass')
+        project = Project.objects.create(name='Test Project', owner=user_admin)
+
+        membership = ProjectMembership.objects.create(
+            project=project,
+            user=user_test,
+            role='DEV',
+            edit_project_info_perm=True,
+            update_project_stage_perm=True,
+        )
+
+        admin_perms = ['edit_project_info_perm', 'add_task_perm', 'update_project_stage_perm', 'manage_open_roles_perm']
+        admin_membership = ProjectMembership.objects.get(project=project, user=user_admin)
+        for perm in admin_perms:
+            self.assertTrue(admin_membership.has_permission(perm))
+
+        perms_expectations = {
+            'edit_project_info_perm': True,
+            'add_task_perm': False,
+            'update_project_stage_perm': True,
+            'manage_open_roles_perm': False,
+        }
+        for perm, expected in perms_expectations.items():
+            self.assertEqual(membership.has_permission(perm), expected)

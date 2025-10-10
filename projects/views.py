@@ -338,12 +338,6 @@ class ProjectCreateView(CreateView):
 
         response = super().form_valid(form)
 
-        # ProjectMembership.objects.create(
-        #     project=self.object,
-        #     user=self.request.user,
-        #     role='No Role',
-        # )
-
         return response
 
     def get_success_url(self):

@@ -14,7 +14,7 @@ def validate_permissions_application_review(func):
             project=project
         ).first()
 
-        has_permission = membership_opj and getattr(membership_opj, 'manage_open_roles_perm', False)
+        has_permission = membership_opj.has_permission('manage_open_roles_perm')
         if not has_permission:
             messages.warning(request, "You do not have permission to review this application.")
             return redirect('projects:applications_list', project.pk)
