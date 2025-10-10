@@ -168,6 +168,15 @@ class ProjectOpenRole(models.Model):
 
         self.project.update_open_to_candidates()
 
+    def save(self, *args, **kwargs):
+        print(args, kwargs)
+        is_new = self.pk is None
+
+        super().save(*args, **kwargs)
+
+        if is_new:
+            self.project.update_open_to_candidates()
+
     def __str__(self):
         return f"{self.project.name} - {self.role_name}"
 

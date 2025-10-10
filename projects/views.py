@@ -152,7 +152,6 @@ class ProjectOpenRoleCreateView(ProjectPermissionRequiredMixin,CreateView):
         form.instance.project = self.project
         form.instance.user = self.request.user
         form.save()
-        self.project.update_open_to_candidates()
 
         if self.request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': True})
