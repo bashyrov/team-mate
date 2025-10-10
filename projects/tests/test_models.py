@@ -112,6 +112,15 @@ class ModelsTestCase(TestCase):
             owner=self.user
         )
 
+        self.rater1 = user_model.objects.create(
+            username='rater1',
+            password='<PASSWORD>'
+        )
+        self.rater2 = user_model.objects.create(
+            username='rater2',
+            password='<PASSWORD>'
+        )
+
         self.assertEqual(project.score, 0)
 
         ProjectRating.objects.create(
@@ -121,12 +130,12 @@ class ModelsTestCase(TestCase):
         )
         ProjectRating.objects.create(
             project=project,
-            rated_by=self.user,
+            rated_by=self.rater1,
             score=5
         )
         ProjectRating.objects.create(
             project=project,
-            rated_by=self.user,
+            rated_by=self.rater2,
             score=3
         )
 
