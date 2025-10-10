@@ -17,6 +17,20 @@ class ProjectRating(models.Model):
     comment = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    def save(self, *args, **kwargs):
+
+        if self.rated_by.given_project_ratings.filter(project=self.project).exists():
+            return
+
+        if self.rated_by.is_member(self.project):
+            return
+
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new:
+            self.project.update_avg_score()
+
 
 class Project(models.Model):
 
