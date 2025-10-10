@@ -3,7 +3,6 @@ from django.test import TestCase
 
 from projects.models import (Project,
                              ProjectMembership,
-                             ProjectApplication,
                              ProjectOpenRole,
                              ProjectRating,
                              Tag,
