@@ -8,9 +8,9 @@ from django.db.models import Avg
 
 from projects.models import ProjectMembership, Project, Task
 from users.forms import DeveloperSearchForm, DeveloperForm, MyTaskSearchForm
-from team_mate import settings
+from team_mate.settings import base
 
-user_model = settings.AUTH_USER_MODEL
+user_model = base.AUTH_USER_MODEL
 
 
 class LeaderboardView(ListView):

@@ -2,9 +2,10 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-from pathlib import Path
+
 from dotenv import load_dotenv
 
+load_dotenv()
 
 def main():
     """Run administrative tasks."""

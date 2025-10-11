@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.db.models import Avg
-from team_mate import settings
+from team_mate.settings import base
 from projects.models import Project, ProjectMembership
 
-user_model = settings.AUTH_USER_MODEL
+user_model = base.AUTH_USER_MODEL
 
 
 class Developer(AbstractUser):
