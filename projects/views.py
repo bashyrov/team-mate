@@ -8,7 +8,6 @@ from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
-
 from .decorators import validate_permissions_application_review, validate_application_status, validate_is_member
 from .models import Project, Task, ProjectMembership, ProjectRating, ProjectApplication, \
     ProjectOpenRole
