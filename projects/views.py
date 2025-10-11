@@ -4,17 +4,19 @@ from django.contrib import messages
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, FormView, DeleteView
+
 from .decorators import validate_permissions_application_review, validate_application_status, validate_is_member
-from .models import Project, Task, ProjectMembership, ProjectRating, ProjectApplication, ProjectOpenRole
-from .forms import (ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate,
-    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm,
-    ProjectOpenRoleSearchForm, TaskSearchForm, ProjectApplicationSearchForm)
-from projects.mixins import (TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingPermissionMixin,
-    ApplicationPermissionRequiredMixin, MembershipPermissionRequiredMixin, BasePermissionMixin)
+from .models import Project, Task, ProjectMembership, ProjectRating, ProjectApplication, \
+    ProjectOpenRole
+from .forms import ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate, ProjectMembershipForm, \
+    ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm, \
+    ProjectOpenRoleSearchForm, TaskSearchForm, ProjectApplicationSearchForm
+from projects.mixins import TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingPermissionMixin, \
+    ApplicationPermissionRequiredMixin, MembershipPermissionRequiredMixin, BasePermissionMixin
 from django.shortcuts import redirect, get_object_or_404, render
 
 UserModel = get_user_model()

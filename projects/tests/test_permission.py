@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client, RequestFactory
+from django.urls import reverse
 
 from projects.models import ProjectMembership, Tag, ProjectOpenRole, Task, ProjectApplication, Project
 

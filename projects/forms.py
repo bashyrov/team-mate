@@ -6,6 +6,8 @@ from .models import Project, ProjectMembership, Task, ProjectRating, ProjectAppl
 user_model = get_user_model()
 
 
+from django import forms
+
 class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
