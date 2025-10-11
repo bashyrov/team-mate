@@ -4,6 +4,8 @@
 It facilitates finding teammates, managing projects, tracking tasks, and monitoring participant ratings.  
 Built on **Django**, the project combines simplicity, flexibility, and team spirit 💡.
 
+The project is available at:
+🔗 https://team-mate.onrender.com/
 ---
 
 ## 🚀 Key Features
