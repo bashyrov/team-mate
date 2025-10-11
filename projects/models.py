@@ -1,9 +1,9 @@
-from team_mate import settings
+from team_mate.settings import base
 from django.db import models
 from django.db.models import Avg
 from projects.service.managers import ProjectManager
 
-user_model = settings.AUTH_USER_MODEL
+user_model = base.AUTH_USER_MODEL
 
 
 class ProjectRating(models.Model):
