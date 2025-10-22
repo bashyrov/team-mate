@@ -12,5 +12,4 @@ urlpatterns = [
     path('my-projects/', views.MyProjectListView.as_view(), name='my_projects'),
     path('my-tasks/', views.MyTasksListView.as_view(), name='my_tasks'),
     path('my-tasks/<int:task_pk>/', project_views.TaskDetailView.as_view(), name='my_tasks_detail'),
-    path('my-tasks/<int:task_pk>/', project_views.TaskDetailView.as_view(), name='my_tasks_detail'),
 ]

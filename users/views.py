@@ -126,7 +126,9 @@ class MyTasksListView(ListView):
 
     def get_queryset(self):
         user = self.request.user
-        qs = Task.objects.filter(assignee=user)
+        qs = Task.objects.filter(assignee=user).select_related('assignee', 'created_by',
+                                                               'project__owner').prefetch_related(
+            'tags')
 
         form = MyTaskSearchForm(self.request.GET, user=user)
         if form.is_valid():
