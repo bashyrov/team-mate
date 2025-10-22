@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db import models
 from django.contrib import messages
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
@@ -79,10 +80,16 @@ class ProjectDetailView(DetailView):
             Project.objects
             .select_related('owner')
             .prefetch_related(
-                'tasks__tags',
-                'projectmembership_set__user',
-                'ratings__rated_by',
+                models.Prefetch(
+                    'tasks',
+                    queryset=Task.objects.filter(project_id=self.kwargs['project_pk']).prefetch_related('tags', 'assignee', 'created_by')
+                ),
+                models.Prefetch(
+                    'ratings',
+                    queryset=ProjectRating.objects.order_by('-created_at').select_related('rated_by')
+                ),
                 'open_roles',
+                'memberships__user',
             )
         )
 
@@ -91,8 +98,8 @@ class ProjectDetailView(DetailView):
         project = self.object
         user = self.request.user
 
-        memberships = list(project.projectmembership_set.all())
-        tasks = Task.objects.filter(project=project)[:8]
+        memberships = project.memberships.all()
+        tasks = project.tasks.all()[:8]
         open_roles = project.open_roles.all()[:3]
         is_deployed = project.development_stage == "deployed"
 
@@ -115,7 +122,7 @@ class ProjectDetailView(DetailView):
                 ]
                 user_permissions = {perm: getattr(membership, perm, False) for perm in permissions}
 
-            is_rated = ProjectRating.objects.filter(project=project, rated_by=user).exists()
+            is_rated = project.ratings.filter(project=project, rated_by=user).exists()
             can_rate = not (is_member and is_owner and is_rated)
 
         context.update({
