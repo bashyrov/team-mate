@@ -251,7 +251,9 @@ class TaskListView(ListView):
 
     def get_queryset(self):
         form = TaskSearchForm(self.request.GET, project=self.project)
-        qs = Task.objects.filter(project_id=self.project.id)
+        qs = Task.objects.filter(project_id=self.kwargs['project_pk']).select_related('assignee', 'created_by',
+                                                                                        'project__owner').prefetch_related(
+            'tags')
 
         if form.is_valid():
             title = form.cleaned_data.get('title')
