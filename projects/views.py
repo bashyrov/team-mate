@@ -315,6 +315,10 @@ class TaskDetailView(TaskPermissionRequiredMixin, DetailView):
     pk_url_kwarg = 'task_pk'
     required_permission = 'view_task'
 
+    def get_queryset(self):
+        return Task.objects.filter(project_id=self.kwargs['project_pk']).select_related('assignee', 'created_by', 'project__owner').prefetch_related('tags')
+
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
