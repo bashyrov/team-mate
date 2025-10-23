@@ -51,7 +51,7 @@ class ProjectPermissionRequiredMixin(BasePermissionMixin):
         has_permission = False
 
         try:
-            user_obj = self.user.get_member_of(self.project.id)
+            user_obj = self.user.get_member_of(self.project)
             has_permission = user_obj.has_permission(self.required_permission)
         except Exception as e:
             return has_permission

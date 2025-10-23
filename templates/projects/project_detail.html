@@ -52,10 +52,10 @@
       <a href="{% url 'projects:project_edit_stage' project.pk %}" class="btn btn-warning btn-sm flex-grow-1">Update Stage</a>
     {% endif %}
     {% if is_owner or manage_open_roles_perm %}
-      <a href="{% url 'projects:project_open_roles_list' project.pk %}" class="btn btn-secondary btn-sm flex-grow-1">Manage Roles</a>
+      <a href="{% url 'projects:project_open_roles_list' project.pk %}" class="btn btn-secondary btn-sm flex-grow-1">Recruitment</a>
     {% endif %}
     {% if is_owner %}
-      <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-info btn-sm flex-grow-1">Edit Roles</a>
+      <a href="{% url 'projects:project_edit_roles' project.pk %}" class="btn btn-info btn-sm flex-grow-1">Manage Roles</a>
     {% endif %}
   </div>
 

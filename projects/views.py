@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db import models
 from django.contrib import messages
+from django.db.models.query import Prefetch
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
@@ -424,9 +425,6 @@ class ProjectRolesUpdateView(ProjectPermissionRequiredMixin, UpdateView):
     form_class = ProjectMembershipFormSet
     pk_url_kwarg = 'project_pk'
     required_permission = 'update_project_roles_perm'
-
-    def get_queryset(self):
-        return Project.objects.select_related('owner').prefetch_related("memberships")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
