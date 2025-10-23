@@ -58,6 +58,8 @@ class DeveloperDetailView(DetailView):
     context_object_name = 'developer'
     pk_url_kwarg = 'user_pk'
 
+    def get_queryset(self):
+        return get_user_model().objects.filter(pk=self.kwargs['user_pk']).prefetch_related("projects")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

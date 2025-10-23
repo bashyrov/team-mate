@@ -8,10 +8,10 @@ class BasePermissionMixin:
     required_permission = None
 
     def is_owner(self):
-        return self.user == self.project.owner
+        return self.project.owner_id == self.user.id
 
     def is_member(self):
-        return self.user == self.project.owner or self.project.members.filter(id=self.user.id).exists()
+        return self.project.members.filter(id=self.user.id).exists()
 
     def applied_to_project(self):
         return self.project.applications.filter(user=self.user, status='pending', role=self.role).exists()
@@ -51,7 +51,7 @@ class ProjectPermissionRequiredMixin(BasePermissionMixin):
         has_permission = False
 
         try:
-            user_obj = self.user.get_member_of(self.project)
+            user_obj = self.user.get_member_of(self.project.id)
             has_permission = user_obj.has_permission(self.required_permission)
         except Exception as e:
             return has_permission

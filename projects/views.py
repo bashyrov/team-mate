@@ -382,6 +382,9 @@ class ProjectStageUpdateView(ProjectPermissionRequiredMixin, UpdateView):
     pk_url_kwarg = 'project_pk'
     required_permission = 'update_project_stage_perm'
 
+    def get_queryset(self):
+        return Project.objects.select_related('owner').prefetch_related("memberships")
+
     def get_success_url(self):
         return reverse_lazy('projects:project_detail', kwargs={'project_pk': self.object.pk})
 
@@ -421,6 +424,9 @@ class ProjectRolesUpdateView(ProjectPermissionRequiredMixin, UpdateView):
     form_class = ProjectMembershipFormSet
     pk_url_kwarg = 'project_pk'
     required_permission = 'update_project_roles_perm'
+
+    def get_queryset(self):
+        return Project.objects.select_related('owner').prefetch_related("memberships")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
