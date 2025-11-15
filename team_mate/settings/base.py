@@ -97,10 +97,10 @@ AUTH_USER_MODEL = 'users.Developer'
 
 
 # AUTH
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = 'projects:project_list'
-LOGIN_URL = 'login'
+LOGOUT_REDIRECT_URL = "projects:project_list"
+LOGIN_URL = "users:login"
 
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
+
