@@ -25,6 +25,8 @@ class DeveloperForm(forms.ModelForm):
             'tech_stack',
             'linkedin_url',
             'portfolio_url',
+            'github_url',
+            'behance_url',
             'telegram_contact',
             'discord_contact',
         )
@@ -44,6 +46,14 @@ class DeveloperForm(forms.ModelForm):
             'portfolio_url': forms.URLInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Portfolio URL'
+            }),
+            'github_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'GitHub profile URL'
+            }),
+            'behance_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Behance profile URL'
             }),
             'telegram_contact': forms.TextInput(attrs={
                 'class': 'form-control',
