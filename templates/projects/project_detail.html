@@ -3,7 +3,10 @@
 {% if project %}
 <div class="d-grid gap-3" style="grid-template-columns: 1fr 2fr;">
   <div class="bg-body-tertiary border rounded-3 shadow-sm sticky-top p-3" style="height: fit-content; top: 20px;">
-    <h2 class="mb-3">{{ project.name }}</h2>
+    <h2 class="mb-3">
+      {{ project.name }}
+      <small class="text-muted ms-2" style="font-size: 0.65rem;">UID: {{ project.uid }}</small>
+    </h2>
     <p class="text-muted mb-3">{{ project.description }}</p>
 
     <div class="mb-2 d-flex align-items-center">
