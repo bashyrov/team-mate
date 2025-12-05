@@ -14,8 +14,8 @@ from .models import Project, Task, ProjectMembership, ProjectRating, ProjectAppl
 from .forms import (ProjectForm, TaskForm, ProjectMembershipFormSet, ProjectMembershipFormUpdate,
     ProjectStageForm, ProjectRatingForm, ProjectApplicationForm, ProjectSearchForm, ProjectOpenRoleForm,
     ProjectOpenRoleSearchForm, TaskSearchForm, ProjectApplicationSearchForm)
-from projects.mixins import (TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingPermissionMixin,
-    ApplicationPermissionRequiredMixin, MembershipPermissionRequiredMixin, BasePermissionMixin)
+from projects.permission_mixins import (TaskPermissionRequiredMixin, ProjectPermissionRequiredMixin, ProjectRatingPermissionMixin,
+                                        ApplicationPermissionRequiredMixin, MembershipPermissionRequiredMixin, BasePermissionMixin)
 from django.shortcuts import redirect, get_object_or_404, render
 
 UserModel = get_user_model()
