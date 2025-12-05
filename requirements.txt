@@ -2,10 +2,14 @@ asgiref==3.10.0
 crispy-bootstrap5==2025.6
 Django==5.2.7
 django-crispy-forms==2.4
+django-debug-toolbar==6.0.0
 gunicorn==23.0.0
 packaging==25.0
+psycopg==3.3.1
+psycopg-binary==3.3.1
 psycopg2-binary==2.9.11
 python-dotenv==1.1.1
+shortuuid==1.0.13
 sqlparse==0.5.3
 tzdata==2025.2
 whitenoise==6.11.0
