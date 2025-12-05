@@ -89,10 +89,6 @@ class Project(models.Model):
 
         return self.open_to_candidates
 
-
-    def get_members(self):
-        return self.members.all()
-
     def update_avg_score(self):
         avg = self.ratings.aggregate(avg=Avg("score"))["avg"] or 0
         self.score = round(avg, 2)
