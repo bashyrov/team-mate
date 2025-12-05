@@ -50,19 +50,6 @@ class Developer(AbstractUser):
 
         return qs
 
-    def has_permission(self, project, permission):
-
-        if self.is_owner(project):
-            return True
-
-        user_membership = self.get_member_of(project)
-
-        if not user_membership:
-            return False
-
-        return getattr(user_membership, permission, False)
-
-
 
 class DeveloperRatings(models.Model):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
