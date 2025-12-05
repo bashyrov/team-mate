@@ -81,7 +81,6 @@ class DeveloperDetailView(DetailView):
         project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
 
         context['is_developer'] = is_developer
-        context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
 
         context['projects'] = Project.objects.filter(id__in=project_ids).order_by('-score')[:5]
 
@@ -108,8 +107,6 @@ class DeveloperUpdateView(UpdateView):
         developer = self.object
 
         project_ids = ProjectMembership.objects.filter(user=developer).values_list('project_id', flat=True)
-        context['avg_project_score'] = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
-
         context['projects'] = Project.objects.filter(id__in=project_ids).order_by('-score')[:5]
 
         return context

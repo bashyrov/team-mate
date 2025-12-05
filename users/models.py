@@ -21,6 +21,7 @@ class Developer(AbstractUser):
     position = models.CharField(max_length=50, choices=POSITION_CHOICES, default='backend')
     score = models.FloatField(default=0)
     tech_stack = models.CharField(max_length=255, blank=True)
+    avg_projects_score = models.DecimalField(default=0, decimal_places=2, max_digits=3)
     linkedin_url = models.URLField(max_length=255, blank=True)
     portfolio_url = models.URLField(max_length=255, blank=True)
     github_url = models.URLField(max_length=255, blank=True)
@@ -31,10 +32,10 @@ class Developer(AbstractUser):
     def __str__(self):
         return self.username
 
-    def avg_project_score(self):
+    def set_avg_project_score(self):
         project_ids = ProjectMembership.objects.filter(user=self).values_list('project_id', flat=True)
         avg_score = Project.objects.filter(id__in=project_ids).aggregate(avg=Avg('score'))['avg'] or 0
-        return round(avg_score, 2)
+        self.avg_projects_score = round(avg_score, 2)
 
     def get_member_of(self, project):
         return ProjectMembership.objects.filter(user=self, project=project).first()
