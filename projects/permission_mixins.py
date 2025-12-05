@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, render, redirect
 
-from projects.models import ProjectMembership, Project, Task, ProjectApplication, ProjectOpenRole
+from projects.models import Project, Task, ProjectOpenRole
 
 
 class BasePermissionMixin:
