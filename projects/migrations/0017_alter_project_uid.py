@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='project',
             name='uid',
-            field=models.CharField(default=projects.models.generate_shortuuid, editable=False, max_length=22, unique=True),
+            field=models.CharField(default=projects.models.generate_shortuuid, editable=False, max_length=22, unique=False),
         ),
     ]
