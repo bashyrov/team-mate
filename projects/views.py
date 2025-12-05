@@ -2,7 +2,6 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.db import models
 from django.contrib import messages
-from django.db.models.query import Prefetch
 from django.template.loader import render_to_string
 from django.contrib.auth import get_user_model
 from django.core.exceptions import PermissionDenied
