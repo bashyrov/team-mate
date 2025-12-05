@@ -4,21 +4,29 @@
 {% else %}
   <h2>No developer.</h2>
 {% endif %}
+<style>
+  .icon-img {
+      max-width: 30px;
+      border-radius: 4px;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+  }
+
+  .icon-img:hover {
+      opacity: 1;
+  }
+
+  .icon-link {
+      display: inline-block;
+      margin-right: 8px;
+  }
+</style>
 <div class="d-grid gap-3" style="grid-template-columns: 1fr 2fr;">
   <div class="bg-body-tertiary border rounded-3 sticky-top" style="padding: 15px; height: fit-content; top: 20px;">
   <div class="card-body">
     <h4 class="card-title mb-2">{{ developer.username }}</h4>
     <p class="mb-1"><strong>Position:</strong> {{ developer.get_position_display }}</p>
     <p class="mb-1"><strong>Tech Stack:</strong> {{ developer.tech_stack }}</p>
-
-    {% if developer.linkedin_url %}
-      <p class="mb-1">
-        <strong>LinkedIn:</strong>
-        <a href="{{ developer.linkedin_url }}" target="_blank" class="text-decoration-underline text-secondary">
-          {{ developer.linkedin_url }}
-        </a>
-      </p>
-    {% endif %}
 
     {% if developer.portfolio_url %}
       <p class="mb-1">
@@ -32,6 +40,35 @@
     <p class="mb-1"><strong>Email:</strong> {{ developer.email }}</p>
     <p class="mb-1"><strong>Avg. rating:</strong> {{ developer.score }} (Soon)</p>
     <p class="mb-1"><strong>Avg. projects rating:</strong> {{ avg_project_score }}</p>
+
+    <div class="d-flex align-items-center mt-2">
+
+        {% if developer.github_url %}
+          <a href="{{ developer.github_url }}" target="_blank" class="icon-link">
+            <img src="https://cdn.pixabay.com/photo/2022/01/30/13/33/github-6980894_960_720.png"
+                 alt="GitHub"
+                 class="icon-img">
+          </a>
+        {% endif %}
+
+        {% if developer.linkedin_url %}
+          <a href="{{ developer.linkedin_url }}" target="_blank" class="icon-link">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png"
+                 alt="LinkedIn"
+                 class="icon-img">
+          </a>
+        {% endif %}
+        {% if developer.behance_url %}
+          <a href="{{ developer.behance_url }}" target="_blank" class="icon-link">
+            <img src="https://1000logos.net/wp-content/uploads/2020/11/Behance-Logo-2020.jpg"
+                 alt="Behance"
+                 class="icon-img">
+          </a>
+        {% endif %}
+
+
+    </div>
+
 
     {% if is_developer %}
       <a href="{% url 'users:profile_update' developer.pk %}" class="btn btn-sm btn-secondary mt-2 w-100">

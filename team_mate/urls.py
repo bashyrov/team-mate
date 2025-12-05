@@ -14,16 +14,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
 
 from django.contrib import admin
 from django.urls import path, include
-from django.contrib.auth import views as auth_views
+
+DEBUG = os.environ.get('DJANGO_SETTINGS_MODULE') == "team_mate.settings.dev"
+
+if DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('projects.urls'), name='projects'),
     path('', include('users.urls'), name='users'),
-    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
-    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
-
-]
+] + debug_toolbar_urls() if DEBUG else []

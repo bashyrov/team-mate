@@ -1,3 +1,5 @@
+import shortuuid
+
 from team_mate.settings import base
 from django.db import models
 from django.db.models import Avg
@@ -32,6 +34,9 @@ class ProjectRating(models.Model):
             self.project.update_avg_score()
 
 
+def generate_shortuuid():
+    return shortuuid.uuid()
+
 class Project(models.Model):
 
     DEVELOPMENT_STAGE_CHOICES = [
@@ -65,7 +70,7 @@ class Project(models.Model):
     deploy_url = models.CharField(max_length=255, blank=True)
     owner = models.ForeignKey(user_model, related_name='owned_projects', on_delete=models.CASCADE)
     open_to_candidates = models.BooleanField(default=False)
-    unical_id = models.CharField(max_length=255, default='unical_id')
+    uid = models.CharField(max_length=22, unique=True, default=generate_shortuuid, editable=False)
     score = models.FloatField(default=0)
     project_url = models.CharField(max_length=255, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -75,7 +80,6 @@ class Project(models.Model):
         through="ProjectMembership",
         related_name="projects"
     )
-
     objects = ProjectManager()
 
     def update_open_to_candidates(self):
@@ -121,7 +125,7 @@ class ProjectMembership(models.Model):
         ("Mentor", "Mentor"),
     ]
 
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='memberships')
     user = models.ForeignKey(user_model, on_delete=models.CASCADE, related_name='memberships')
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default="DEV")
     edit_project_info_perm = models.BooleanField(default=False)

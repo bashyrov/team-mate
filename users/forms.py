@@ -1,3 +1,4 @@
+from django.contrib.auth.forms import UserCreationForm
 from django import forms
 from django.contrib.auth import get_user_model
 
@@ -19,14 +20,16 @@ class DeveloperSearchForm(forms.Form):
 class DeveloperForm(forms.ModelForm):
     class Meta:
         model = get_user_model()
-        fields = [
+        fields = (
             'position',
             'tech_stack',
             'linkedin_url',
             'portfolio_url',
+            'github_url',
+            'behance_url',
             'telegram_contact',
             'discord_contact',
-        ]
+        )
         widgets = {
             'position': forms.Select(attrs={
                 'class': 'form-control',
@@ -44,6 +47,14 @@ class DeveloperForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Portfolio URL'
             }),
+            'github_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'GitHub profile URL'
+            }),
+            'behance_url': forms.URLInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Behance profile URL'
+            }),
             'telegram_contact': forms.TextInput(attrs={
                 'class': 'form-control',
                 'placeholder': 'Telegram username or link'
@@ -54,6 +65,10 @@ class DeveloperForm(forms.ModelForm):
             }),
         }
 
+class DeveloperCreationForm(UserCreationForm):
+    class Meta(UserCreationForm.Meta):
+        model = get_user_model()
+        fields = ("username", "email")
 
 class MyTaskSearchForm(forms.Form):
     title = forms.CharField(

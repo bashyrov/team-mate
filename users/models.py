@@ -23,6 +23,8 @@ class Developer(AbstractUser):
     tech_stack = models.CharField(max_length=255, blank=True)
     linkedin_url = models.URLField(max_length=255, blank=True)
     portfolio_url = models.URLField(max_length=255, blank=True)
+    github_url = models.URLField(max_length=255, blank=True)
+    behance_url = models.URLField(max_length=255, blank=True)
     telegram_contact = models.CharField(max_length=255, blank=True)
     discord_contact = models.CharField(max_length=255, blank=True)
 
