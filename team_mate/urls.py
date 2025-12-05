@@ -29,4 +29,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('projects.urls'), name='projects'),
     path('', include('users.urls'), name='users'),
-] + debug_toolbar_urls() if DEBUG else []
+]
+
+if DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+    urlpatterns += debug_toolbar_urls()
