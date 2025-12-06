@@ -8,10 +8,10 @@ from projects.views import ProjectListView
 PROJECT_URL = reverse('projects:project_list')
 user_model = get_user_model()
 
-class AuthenticatedAccessTests(TestCase):
+class PublicAccessTests(TestCase):
 
     def setUp(self):
-        self.user = user_model.objects.create(
+        self.user = user_model.objects.create_user(
             username='testuser',
             email='test@mail.com',
             password='pass'
@@ -65,112 +65,120 @@ class AuthenticatedAccessTests(TestCase):
         'task_list': 200,
     }
 
-    ARGS = {
-        'project_detail': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'project_list': [],
-        'project_create': [],
-        'project_edit': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'task_create': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'task_edit': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-                'task_pk': Task.objects.all().first().pk,
-            }
-        ],
-        'project_rate': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'project_edit_roles': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'project_edit_stage': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'project_open_roles_list': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'project_open_roles_create': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'project_open_roles_delete': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-                'role_pk': ProjectOpenRole.objects.all().first().pk,
-            }
-        ],
-        'apply': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-                'role_pk': ProjectOpenRole.objects.all().first().pk,
-            }
-        ],
-        'applications_list': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'application_archive': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ],
-        'application_approve': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-                'application_pk': ProjectApplication.objects.all().first().pk,
-            }
-        ],
-        'application_reject': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-                'application_pk': ProjectApplication.objects.all().first().pk,
-            }
-        ],
-        'task_list': [
-            {
-                'project_pk': Project.objects.all().first().pk,
-            }
-        ]
-    }
-
 
     def test_retrieve_projects_crud_public(self):
+        project = Project.objects.first()
+        project_pk = project.pk
+        task_pk = Task.objects.first().pk
+        role_pk = ProjectOpenRole.objects.first().pk
+        application_pk = ProjectApplication.objects.first().pk
+
+        ARGS = {
+            'project_list': [],
+            'project_detail': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'project_create': [],
+            'project_edit': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'task_create': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'task_edit': [
+                {
+                    'project_pk': project_pk,
+                    'task_pk': Task.objects.all().first().pk,
+                }
+            ],
+            'project_rate': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'project_edit_roles': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'project_edit_stage': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'project_open_roles_list': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'project_open_roles_create': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'project_open_roles_delete': [
+                {
+                    'project_pk': project_pk,
+                    'role_pk': ProjectOpenRole.objects.all().first().pk,
+                }
+            ],
+            'apply': [
+                {
+                    'project_pk': project_pk,
+                    'role_pk': ProjectOpenRole.objects.all().first().pk,
+                }
+            ],
+            'applications_list': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'application_archive': [
+                {
+                    'project_pk': project_pk,
+                }
+            ],
+            'application_approve': [
+                {
+                    'project_pk': project_pk,
+                    'application_pk': ProjectApplication.objects.all().first().pk,
+                }
+            ],
+            'application_reject': [
+                {
+                    'project_pk': project_pk,
+                    'application_pk': ProjectApplication.objects.all().first().pk,
+                }
+            ],
+            'task_list': [
+                {
+                    'project_pk': project_pk,
+                }
+            ]
+        }
+
         for link, status_code in self.LINKS.items():
-            args_list = self.ARGS.get(link, [{}])
+            args_list = ARGS.get(link, [{}])
             for args in args_list:
                 url = reverse(f"projects:{link}", kwargs=args)
                 response = self.client.get(url)
-                print(url)
-                self.assertEqual(response.status_code, status_code, f"Failed at {url} with args {args}, "
-                                                                    f"expected {status_code} but got {response.status_code}")
+                self.assertEqual(
+                    response.status_code,
+                    status_code,
+                    f"Failed at {url} ({link}) with args {args}, expected {status_code} but got {response.status_code}"
+                )
 
 
 class ProjectTests(TestCase):
     def setUp(self):
         self.client = Client()
-        self.user = user_model.objects.create(
+        self.user = user_model.objects.create_user(
             username='testuser',
             email='test@mail.com',
             password='pass'

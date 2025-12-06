@@ -75,7 +75,7 @@ class ModelsTestCase(TestCase):
             role='PM'
         )
 
-        members = project.get_members()
+        members = project.members.all()
         expected_members = user_model.objects.filter(
             pk__in=[
                 user_1.pk, user_2.pk, user_3.pk, user_4.pk
