@@ -67,4 +67,3 @@ docker-compose exec team-mate-web-1 sh
 python manage.py loaddata initial_data.json
 ```
 
-

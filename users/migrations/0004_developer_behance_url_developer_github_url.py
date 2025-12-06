@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0003_alter_developer_linkedin_url_and_more'),
+        ("users", "0003_alter_developer_linkedin_url_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='developer',
-            name='behance_url',
+            model_name="developer",
+            name="behance_url",
             field=models.URLField(blank=True, max_length=255),
         ),
         migrations.AddField(
-            model_name='developer',
-            name='github_url',
+            model_name="developer",
+            name="github_url",
             field=models.URLField(blank=True, max_length=255),
         ),
     ]

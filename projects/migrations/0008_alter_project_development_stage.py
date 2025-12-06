@@ -6,13 +6,24 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0007_alter_projectapplication_project'),
+        ("projects", "0007_alter_projectapplication_project"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='development_stage',
-            field=models.CharField(choices=[('initiation', 'Project Initiation'), ('planning', 'Planning'), ('design', 'Design & Architecture'), ('implementation', 'Implementation / Development'), ('testing', 'Testing & QA'), ('deployed', 'Deployed')], default='initiation', max_length=50),
+            model_name="project",
+            name="development_stage",
+            field=models.CharField(
+                choices=[
+                    ("initiation", "Project Initiation"),
+                    ("planning", "Planning"),
+                    ("design", "Design & Architecture"),
+                    ("implementation", "Implementation / Development"),
+                    ("testing", "Testing & QA"),
+                    ("deployed", "Deployed"),
+                ],
+                default="initiation",
+                max_length=50,
+            ),
         ),
     ]

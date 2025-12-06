@@ -6,13 +6,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('users', '0004_developer_behance_url_developer_github_url'),
+        ("users", "0004_developer_behance_url_developer_github_url"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='developer',
-            name='avg_projects_score',
-            field=models.DecimalField(decimal_places=2, default=0, max_digits=3),
+            model_name="developer",
+            name="avg_projects_score",
+            field=models.DecimalField(
+                decimal_places=2, default=0, max_digits=3
+            ),
         ),
     ]

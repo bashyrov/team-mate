@@ -6,13 +6,30 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0009_alter_projectapplication_role'),
+        ("projects", "0009_alter_projectapplication_role"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='domain',
-            field=models.CharField(choices=[('marketing', 'Marketing'), ('blockchain', 'Blockchain'), ('food_tech', 'Food Tech'), ('technology', 'Technology'), ('e_commerce', 'E-Commerce'), ('ed_tech', 'EdTech'), ('utilities', 'Utilities'), ('design', 'Design'), ('saas', 'SaaS'), ('fintech', 'FinTech'), ('ml', 'Machine Learning'), ('big_data', 'Big Data')], default='technology', max_length=50),
+            model_name="project",
+            name="domain",
+            field=models.CharField(
+                choices=[
+                    ("marketing", "Marketing"),
+                    ("blockchain", "Blockchain"),
+                    ("food_tech", "Food Tech"),
+                    ("technology", "Technology"),
+                    ("e_commerce", "E-Commerce"),
+                    ("ed_tech", "EdTech"),
+                    ("utilities", "Utilities"),
+                    ("design", "Design"),
+                    ("saas", "SaaS"),
+                    ("fintech", "FinTech"),
+                    ("ml", "Machine Learning"),
+                    ("big_data", "Big Data"),
+                ],
+                default="technology",
+                max_length=50,
+            ),
         ),
     ]

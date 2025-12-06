@@ -5,8 +5,11 @@ from django.db import models
 class ProjectManager(models.Manager):
 
     def validate_stage(self, project):
-        if project.development_stage == 'deployed' and not project.deploy_url:
-            raise ValidationError({
-                'stage': 'Cannot set stage to "Deployed" without a deploy URL.'
-            })
+        if project.development_stage == "deployed" and not project.deploy_url:
+            raise ValidationError(
+                {
+                    "stage": "Cannot set stage to "
+                    '"Deployed" without a deploy URL.'
+                }
+            )
         return True
