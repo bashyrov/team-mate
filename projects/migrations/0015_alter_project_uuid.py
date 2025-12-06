@@ -7,13 +7,15 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0014_rename_field_project_uuid'),
+        ("projects", "0014_rename_field_project_uuid"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='uuid',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, null=True),
+            model_name="project",
+            name="uuid",
+            field=models.UUIDField(
+                default=uuid.uuid4, editable=False, null=True
+            ),
         ),
     ]

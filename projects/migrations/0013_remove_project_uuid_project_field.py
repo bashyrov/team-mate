@@ -7,17 +7,19 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0012_remove_project_unical_id_project_uuid'),
+        ("projects", "0012_remove_project_unical_id_project_uuid"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='project',
-            name='uuid',
+            model_name="project",
+            name="uuid",
         ),
         migrations.AddField(
-            model_name='project',
-            name='field',
-            field=models.UUIDField(default=uuid.uuid4, editable=False, unique=False, null=True),
+            model_name="project",
+            name="field",
+            field=models.UUIDField(
+                default=uuid.uuid4, editable=False, unique=False, null=True
+            ),
         ),
     ]

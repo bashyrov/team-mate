@@ -7,13 +7,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0016_remove_project_uuid_project_uid'),
+        ("projects", "0016_remove_project_uuid_project_uid"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='project',
-            name='uid',
-            field=models.CharField(default=projects.models.generate_shortuuid, editable=False, max_length=22, unique=False),
+            model_name="project",
+            name="uid",
+            field=models.CharField(
+                default=projects.models.generate_shortuuid,
+                editable=False,
+                max_length=22,
+                unique=False,
+            ),
         ),
     ]

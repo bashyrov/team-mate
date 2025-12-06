@@ -6,33 +6,33 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0002_delete_developerratings'),
+        ("projects", "0002_delete_developerratings"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='projectmembership',
-            name='add_task_perm',
+            model_name="projectmembership",
+            name="add_task_perm",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='projectmembership',
-            name='edit_project_perm',
+            model_name="projectmembership",
+            name="edit_project_perm",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='projectmembership',
-            name='manage_open_roles_perm',
+            model_name="projectmembership",
+            name="manage_open_roles_perm",
             field=models.BooleanField(default=False),
         ),
         migrations.AddField(
-            model_name='projectmembership',
-            name='update_project_stage_perm',
+            model_name="projectmembership",
+            name="update_project_stage_perm",
             field=models.BooleanField(default=False),
         ),
         migrations.AlterField(
-            model_name='project',
-            name='open_to_candidates',
+            model_name="project",
+            name="open_to_candidates",
             field=models.BooleanField(default=False),
         ),
     ]

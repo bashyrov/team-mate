@@ -6,13 +6,13 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0003_projectmembership_add_task_perm_and_more'),
+        ("projects", "0003_projectmembership_add_task_perm_and_more"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='projectmembership',
-            old_name='edit_project_perm',
-            new_name='edit_project_info_perm',
+            model_name="projectmembership",
+            old_name="edit_project_perm",
+            new_name="edit_project_info_perm",
         ),
     ]

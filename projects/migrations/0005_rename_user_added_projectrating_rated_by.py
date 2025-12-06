@@ -6,13 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('projects', '0004_rename_edit_project_perm_projectmembership_edit_project_info_perm'),
+        (
+            "projects",
+            "0004_rename_edit_project_perm_projectmembership_edit_project_info_perm",
+        ),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='projectrating',
-            old_name='user_added',
-            new_name='rated_by',
+            model_name="projectrating",
+            old_name="user_added",
+            new_name="rated_by",
         ),
     ]
