@@ -1,63 +1,70 @@
-# 👥 Team Mate
+# Team Mate
+Team Mate is a web platform designed for developers and project teams.
+It facilitates finding teammates, managing projects, tracking tasks, and monitoring participant ratings.
+Built on Django, the project combines simplicity, flexibility, and team spirit 💡.
 
-**Team Mate** is a web platform designed for developers and project teams.  
-It facilitates finding teammates, managing projects, tracking tasks, and monitoring participant ratings.  
-Built on **Django**, the project combines simplicity, flexibility, and team spirit 💡.
+The project is available at: 🔗 https://team-mate.onrender.com/
 
-The project is available at:
-🔗 https://team-mate.onrender.com/
----
+[![Django](https://img.shields.io/badge/Django-5.2%2B-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+
 
 ## 🚀 Key Features
 
 ### 🔹 For Developers
-- Create and edit profiles: specify position, tech stack, portfolio, and social media links  
-- View personal ratings and leaderboards  
-- Receive feedback and ratings from colleagues and managers  
+
+- Create and edit profiles: specify position, tech stack, portfolio, and social media links
+- View personal ratings and leaderboards
+- Receive feedback and ratings from colleagues and managers
 - Leaderboard showcasing top developers based on project ratings
 
 ### 🔹 For Projects
-- Create and manage projects  
-- Add participants and assign roles  
-- Open roles for recruiting new team members  
-- Project evaluation by participants  
-- Automatic recalculation of average project and participant ratings  
-- Custom permissions for each project member  
+
+- Create and manage projects
+- Add participants and assign roles
+- Open roles for recruiting new team members
+- Project evaluation by participants
+- Automatic recalculation of average project and participant ratings
+- Custom permissions for each project member
 - Built-in task tracker
 
 ### 🔹 For Tasks
-- Create and assign tasks  
-- Track task statuses (`To Do`, `In Progress`, `Done`)  
-- Support for tags and deadlines  
-- Personalized task lists for each user  
 
----
+- Create and assign tasks
+- Track task statuses (To Do, In Progress, Done)
+- Support for tags and deadlines
+- Personalized task lists for each user
 
-## 🛠️ Technologies
+### 🔹 User Registration
 
-| Component | Technology |
-|-----------|------------|
-| Backend | Django 5+ |
-| Frontend | Bootstrap 5 + Flowbite |
-| ORM | Django ORM |
-| Database | SQLite |
-| Authentication | Django Auth (custom user model `Developer`) |
-| Templates | Django Templates + Bootstrap |
-| Project Logic | Custom managers and M2M relationships |
+- Secure user registration system to create new accounts and start participating in projects immediately.
 
----
+## Quick Start (Local Development)
 
-## 🗄️ Initial Data Setup
+### 1. Clone the repository
+```bash
+git clone https://github.com/bashyrov/team-mate.git
+cd rick-and-morty-api
+```
 
-To explore the platform with pre-populated data, load the `initial_data.json` fixture. This includes sample users, projects, tasks, ratings, and more to help you get started.
+### 2. Copy example env file
+```bash
+cp .env.sample .env
+```
 
+
+### 3. Start docker-compose
+```bash
+docker-compose up --build
+```
+
+API will be available at: http://127.0.0.1:8000
+
+### 🗄️ Initial Data Setup
+```bash
+docker-compose exec team-mate-web-1 sh
 python manage.py loaddata initial_data.json
+```
 
 
-## 🔑 Superuser Access
-To experience the platform as an admin (who participates in projects and owns some), use the following credentials to log in to the Django admin panel (e.g., http://localhost:8000/admin/):
-
-Username: admin
-Password: admin
-
-The admin user is fully integrated into the platform, participating in projects (e.g., as a Team Lead in "SaaS Analytics" and "Admin Project 2") and owning projects ("Admin Project 1" and "Admin Project 2"). This allows you to explore the platform from an admin's perspective.
