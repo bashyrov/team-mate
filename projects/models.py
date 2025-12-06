@@ -27,11 +27,7 @@ class ProjectRating(models.Model):
         if self.rated_by.get_member_of(self.project):
             return
 
-        is_new = self.pk is None
         super().save(*args, **kwargs)
-
-        if is_new:
-            self.project.update_avg_score()
 
 
 def generate_shortuuid():
@@ -80,6 +76,7 @@ class Project(models.Model):
         through="ProjectMembership",
         related_name="projects"
     )
+
     objects = ProjectManager()
 
     def update_open_to_candidates(self):
@@ -91,10 +88,6 @@ class Project(models.Model):
             self.save(update_fields=['open_to_candidates'])
 
         return self.open_to_candidates
-
-
-    def get_members(self):
-        return self.members.all()
 
     def update_avg_score(self):
         avg = self.ratings.aggregate(avg=Avg("score"))["avg"] or 0
