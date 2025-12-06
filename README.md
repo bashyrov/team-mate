@@ -2,6 +2,7 @@
 Team Mate is a web platform designed for developers and project teams.
 It facilitates finding teammates, managing projects, tracking tasks, and monitoring participant ratings.
 Built on Django, the project combines simplicity, flexibility, and team spirit 💡.
+
 The project is available at: 🔗 https://team-mate.onrender.com/
 
 [![Django](https://img.shields.io/badge/Django-5.2%2B-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
